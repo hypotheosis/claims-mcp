@@ -747,7 +747,9 @@
       + (if "integrity" in inputs {
         "claims-mcp --catalog " + catalog-path + " verify --json > " + inputs.integrity + "\n"
       } else { "" })
-      + "typst compile --root . report/claims-report.typ audit.pdf \\\n  --input catalog="
+      + "typst compile --root . report/claims-report.typ "
+      + (if full { "audit-full.pdf" } else { "audit.pdf" })
+      + " \\\n  --input catalog="
       + catalog-path
       + " \\\n  --input detail="
       + detail
@@ -756,7 +758,7 @@
       + integrity-flag,
   )
   if not full {
-    [This is the summary. Pass `--input detail=full` (or `just report detail=full`) for every
+    [This is the summary. Pass `--input detail=full` (or `just report full`) for every
       finding in full, every claim per gap, the claim hierarchy, the traceability matrix, and the
       evidence appendix with each claim's verdict history.]
   }
