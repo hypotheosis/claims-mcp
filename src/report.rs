@@ -339,14 +339,15 @@ fn breadth_first<'c, I: IntoIterator<Item = ClaimId>>(
 mod tests {
     use std::ffi::{OsStr, OsString};
     use std::path::{Path, PathBuf};
-    use std::process::Command;
+    use std::process::{Command, Output};
 
     use chrono::DateTime;
+    use serde_json::{json, Value};
 
     use super::*;
     use crate::catalog::tests::{at, evidence, new_claim, verdict};
-    use crate::catalog::NewClaim;
-    use crate::model::{ClaimRef, Stance, Verdict};
+    use crate::catalog::{NewClaim, NewEvidence, NewVerdict};
+    use crate::model::{ClaimRef, EvidenceId, EvidenceKind, Stance, Verdict};
 
     fn child_of(statement: &str, parent: ClaimId) -> NewClaim {
         NewClaim {
@@ -521,82 +522,208 @@ mod tests {
             .join(name)
     }
 
-    /// Compiles `report/claims-report.typ` over `catalog` and checks that it produces a PDF
-    /// with no warnings and that its `<audit-report>` metadata equals `audit_report`.
-    ///
-    /// The Typst CLI is an external tool, so the check is skipped (with a note on stderr) when
-    /// `typst` is not on `PATH`, unless `REQUIRE_TYPST=1` is set (as CI should), which turns
-    /// the skip into a failure.
-    fn assert_template_matches(catalog: &Catalog) {
-        let typst_installed = Command::new("typst")
-            .arg("--version")
-            .output()
-            .is_ok_and(|output| output.status.success());
-        if !typst_installed {
-            // Rust note: `env::var` returns `Result`; `is_ok_and` is false for unset variables.
-            let required = std::env::var("REQUIRE_TYPST").is_ok_and(|value| value == "1");
-            assert!(!required, "REQUIRE_TYPST=1 but `typst` is not on PATH");
-            eprintln!("skipping Typst template check: `typst` is not on PATH");
-            return;
+    /// Detail modes of `report/claims-report.typ`; every template check renders both.
+    const DETAILS: [&str; 2] = ["summary", "full"];
+
+    /// The template's two metadata labels for one detail mode, as `typst query` emits them.
+    struct Rendered {
+        /// `<audit-report>`, which must equal `audit_report`.
+        report: Value,
+        /// `<report-layout>`: the findings grouping and the collapsed roll-up locators.
+        layout: Value,
+    }
+
+    /// A catalog and its integrity result written to a temp dir, ready to render.
+    struct TemplateRun {
+        // Rust note: dropping a `TempDir` deletes the directory, so it is kept for as long as
+        // the run, even though only the paths below are read.
+        dir: tempfile::TempDir,
+        catalog_input: OsString,
+        integrity_input: OsString,
+    }
+
+    impl TemplateRun {
+        fn new(catalog: &Catalog) -> Self {
+            let dir = tempfile::tempdir().expect("temp dir");
+            let catalog_path = dir.path().join("claims.json");
+            std::fs::write(
+                &catalog_path,
+                serde_json::to_vec(catalog).expect("serialize catalog"),
+            )
+            .expect("write catalog");
+            // The template cannot compute HMACs, so it takes the integrity result as an input,
+            // as `just report` passes it from `claims-mcp verify --json`.
+            let integrity_path = dir.path().join("integrity.json");
+            std::fs::write(
+                &integrity_path,
+                serde_json::to_vec(&seal::verify(catalog)).expect("serialize integrity"),
+            )
+            .expect("write integrity");
+            // Rust note: `OsString` is the platform's native string type; `Command` args take
+            // it directly, so paths need no lossy conversion to `String`.
+            let mut catalog_input = OsString::from("catalog=");
+            catalog_input.push(&catalog_path);
+            let mut integrity_input = OsString::from("integrity=");
+            integrity_input.push(&integrity_path);
+            Self {
+                dir,
+                catalog_input,
+                integrity_input,
+            }
         }
-        let dir = tempfile::tempdir().expect("temp dir");
-        let catalog_path = dir.path().join("claims.json");
-        std::fs::write(
-            &catalog_path,
-            serde_json::to_vec(catalog).expect("serialize catalog"),
-        )
-        .expect("write catalog");
-        let template = Path::new(env!("CARGO_MANIFEST_DIR")).join("report/claims-report.typ");
-        // Rust note: `OsString` is the platform's native string type; `Command` args take it
-        // directly, so paths need no lossy conversion to `String`.
-        let mut catalog_input = OsString::from("catalog=");
-        catalog_input.push(&catalog_path);
-        // The template cannot compute HMACs, so it takes the integrity result as an input, as
-        // `just report` passes it from `claims-mcp verify --json`.
-        let integrity_path = dir.path().join("integrity.json");
-        std::fs::write(
-            &integrity_path,
-            serde_json::to_vec(&seal::verify(catalog)).expect("serialize integrity"),
-        )
-        .expect("write integrity");
-        let mut integrity_input = OsString::from("integrity=");
-        integrity_input.push(&integrity_path);
-        // `--root /` lets the template read both the repo template and the temp catalog.
-        let typst = |subcommand: &str, extra: &[&OsStr]| {
-            let output = Command::new("typst")
-                .args([
-                    OsStr::new(subcommand),
-                    OsStr::new("--root"),
-                    OsStr::new("/"),
-                ])
-                .arg(&template)
+
+        fn pdf(&self) -> PathBuf {
+            self.dir.path().join("audit.pdf")
+        }
+
+        /// Runs `typst <subcommand>` on the template at `detail` and returns its raw output.
+        fn typst(&self, subcommand: &str, detail: &str, extra: &[&OsStr]) -> Output {
+            // `--root /` lets the template read both the repo template and the temp catalog.
+            Command::new("typst")
+                .args([subcommand, "--root", "/"])
+                .arg(report_file("claims-report.typ"))
                 .args(extra)
-                .args([OsStr::new("--input"), &catalog_input])
-                .args([OsStr::new("--input"), &integrity_input])
+                .arg("--input")
+                .arg(&self.catalog_input)
+                .arg("--input")
+                .arg(&self.integrity_input)
+                .arg("--input")
+                .arg(format!("detail={detail}"))
                 .output()
-                .expect("run typst");
+                .expect("run typst")
+        }
+
+        /// Like `typst`, but asserts success with no warnings and returns stdout.
+        fn typst_ok(&self, subcommand: &str, detail: &str, extra: &[&OsStr]) -> Vec<u8> {
+            let output = self.typst(subcommand, detail, extra);
             let stderr = String::from_utf8_lossy(&output.stderr);
             assert!(
                 output.status.success(),
-                "typst {subcommand} failed: {stderr}"
+                "typst {subcommand} ({detail}) failed: {stderr}"
             );
             assert!(
                 stderr.trim().is_empty(),
-                "typst {subcommand} warned: {stderr}"
+                "typst {subcommand} ({detail}) warned: {stderr}"
             );
             output.stdout
-        };
+        }
 
-        typst("compile", &[dir.path().join("audit.pdf").as_os_str()]);
-        let queried = typst(
-            "query",
-            &["<audit-report>", "--field", "value", "--one"].map(OsStr::new),
-        );
+        /// Compiles the PDF at `detail`, then queries both metadata labels.
+        fn render(&self, detail: &str) -> Rendered {
+            self.typst_ok("compile", detail, &[self.pdf().as_os_str()]);
+            let query = |label: &str| -> Value {
+                let stdout = self.typst_ok(
+                    "query",
+                    detail,
+                    &[label, "--field", "value", "--one"].map(OsStr::new),
+                );
+                serde_json::from_slice(&stdout).expect("typst query emits JSON")
+            };
+            Rendered {
+                report: query("<audit-report>"),
+                layout: query("<report-layout>"),
+            }
+        }
+    }
 
-        let from_template: serde_json::Value =
-            serde_json::from_slice(&queried).expect("typst query emits JSON");
-        let from_rust = serde_json::to_value(audit_report(catalog, true)).expect("serialize");
-        assert_eq!(from_template, from_rust);
+    /// Renders the template over `catalog` in every detail mode and checks that each compile is
+    /// warning-free and that its `<audit-report>` metadata equals `audit_report`. Returns the
+    /// summary and full renders, or `None` when `typst` is missing and the check was skipped.
+    fn assert_template_matches(catalog: &Catalog) -> Option<[Rendered; 2]> {
+        if !typst_available() {
+            return None;
+        }
+        let run = TemplateRun::new(catalog);
+        let expected = serde_json::to_value(audit_report(catalog, true)).expect("serialize");
+        // Rust note: `array::map` builds a new fixed-size array: one render per mode.
+        Some(DETAILS.map(|detail| {
+            let rendered = run.render(detail);
+            assert_eq!(rendered.report, expected, "detail={detail}");
+            assert_eq!(rendered.layout["detail"], detail);
+            rendered
+        }))
+    }
+
+    /// root <- areas A and B. A <- parent <- ten leaves: the first refuted, the second not
+    /// enough info, the rest supported. The parent is not enough info, citing roll-up evidence
+    /// in the old `children: CLM-..., ...` locator format. B <- one not-enough-info leaf whose
+    /// rationale names a `Fix:` step. Ids: root CLM-0001, areas CLM-0002 and CLM-0003, parent
+    /// CLM-0004, leaves CLM-0005 to CLM-0014, B's leaf CLM-0015. Returns the catalog and the
+    /// roll-up evidence id.
+    fn areas_fixture() -> (Catalog, EvidenceId) {
+        let mut catalog = Catalog::default();
+        let root = catalog
+            .add_claim(new_claim("root"), at(0))
+            .expect("root")
+            .id;
+        let area_a = catalog
+            .add_claim(child_of("area a", root), at(0))
+            .expect("area a")
+            .id;
+        let area_b = catalog
+            .add_claim(child_of("area b", root), at(0))
+            .expect("area b")
+            .id;
+        let parent = catalog
+            .add_claim(child_of("parent", area_a), at(0))
+            .expect("parent")
+            .id;
+        let leaves: Vec<ClaimId> = (0..10)
+            .map(|index| {
+                catalog
+                    .add_claim(child_of(&format!("leaf {index}"), parent), at(0))
+                    .expect("leaf")
+                    .id
+            })
+            .collect();
+        let undecided = catalog
+            .add_claim(child_of("undecided", area_b), at(0))
+            .expect("undecided")
+            .id;
+        for (index, &leaf) in leaves.iter().enumerate() {
+            let (stance, outcome) = match index {
+                0 => (Stance::Refutes, Verdict::Refuted),
+                1 => (Stance::Neutral, Verdict::NotEnoughInfo),
+                _ => (Stance::Supports, Verdict::Supported),
+            };
+            let item = catalog
+                .add_evidence(leaf, evidence(stance), at(1))
+                .expect("leaf evidence");
+            catalog
+                .record_verdict(leaf, verdict(outcome, vec![item.id]), at(2))
+                .expect("leaf verdict");
+        }
+        let listed: Vec<String> = leaves.iter().map(ToString::to_string).collect();
+        let rollup = catalog
+            .add_evidence(
+                parent,
+                NewEvidence {
+                    kind: EvidenceKind::Analysis,
+                    locator: format!("children: {}", listed.join(", ")),
+                    summary: "Two leaves are open.".to_owned(),
+                    stance: Stance::Neutral,
+                },
+                at(3),
+            )
+            .expect("roll-up evidence");
+        catalog
+            .record_verdict(
+                parent,
+                verdict(Verdict::NotEnoughInfo, vec![rollup.id]),
+                at(4),
+            )
+            .expect("parent verdict");
+        catalog
+            .record_verdict(
+                undecided,
+                NewVerdict {
+                    rationale: "No test covers it. Fix: add one.".to_owned(),
+                    ..verdict(Verdict::NotEnoughInfo, Vec::new())
+                },
+                at(2),
+            )
+            .expect("undecided verdict");
+        (catalog, rollup.id)
     }
 
     #[test]
@@ -679,6 +806,54 @@ mod tests {
             "text helper assertions failed: {stderr}"
         );
         assert!(stderr.trim().is_empty(), "typst warned: {stderr}");
+    }
+
+    #[test]
+    fn typst_template_groups_findings_by_area() {
+        let (catalog, _) = areas_fixture();
+        let Some(renders) = assert_template_matches(&catalog) else {
+            return;
+        };
+        // The root and the areas head the groups; the roll-up parent is an ordinary finding.
+        let expected = json!([
+            {"area": "CLM-0002", "findings": ["CLM-0004", "CLM-0005", "CLM-0006"]},
+            {"area": "CLM-0003", "findings": ["CLM-0015"]},
+        ]);
+        for rendered in &renders {
+            assert_eq!(rendered.layout["areas"], expected);
+        }
+    }
+
+    #[test]
+    fn typst_template_collapses_rollup_locators() {
+        let (catalog, rollup) = areas_fixture();
+        let Some(renders) = assert_template_matches(&catalog) else {
+            return;
+        };
+        // Counts come from the catalog; only the children that are not supported are named.
+        let expected = "children of CLM-0004: 10 active (8 supported, 1 refuted, 1 not enough \
+                        info). Not supported: CLM-0005–0006";
+        for rendered in &renders {
+            assert_eq!(
+                rendered.layout["rollup_locators"][rollup.to_string().as_str()],
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn typst_template_rejects_unknown_detail() {
+        if !typst_available() {
+            return;
+        }
+        let run = TemplateRun::new(&Catalog::default());
+        let output = run.typst("compile", "bogus", &[run.pdf().as_os_str()]);
+        assert!(!output.status.success(), "detail=bogus must not compile");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains("detail must be"),
+            "unexpected error: {stderr}"
+        );
     }
 
     #[test]
