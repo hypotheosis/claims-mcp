@@ -8,6 +8,7 @@ mod seal;
 mod server;
 mod store;
 
+use std::borrow::Cow;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -17,9 +18,13 @@ use clap::{Parser, Subcommand};
 use rmcp::ServiceExt;
 use tracing_subscriber::EnvFilter;
 
+use crate::report::next_steps::{self, AreaCount, NextSteps, Tier};
 use crate::seal::IntegrityReport;
 use crate::server::ClaimsServer;
 use crate::store::CatalogStore;
+
+/// Statements longer than this many `char`s are cut in the TL;DR.
+const STATEMENT_CHARS: usize = 100;
 
 /// Command-line options.
 #[derive(Debug, Parser)]
@@ -50,6 +55,16 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+    /// Print a TL;DR: open leaf claims ranked into priority tiers, each with its next step.
+    Tldr {
+        /// Items listed in each of tiers 1 and 2; the rest are counted per area. 0 lists
+        /// everything.
+        #[arg(long, default_value_t = next_steps::DEFAULT_LIMIT)]
+        limit: usize,
+        /// Print JSON (the `next_steps` tool's output) instead of Markdown.
+        #[arg(long)]
+        json: bool,
+    },
     /// Seal records that have no seal, for maintainers migrating a catalog.
     Seal {
         /// Seal every unsealed record as adopted. Required: adoption is the only sealing
@@ -71,6 +86,9 @@ async fn main() -> ExitCode {
     let outcome = match cli.command {
         None => serve(store).await.map(|()| ExitCode::SUCCESS),
         Some(Command::Verify { json }) => verify(&store, json).await,
+        Some(Command::Tldr { limit, json }) => {
+            tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
+        }
         Some(Command::Seal { adopt: _ }) => adopt(&store).await.map(|()| ExitCode::SUCCESS),
     };
     outcome.unwrap_or_else(|error| {
@@ -152,6 +170,106 @@ fn write_report(out: &mut impl Write, path: &str, report: &IntegrityReport) -> s
     Ok(())
 }
 
+/// Prints the next-steps TL;DR as Markdown, or as JSON with `json`. Gaps are the expected
+/// content, so the exit code is 0 whenever the catalog could be read.
+async fn tldr(store: &CatalogStore, limit: usize, json: bool) -> anyhow::Result<()> {
+    let steps = store
+        .read(move |catalog| Ok(next_steps::next_steps(catalog, limit)))
+        .await
+        .context("failed to read the catalog")?;
+    let mut out = std::io::stdout().lock();
+    if json {
+        serde_json::to_writer(&mut out, &steps)?;
+        writeln!(out)?;
+    } else {
+        write_tldr(&mut out, &store.path().display().to_string(), &steps)?;
+    }
+    Ok(())
+}
+
+/// Markdown form of the TL;DR (spec section 6).
+fn write_tldr(out: &mut impl Write, path: &str, steps: &NextSteps) -> std::io::Result<()> {
+    let summary = &steps.summary;
+    writeln!(out, "# TL;DR: {path}\n")?;
+    writeln!(
+        out,
+        "{} active claims: {} leaves ({} done, {} open), {} roll-ups.\n",
+        summary.active_claims,
+        summary.done_leaves + summary.open_leaves,
+        summary.done_leaves,
+        summary.open_leaves,
+        summary.rollup_claims
+    )?;
+    if !steps.integrity.verified {
+        writeln!(out, "## 0. STOP: integrity check failed\n")?;
+        writeln!(
+            out,
+            "{} records failed their seal check (`claims-mcp verify` lists them). The catalog \
+             was changed outside the server, so nothing below can be trusted. Restore it from \
+             git before acting on this list.\n",
+            steps.integrity.problems.len()
+        )?;
+    }
+    write_tier(out, "1. Wrong", &steps.wrong)?;
+    write_tier(out, "2. Unproven, integrity 3-4", &steps.unproven)?;
+    let other_total: usize = steps.other.iter().map(|entry| entry.count).sum();
+    writeln!(out, "## 3. Everything else ({other_total})\n")?;
+    if steps.other.is_empty() {
+        writeln!(out, "None.")
+    } else {
+        writeln!(out, "{}", area_list(&steps.other))
+    }
+}
+
+/// One tier: a bullet per listed item, then the per-area count of the rest.
+fn write_tier(out: &mut impl Write, heading: &str, tier: &Tier) -> std::io::Result<()> {
+    writeln!(out, "## {heading} ({})\n", tier.total)?;
+    if tier.items.is_empty() {
+        return writeln!(out, "None.\n");
+    }
+    for item in &tier.items {
+        write!(out, "- **{}**", item.id)?;
+        if let Some(level) = item.integrity_level {
+            write!(out, " IL{}", level.get())?;
+        }
+        if !item.issues.is_empty() {
+            write!(out, " [#{}]", item.issues.join(", #"))?;
+        }
+        writeln!(
+            out,
+            " {}\n  - Next: {}",
+            truncated(&item.statement, STATEMENT_CHARS),
+            item.next_step
+        )?;
+    }
+    if !tier.omitted.is_empty() {
+        let hidden = tier.total - tier.items.len();
+        writeln!(out, "\n...and {hidden} more: {}", area_list(&tier.omitted))?;
+    }
+    writeln!(out)
+}
+
+/// `OPS 30, POL 21, ...`
+fn area_list(counts: &[AreaCount]) -> String {
+    counts
+        .iter()
+        .map(|entry| format!("{} {}", entry.area, entry.count))
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// `text` cut to `max_chars` `char`s with `...` appended, or unchanged when it fits.
+///
+/// Rust note: `Cow` (clone-on-write) borrows the input when it fits and only allocates a new
+/// `String` when it has to cut. `char_indices` walks whole Unicode scalar values, so the cut
+/// never splits a multibyte character.
+fn truncated(text: &str, max_chars: usize) -> Cow<'_, str> {
+    match text.char_indices().nth(max_chars) {
+        Some((cut, _)) => Cow::Owned(format!("{}...", &text[..cut])),
+        None => Cow::Borrowed(text),
+    }
+}
+
 /// Seals unsealed records as adopted and lists them.
 async fn adopt(store: &CatalogStore) -> anyhow::Result<()> {
     let adopted = store.adopt().await.context("seal --adopt failed")?;
@@ -173,6 +291,8 @@ async fn adopt(store: &CatalogStore) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::model::{ClaimId, CurrentVerdict, IntegrityLevel};
+    use crate::report::next_steps::{NextStep, NextStepsSummary};
     use crate::seal::IntegrityProblem;
 
     fn rendered(report: &IntegrityReport) -> String {
@@ -212,5 +332,108 @@ mod tests {
             rendered(&report),
             "claims.json: integrity verified (3 records checked)\n"
         );
+    }
+
+    fn integrity(problems: usize) -> IntegrityReport {
+        IntegrityReport {
+            verified: problems == 0,
+            records: 9,
+            problems: (0..problems)
+                .map(|index| IntegrityProblem {
+                    record: format!("CLM-000{index}"),
+                    problem: "seal does not match its content".to_owned(),
+                })
+                .collect(),
+            adopted: Vec::new(),
+        }
+    }
+
+    /// One refuted item listed with one more omitted, an empty tier 2, and two tier 3 claims.
+    fn sample_steps(problems: usize) -> NextSteps {
+        NextSteps {
+            integrity: integrity(problems),
+            summary: NextStepsSummary {
+                active_claims: 6,
+                rollup_claims: 1,
+                open_leaves: 4,
+                done_leaves: 1,
+            },
+            wrong: Tier {
+                total: 2,
+                items: vec![NextStep {
+                    id: ClaimId::new(12),
+                    integrity_level: Some(IntegrityLevel::try_from(4).expect("level")),
+                    verdict: CurrentVerdict::Refuted,
+                    stale: false,
+                    area: "AUTH".to_owned(),
+                    statement: "Tokens expire.".to_owned(),
+                    next_step: "Add an expiry test.".to_owned(),
+                    issues: vec!["360".to_owned(), "361".to_owned()],
+                }],
+                omitted: vec![AreaCount {
+                    area: "OPS".to_owned(),
+                    count: 1,
+                }],
+            },
+            unproven: Tier::default(),
+            other: vec![AreaCount {
+                area: "(none)".to_owned(),
+                count: 2,
+            }],
+        }
+    }
+
+    fn rendered_tldr(steps: &NextSteps) -> String {
+        let mut out = Vec::new();
+        write_tldr(&mut out, "claims.json", steps).expect("write to memory");
+        String::from_utf8(out).expect("UTF-8")
+    }
+
+    #[test]
+    fn tldr_renders_every_tier() {
+        assert_eq!(
+            rendered_tldr(&sample_steps(0)),
+            "# TL;DR: claims.json\n\n\
+             6 active claims: 5 leaves (1 done, 4 open), 1 roll-ups.\n\n\
+             ## 1. Wrong (2)\n\n\
+             - **CLM-0012** IL4 [#360, #361] Tokens expire.\n  \
+             - Next: Add an expiry test.\n\n\
+             ...and 1 more: OPS 1\n\n\
+             ## 2. Unproven, integrity 3-4 (0)\n\n\
+             None.\n\n\
+             ## 3. Everything else (2)\n\n\
+             (none) 2\n"
+        );
+    }
+
+    #[test]
+    fn tldr_opens_with_stop_when_integrity_fails() {
+        let text = rendered_tldr(&sample_steps(2));
+        let stop = text
+            .find("## 0. STOP: integrity check failed\n\n2 records failed")
+            .expect("STOP section");
+        let wrong = text.find("## 1. Wrong").expect("tier 1");
+        assert!(stop < wrong);
+        assert!(!rendered_tldr(&sample_steps(0)).contains("STOP"));
+    }
+
+    #[test]
+    fn tldr_omits_missing_level_and_issues() {
+        let mut steps = sample_steps(0);
+        steps.wrong.items[0].integrity_level = None;
+        steps.wrong.items[0].issues.clear();
+        assert!(rendered_tldr(&steps).contains("- **CLM-0012** Tokens expire.\n"));
+    }
+
+    #[test]
+    fn truncated_cuts_on_char_boundaries() {
+        let long = "\u{e9}".repeat(STATEMENT_CHARS + 1);
+        let exact = "\u{e9}".repeat(STATEMENT_CHARS);
+
+        assert_eq!(truncated(&long, STATEMENT_CHARS), format!("{exact}..."));
+        assert!(matches!(
+            truncated(&exact, STATEMENT_CHARS),
+            Cow::Borrowed(_)
+        ));
     }
 }
