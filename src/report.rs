@@ -1,4 +1,7 @@
-//! Read-only analyses over a catalog: the audit report and trace queries.
+//! Read-only analyses over a catalog: the audit report, trace queries, and the next-steps
+//! TL;DR.
+
+pub mod next_steps;
 
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 
@@ -213,17 +216,10 @@ fn classify_gaps(
         CurrentVerdict::NotEnoughInfo => gaps.not_enough_info.push(claim.id),
         CurrentVerdict::Supported => {}
     }
-    if let Some(latest) = claim.verdicts.last() {
-        if claim
-            .evidence
-            .iter()
-            .any(|e| e.recorded_at > latest.recorded_at)
-        {
-            gaps.stale.push(claim.id);
-        }
+    if is_stale(claim) {
+        gaps.stale.push(claim.id);
     }
-    let high_integrity = claim.integrity_level.is_some_and(|level| level.get() >= 3);
-    if high_integrity && claim.verification_method == VerificationMethod::Inspection {
+    if is_high_integrity(claim) && claim.verification_method == VerificationMethod::Inspection {
         gaps.rigor.push(claim.id);
     }
     if children
@@ -239,6 +235,22 @@ fn classify_gaps(
     {
         gaps.dangling_links.push(claim.id);
     }
+}
+
+/// `true` when the claim has evidence recorded after its latest verdict (spec section 4.1).
+/// A claim without a verdict is never stale.
+fn is_stale(claim: &Claim) -> bool {
+    claim.verdicts.last().is_some_and(|latest| {
+        claim
+            .evidence
+            .iter()
+            .any(|e| e.recorded_at > latest.recorded_at)
+    })
+}
+
+/// `true` for integrity level 3 or 4.
+fn is_high_integrity(claim: &Claim) -> bool {
+    claim.integrity_level.is_some_and(|level| level.get() >= 3)
 }
 
 /// Walks the hierarchy from `id` breadth-first, up to `max_depth` links (unlimited if `None`).
