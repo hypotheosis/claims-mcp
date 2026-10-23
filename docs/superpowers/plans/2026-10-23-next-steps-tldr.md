@@ -1338,4 +1338,4 @@ Expected: `57`, then `298` (32 + 266 listed items).
 - [ ] **Step 6: Confirm the tree is clean apart from `bdc.json`**
 
 Run: `git status --short`
-Expected: exactly `?? bdc.json`.
+Expected: `?? bdc.json` and `?? .bdc.json.lock` (the store's lock sidecar, created by the smoke tests; delete it with `rm .bdc.json.lock`). Nothing else.
