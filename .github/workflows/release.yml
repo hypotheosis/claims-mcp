@@ -77,7 +77,7 @@ jobs:
       - name: package
         run: |
           mkdir "$ARCHIVE"
-          cp README.md "$ARCHIVE/"
+          cp README.md LICENSE NOTICE "$ARCHIVE/"
           cp -r skills "$ARCHIVE/"
           if [[ "$RUNNER_OS" == Windows ]]; then
             cp "target/${{ matrix.target }}/release/claims-mcp.exe" "$ARCHIVE/"
