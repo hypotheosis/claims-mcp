@@ -16,5 +16,5 @@ test:
 report catalog="claims.json" out="audit.pdf" notes="report/audit-notes.toml":
     typst compile --root . report/claims-report.typ {{out}} \
         --input catalog={{catalog}} \
-        --input commit=$(git rev-parse --short HEAD) \
+        --input commit=$(git describe --always --dirty) \
         --input notes={{notes}}

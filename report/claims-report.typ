@@ -6,7 +6,8 @@
 //
 // Inputs (all optional):
 //   catalog     catalog path, relative to --root (default claims.json)
-//   commit      catalog commit shown on the cover and in the reproduce section
+//   commit      catalog commit shown on the cover and in the reproduce section; a "-dirty"
+//               suffix (git describe --dirty) marks uncommitted changes
 //   notes       TOML sidecar: artifact, version, repository, method, assessment, [[points]]
 //   date        report date (default: today)
 //   artifact, version, repository, method, assessment
@@ -489,7 +490,16 @@
 
 #let section-reproduce() = {
   heading[Reproduce]
-  let checkout = if commit == none { "" } else { "git checkout " + commit + "\n" }
+  // `git describe --dirty` appends "-dirty" when the catalog had uncommitted changes; that
+  // state cannot be checked out, so say so instead of printing an invalid ref.
+  let checkout = if commit == none {
+    ""
+  } else if commit.ends-with("-dirty") {
+    let base = commit.trim("-dirty", at: end)
+    "# rendered from uncommitted changes on top of this commit\ngit checkout " + base + "\n"
+  } else {
+    "git checkout " + commit + "\n"
+  }
   let notes-flag = if "notes" in inputs { " \\\n  --input notes=" + inputs.notes } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
   [Regenerate this PDF:]
