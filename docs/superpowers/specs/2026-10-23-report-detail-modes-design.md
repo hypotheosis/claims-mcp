@@ -36,8 +36,8 @@ message naming the accepted values.
 | Section | `summary` | `full` |
 |---|---|---|
 | Cover, Result, Assessment | unchanged | unchanged |
-| Retired claims | total, then one row per distinct reason with its count; no per-claim table | per-claim table, with wrapping fixed |
-| Integrity | status line; adopted records as a count | status line; adopted IDs as compressed ranges |
+| Retired claims | one row per distinct reason (claim ids in the reason replaced by `[claim ids]`) with its count, then the total; no per-claim table | per-claim table, with wrapping fixed |
+| Integrity | status line; adopted records as a count | status line; adopted record list, as now |
 | Findings | grouped by area (below): refuted claims as cards, not-enough-info claims as table rows (ID, statement, IL, `Fix:` step) | grouped by area; every finding as a card with all cited evidence |
 | Points for the evaluator, Coverage | unchanged | unchanged |
 | Gap summary | gap, meaning, count | same table, then each non-empty gap's IDs as compressed ranges |
@@ -69,14 +69,18 @@ are separated by commas.
 
 - **Roll-up locators.** An evidence locator matching `children:` followed by IDs (old format)
   or `children of CLM-NNNN` (new format) renders as
-  `children of CLM-0011: 94 active (63 supported, 24 not enough info, 7 refuted: CLM-0594,
-  ...)`. Counts and the named children come from the catalog's current active children of the
+  `children of CLM-0011: 94 active (63 supported, 7 refuted, 24 not enough info). Not
+  supported: CLM-0591, CLM-0594, ...`. Counts and the named children come from the catalog's current active children of the
   claim that owns the evidence; only children that are not supported are named, as compressed
   ranges.
 - **Free text.** In summaries, rationales, and reasons, any run of 6 or more claim IDs separated
   by commas (optional spaces) is replaced by its compressed-range form. Other text is unchanged.
 
 ### Text rendering
+
+The pure text helpers (range compression, run compression, the `Fix:` step, the retired-reason
+key, wrap points, and backtick spans) live in `report/text.typ`, imported by the template and
+checked by assertions in `report/text-tests.typ`.
 
 - Backtick spans in statements, sources, reasons, summaries, and rationales render as inline
   code.
@@ -88,7 +92,9 @@ are separated by commas.
 
 ### Plumbing
 
-- `justfile`: `report` gains `detail="summary"` and passes `--input detail={{detail}}`.
+- `justfile`: `report` takes `detail` as its first parameter (`just report full`), and `out`
+  defaults to `audit-full.pdf` for `full` and `audit.pdf` otherwise. `/audit-full.pdf` joins
+  `/audit.pdf` in `.gitignore`.
 - CI (`.github/workflows/ci.yml`) renders `audit.pdf` (summary) and `audit-full.pdf` (full);
   the release attaches both.
 - README: document the `detail` input and the two release PDFs.
@@ -109,6 +115,7 @@ In `src/report.rs`:
 - New fixture: one root, two areas, a roll-up parent whose evidence has an old-style `children:`
   locator listing 10 or more IDs, a refuted leaf, and a not-enough-info leaf.
 - A test that `detail=bogus` fails to compile.
+- `typst_template_text_helpers` compiles `report/text-tests.typ`.
 
 Manual check: render `bdc.json` in both modes, compare page counts with the current 1,869, and
 inspect sample pages from each section. Summary mode should come in under about 60 pages.
