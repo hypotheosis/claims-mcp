@@ -1,0 +1,101 @@
+# Pull request checks: the pre-commit checklist from .claude/CLAUDE.md, the test suite on every
+# release platform, and the rendered audit report as a downloadable artifact.
+#
+# release.yml also calls this workflow, so a tag publishes only after these checks pass on the
+# tagged commit, and the release reuses the audit report rendered here.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  TYPST_VERSION: 0.14.2
+
+jobs:
+  check:
+    name: fmt, clippy, build, test
+    runs-on: ubuntu-latest
+    env:
+      # Turn every compiler warning into an error, and make the Typst template parity tests
+      # fail instead of skipping when `typst` is missing.
+      RUSTFLAGS: -D warnings
+      REQUIRE_TYPST: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - uses: typst-community/setup-typst@fee4b65b091cc546f02ce3be15fad8760f38a108 # v5.3.0
+        with:
+          typst-version: ${{ env.TYPST_VERSION }}
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo build --locked
+      - run: cargo test --locked
+
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      # The Typst parity tests run in `check`; here they skip, since they do not depend on
+      # the platform.
+      - run: cargo test --locked
+
+  msrv:
+    name: MSRV (rust-version in Cargo.toml)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: "1.89"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - run: cargo check --locked --all-targets
+
+  report:
+    name: audit report
+    runs-on: ubuntu-latest
+    steps:
+      # Render from the PR head rather than the merge commit GitHub checks out by default, so
+      # the report's catalog and commit stamp match what reviewers see on the PR.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: typst-community/setup-typst@fee4b65b091cc546f02ce3be15fad8760f38a108 # v5.3.0
+        with:
+          typst-version: ${{ env.TYPST_VERSION }}
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+      - run: just report
+      - id: name
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          short_sha=$(git rev-parse --short HEAD)
+          echo "artifact=audit-report-${PR_NUMBER:+pr-$PR_NUMBER-}$short_sha" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ steps.name.outputs.artifact }}
+          path: audit.pdf
+          if-no-files-found: error
