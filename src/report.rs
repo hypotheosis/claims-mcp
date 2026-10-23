@@ -841,6 +841,144 @@ mod tests {
         }
     }
 
+    /// Adds evidence with `stance` to `claim` and records `outcome` citing it.
+    fn decide(catalog: &mut Catalog, claim: ClaimId, stance: Stance, outcome: Verdict) {
+        let item = catalog
+            .add_evidence(claim, evidence(stance), at(1))
+            .expect("evidence");
+        catalog
+            .record_verdict(claim, verdict(outcome, vec![item.id]), at(2))
+            .expect("verdict");
+    }
+
+    /// Asserts that every render's `<report-layout>` groups findings as `expected`.
+    fn assert_areas(catalog: &Catalog, expected: &Value) {
+        let Some(renders) = assert_template_matches(catalog) else {
+            return;
+        };
+        for rendered in &renders {
+            assert_eq!(&rendered.layout["areas"], expected);
+        }
+    }
+
+    #[test]
+    fn typst_template_keeps_refuted_heads_without_open_children() {
+        // Ids: root CLM-0001, area CLM-0002, leaf CLM-0003.
+        let mut catalog = Catalog::default();
+        let root = catalog
+            .add_claim(new_claim("root"), at(0))
+            .expect("root")
+            .id;
+        let area = catalog
+            .add_claim(child_of("area", root), at(0))
+            .expect("area")
+            .id;
+        let leaf = catalog
+            .add_claim(child_of("leaf", area), at(0))
+            .expect("leaf")
+            .id;
+        decide(&mut catalog, root, Stance::Refutes, Verdict::Refuted);
+        decide(&mut catalog, area, Stance::Refutes, Verdict::Refuted);
+        decide(&mut catalog, leaf, Stance::Supports, Verdict::Supported);
+
+        // The refuted root is a finding; the refuted area keeps its group with no findings.
+        assert_areas(
+            &catalog,
+            &json!([
+                {"area": null, "findings": ["CLM-0001"]},
+                {"area": "CLM-0002", "findings": []},
+            ]),
+        );
+    }
+
+    #[test]
+    fn typst_template_groups_by_first_active_parent() {
+        // Ids: root CLM-0001, area B CLM-0002, retired parent CLM-0003, child CLM-0004 (from
+        // CLM-0003 and CLM-0002), childless CLM-0005 under the root.
+        let mut catalog = Catalog::default();
+        let root = catalog
+            .add_claim(new_claim("root"), at(0))
+            .expect("root")
+            .id;
+        let area_b = catalog
+            .add_claim(child_of("area b", root), at(0))
+            .expect("area b")
+            .id;
+        let retired_parent = catalog
+            .add_claim(new_claim("retired parent"), at(0))
+            .expect("retired parent")
+            .id;
+        let child = catalog
+            .add_claim(
+                NewClaim {
+                    derived_from: vec![
+                        ClaimRef::Existing(retired_parent),
+                        ClaimRef::Existing(area_b),
+                    ],
+                    ..new_claim("child")
+                },
+                at(0),
+            )
+            .expect("child")
+            .id;
+        let childless = catalog
+            .add_claim(child_of("childless", root), at(0))
+            .expect("childless")
+            .id;
+        catalog
+            .retire_claim(retired_parent, "superseded", at(3))
+            .expect("retire first parent");
+        decide(&mut catalog, child, Stance::Refutes, Verdict::Refuted);
+        decide(&mut catalog, childless, Stance::Refutes, Verdict::Refuted);
+
+        // The child skips its retired first parent; the childless claim is under Top level.
+        assert_areas(
+            &catalog,
+            &json!([
+                {"area": null, "findings": ["CLM-0005"]},
+                {"area": "CLM-0002", "findings": ["CLM-0004"]},
+            ]),
+        );
+    }
+
+    #[test]
+    fn typst_template_collapses_new_format_rollup_locator() {
+        // Ids: parent CLM-0001, children CLM-0002 and CLM-0003.
+        let mut catalog = Catalog::default();
+        let parent = catalog
+            .add_claim(new_claim("parent"), at(0))
+            .expect("parent")
+            .id;
+        for name in ["first", "second"] {
+            let child = catalog
+                .add_claim(child_of(name, parent), at(0))
+                .expect("child")
+                .id;
+            decide(&mut catalog, child, Stance::Supports, Verdict::Supported);
+        }
+        let rollup = catalog
+            .add_evidence(
+                parent,
+                NewEvidence {
+                    kind: EvidenceKind::Analysis,
+                    locator: format!("children of {parent}"),
+                    summary: "Both children hold.".to_owned(),
+                    stance: Stance::Supports,
+                },
+                at(3),
+            )
+            .expect("roll-up evidence");
+        let Some(renders) = assert_template_matches(&catalog) else {
+            return;
+        };
+        for rendered in &renders {
+            assert_eq!(
+                rendered.layout["rollup_locators"][rollup.id.to_string().as_str()],
+                "children of CLM-0001: 2 active (2 supported)"
+            );
+        }
+    }
+
     #[test]
     fn typst_template_rejects_unknown_detail() {
         if !typst_available() {

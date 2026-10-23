@@ -191,7 +191,8 @@
 
 // A claim's area: its ancestor one level below a root, following first active parents. An
 // area claim is its own area; a root has none. Revisiting a claim stops the walk, so a
-// hand-edited cycle cannot loop forever.
+// hand-edited cycle cannot loop forever; a claim whose walk ends in a cycle has no root above
+// it, so it is treated as a root (no area) and is still listed when it is a finding.
 #let area-of(claim) = {
   let path = (claim.id,)
   let parent = first-active-parent(claim)
@@ -199,33 +200,34 @@
     path.push(parent)
     parent = first-active-parent(by-id.at(parent))
   }
-  if path.len() >= 2 { path.at(-2) } else { none }
+  if parent != none or path.len() < 2 { none } else { path.at(-2) }
 }
 #let area = active.map(claim => (claim.id, area-of(claim))).to-dict()
 
-// Roots and areas that have active children head the findings and the result instead of being
-// listed as findings themselves.
-#let is-heading-rollup(claim) = {
-  children-of(claim.id).len() > 0 and area.at(claim.id) in (none, claim.id)
-}
-#let findings = active.filter(claim => {
-  current-verdict(claim) in ("refuted", "not_enough_info") and not is-heading-rollup(claim)
-})
+#let is-open(claim) = current-verdict(claim) in ("refuted", "not_enough_info")
 
-// Findings grouped by area: claims under a root but in no area first, then each area in catalog
-// order. Groups without findings are left out.
+// Areas with active children head their group instead of being listed as findings. Roots and
+// childless areas are ordinary findings, so no refuted or undecided claim is hidden.
+#let is-heading-rollup(claim) = {
+  area.at(claim.id) == claim.id and children-of(claim.id).len() > 0
+}
+#let findings = active.filter(claim => is-open(claim) and not is-heading-rollup(claim))
+
+// Findings grouped by area. Roots and childless areas (claims directly below a root, with no
+// children) form the top-level group, listed first; then each heading area in catalog order. A
+// group is kept when it has findings or when its head is itself refuted or not enough info.
 #let finding-groups = {
   let grouped = (:)
   for claim in findings {
     let key = area.at(claim.id)
-    let key = if key == none { "" } else { key }
+    let key = if key == none or key == claim.id { "" } else { key }
     grouped.insert(key, grouped.at(key, default: ()) + (claim,))
   }
-  let area-ids = active.filter(claim => area.at(claim.id) == claim.id).map(claim => claim.id)
-  (("",) + area-ids).filter(key => key in grouped).map(key => (
-    area: if key == "" { none } else { key },
-    findings: grouped.at(key),
-  ))
+  let top = if "" in grouped { ((area: none, findings: grouped.at("")),) } else { () }
+  let heads = active.filter(claim => {
+    is-heading-rollup(claim) and (claim.id in grouped or is-open(claim))
+  })
+  top + heads.map(head => (area: head.id, findings: grouped.at(head.id, default: ())))
 }
 
 // Roll-up evidence names its claim's children: `children: CLM-0003, CLM-0004` (old skill
@@ -525,7 +527,11 @@
     heading(level: 2)[#id-text(head.id) #h(0.3em) #marker(current-verdict(head))]
     par(rich(head.statement))
   }
-  par(emph[#group.findings.len() findings: #finding-counts(group.findings).])
+  if group.findings.len() == 0 {
+    par(emph[No findings below this area.])
+  } else {
+    par(emph[#group.findings.len() findings: #finding-counts(group.findings).])
+  }
   let refuted = group.findings.filter(claim => current-verdict(claim) == "refuted")
   let cards = if full { group.findings } else { refuted }
   cards.map(finding).join(v(0.6em))
@@ -544,12 +550,13 @@
 
 #let section-findings() = {
   heading[Findings]
-  if findings.len() == 0 {
+  if finding-groups.len() == 0 {
     emph[No active claim is refuted or undecided.]
     return
   }
   [Active claims that are refuted or not enough info, grouped by area: the claim one level
-    below the root. Roots and areas head the groups instead of being listed.]
+    below the root. Areas with children head their group instead of being listed; roots and
+    claims directly below a root with no children are under Top level.]
   if not full {
     [ Refuted claims are shown in full; the rest show the next step from their latest
       rationale.]

@@ -52,14 +52,22 @@ the same rule `next_steps` uses. A rationale with no `Fix:` shows a dash.
 ### Areas and findings grouping
 
 A claim's **area** is its ancestor exactly one level below a root, reached by following the
-first active parent in `derived_from` at each step. An area claim is its own area. A root
-claim and claims in a catalog with no second level belong to a single unnamed group.
+first active parent in `derived_from` at each step. An area claim is its own area; a root has
+none. If the walk revisits a claim (a hand-edited cycle), the claim is treated as a root.
 
-Findings are the active refuted and not-enough-info claims. Area claims, and root claims that
-have active children, are not listed as findings (a root's verdict is the overall result); each heads its group instead, showing its ID, statement, verdict marker, and the
-group's finding counts by verdict. Counts are computed from the catalog at render time, never
-read from roll-up text. Groups appear in catalog order of their area claims, and groups with no
-findings are omitted.
+Findings are the active refuted and not-enough-info claims. Only an area claim that has active
+children is not listed as a finding; it heads its group instead, showing its ID, statement,
+verdict marker, and the group's finding counts by verdict. Roots (a root's verdict is the
+overall result, but it is still listed when refuted or undecided) and childless areas, the
+claims directly below a root with no children, are ordinary findings in the top-level group,
+headed "Top level". Counts are computed from the catalog at render time, never read from
+roll-up text.
+
+The top-level group comes first, then the area groups in catalog order of their area claims. A
+group is kept when it has findings or when its head is itself refuted or not enough info (it
+then shows that it has no findings below it); other groups are omitted. The Findings section
+says that no claim is refuted or undecided only when there are no groups at all, so it never
+contradicts the Result table.
 
 ### ID lists
 
