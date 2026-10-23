@@ -338,7 +338,7 @@ fn breadth_first<'c, I: IntoIterator<Item = ClaimId>>(
 #[cfg(test)]
 mod tests {
     use std::ffi::{OsStr, OsString};
-    use std::path::Path;
+    use std::path::{Path, PathBuf};
     use std::process::Command;
 
     use chrono::DateTime;
@@ -497,6 +497,30 @@ mod tests {
         assert_eq!(value["totals"]["by_verdict"]["supported"], 1);
     }
 
+    /// Whether the Typst CLI is on `PATH`. It is an external tool, so the template checks are
+    /// skipped (with a note on stderr) without it, unless `REQUIRE_TYPST=1` is set (as CI
+    /// should), which turns the skip into a failure.
+    fn typst_available() -> bool {
+        let installed = Command::new("typst")
+            .arg("--version")
+            .output()
+            .is_ok_and(|output| output.status.success());
+        if !installed {
+            // Rust note: `env::var` returns `Result`; `is_ok_and` is false for unset variables.
+            let required = std::env::var("REQUIRE_TYPST").is_ok_and(|value| value == "1");
+            assert!(!required, "REQUIRE_TYPST=1 but `typst` is not on PATH");
+            eprintln!("skipping Typst template check: `typst` is not on PATH");
+        }
+        installed
+    }
+
+    /// Path of a file under `report/` in this repository.
+    fn report_file(name: &str) -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("report")
+            .join(name)
+    }
+
     /// Compiles `report/claims-report.typ` over `catalog` and checks that it produces a PDF
     /// with no warnings and that its `<audit-report>` metadata equals `audit_report`.
     ///
@@ -634,6 +658,27 @@ mod tests {
             .all(|members| members.as_array().is_some_and(|ids| !ids.is_empty()));
         assert!(all_gaps_present, "fixture must exercise every gap: {gaps}");
         assert_template_matches(&catalog);
+    }
+
+    /// Compiles `report/text-tests.typ`, whose assertions check the template's text helpers.
+    #[test]
+    fn typst_template_text_helpers() {
+        if !typst_available() {
+            return;
+        }
+        let dir = tempfile::tempdir().expect("temp dir");
+        let output = Command::new("typst")
+            .arg("compile")
+            .arg(report_file("text-tests.typ"))
+            .arg(dir.path().join("text-tests.pdf"))
+            .output()
+            .expect("run typst");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            output.status.success(),
+            "text helper assertions failed: {stderr}"
+        );
+        assert!(stderr.trim().is_empty(), "typst warned: {stderr}");
     }
 
     #[test]
