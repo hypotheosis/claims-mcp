@@ -52,13 +52,32 @@
   "[claim ids]",
 )
 
-// Zero-width spaces after separators let long paths and locators wrap inside table cells. A
-// hyphen after an uppercase letter is skipped, so ids like `CLM-0042` and `EVD-0007` never
-// split; the hyphen pattern matches the character before it too, which is kept in place.
-#let wrappable(value) = value.replace(
-  regex("[/_.:,=]|[^A-Z]-"),
-  found => found.text + sym.zws,
-)
+// Wrap points: after `/ _ . : , =`, and after a hyphen unless an uppercase letter precedes it,
+// so ids like `CLM-0042` and `EVD-0007` never split. The hyphen pattern also matches the
+// character before it, which stays in the earlier piece.
+#let wrap-point = regex("[/_.:,=]|[^A-Z]-")
+
+// `value` cut after each wrap point; concatenating the pieces gives `value` back.
+#let wrap-pieces(value) = {
+  let cuts = value.matches(wrap-point).map(found => found.end)
+  ((0,) + cuts).zip(cuts + (value.len(),)).filter(((start, end)) => end > start).map(
+    ((start, end)) => value.slice(start, end),
+  )
+}
+
+// Lets long paths and locators wrap inside table cells. A word with wrap points becomes one
+// inline box per piece, and a line may break between boxes, so no zero-width space character
+// is needed (it would end up in text copied from the PDF). Only words are split: a box cannot
+// break at its own spaces. `piece` renders each piece and space, e.g. `raw` for inline code.
+#let wrappable(value, piece: text) = {
+  value
+    .split(" ")
+    .map(word => {
+      let pieces = wrap-pieces(word)
+      if pieces.len() < 2 { piece(word) } else { pieces.map(part => box(piece(part))).join() }
+    })
+    .join(piece(" "))
+}
 
 // Catalog free text: id runs compressed, `backtick` spans as inline code, and wrap points
 // throughout. Unbalanced backticks are printed as written.
@@ -67,6 +86,8 @@
   if calc.even(parts.len()) { return wrappable(parts.join("`")) }
   parts
     .enumerate()
-    .map(((index, part)) => if calc.odd(index) { raw(wrappable(part)) } else { wrappable(part) })
+    .map(((index, part)) => if calc.odd(index) { wrappable(part, piece: raw) } else {
+      wrappable(part)
+    })
     .join()
 }

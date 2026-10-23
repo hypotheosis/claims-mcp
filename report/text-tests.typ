@@ -1,7 +1,7 @@
 // Checks for report/text.typ. `cargo test typst_template_text_helpers` compiles this file; a
 // failed assertion fails the compile and names both values.
 
-#import "text.typ": compress-ids, compress-runs, fix-step, reason-key, rich, wrappable
+#import "text.typ": compress-ids, compress-runs, fix-step, reason-key, rich, wrap-pieces
 
 // compress-ids: sorted, deduplicated, consecutive runs as ranges, five-digit ids kept whole.
 #assert.eq(
@@ -45,9 +45,15 @@
   "replaced by [claim ids].",
 )
 
-// wrappable: wrap points after separators, but never inside a `CLM-` or `EVD-` id.
-#assert.eq(wrappable("CLM-0001 a-b"), "CLM-0001 a-" + sym.zws + "b")
-#assert.eq(wrappable("src/a.rs:1"), "src/" + sym.zws + "a." + sym.zws + "rs:" + sym.zws + "1")
+// wrap-pieces: cuts after separators, never inside a `CLM-` or `EVD-` id, and loses nothing.
+#assert.eq(wrap-pieces("CLM-0001 a-b"), ("CLM-0001 a-", "b"))
+#assert.eq(wrap-pieces("src/a.rs:1"), ("src/", "a.", "rs:", "1"))
+#assert.eq(wrap-pieces("ends/"), ("ends/",))
+#assert.eq(wrap-pieces(""), ())
+#assert.eq(wrap-pieces("crates/bdc-core/x_y.rs:12-14").join(), "crates/bdc-core/x_y.rs:12-14")
+#assert.eq(wrap-pieces("two words"), ("two words",))
+// No zero-width space character reaches the document, so copied text stays exact.
+#assert(not repr(rich("see `src/a.rs:1` and b/c.md")).contains("\u{200b}"))
 
 // rich: balanced backticks become raw elements; unbalanced ones stay text.
 #assert(repr(rich("see `a.md:1` here")).contains("raw("))
