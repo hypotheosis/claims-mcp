@@ -1,5 +1,6 @@
 //! `claims-mcp`: a stdio MCP server that maintains a JSON catalog of verifiable claims.
 
+mod catalog;
 mod error;
 mod model;
 
