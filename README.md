@@ -232,5 +232,5 @@ just test     # cargo test
 and points at a commit on `main` (and fails without publishing otherwise), reruns CI on the tagged commit, builds the five
 archives listed under [Install](#1-install-the-server), and publishes a GitHub release with
 the archives, their `.sha256` files, and the audit report. A pull request that changes
-`release.yml` runs the builds as a dry run without publishing. Release tags (`v*`) cannot be moved or deleted once
-pushed, so a bad release is fixed with a new version.
+`release.yml` runs the builds as a dry run without publishing. Release tags (`v*`) cannot be
+moved or deleted once pushed, so a bad release is fixed with a new version.
