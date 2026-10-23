@@ -1,0 +1,1568 @@
+{
+  "schema_version": 1,
+  "next_claim_seq": 35,
+  "next_evidence_seq": 40,
+  "claims": [
+    {
+      "id": "CLM-0001",
+      "statement": "claims-mcp is a stdio MCP server that maintains a catalog of claims stored as a JSON file in the repo, and the repo contains a skill tailored to using it for claims auditing",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "concept.md",
+      "derived_from": [],
+      "artifacts": [
+        "concept.md"
+      ],
+      "tags": [
+        "concept"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0039",
+          "kind": "analysis",
+          "locator": "children: CLM-0002, CLM-0003, CLM-0004, CLM-0005, CLM-0010, CLM-0012, CLM-0014, CLM-0015, CLM-0016, CLM-0017, CLM-0019",
+          "summary": "All 11 children supported. Concept coverage: stdio MCP server (0002, 0004) on rmcp (0003); JSON catalog in the repo (0005 + durability 0006-0009, 0018); traceability (0010/0011); FEVER (0012/0013); IEEE 1012 levels/methods (0014); V&V gap reporting (0015); tailored skill (0016) wired via .mcp.json (0017); spec conformance (0019).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:52:04.867883487Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every element of concept.md maps to a supported child claim (EVD-0039).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0039"
+          ],
+          "recorded_at": "2026-10-23T12:52:08.053225450Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:52:08.053225450Z"
+    },
+    {
+      "id": "CLM-0002",
+      "statement": "The server speaks MCP over stdio, and stdout carries only JSON-RPC protocol messages (logs go to stderr)",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "concept.md: 'stdio-based mcp server'; spec 5.2",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/main.rs"
+      ],
+      "tags": [
+        "transport"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0001",
+          "kind": "demonstration",
+          "locator": "target/release/claims-mcp driven over stdio (initialize, tools/list, 8 tools/call) in a temp dir",
+          "summary": "10 stdout lines, all JSON-RPC 2.0 messages (0 non-JSON-RPC lines); 0 bytes on stderr; process exited 0 when stdin closed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:06.981356965Z"
+        },
+        {
+          "id": "EVD-0002",
+          "kind": "inspection",
+          "locator": "src/main.rs:45-52 init_tracing",
+          "summary": "tracing_subscriber fmt is configured with .with_writer(std::io::stderr) and ANSI disabled; the server is served via rmcp::transport::stdio_pipes().",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:06.996408866Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Live stdio run produced only JSON-RPC lines on stdout and nothing on stderr; code routes tracing to stderr.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0001",
+            "EVD-0002"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.665027683Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.665027683Z"
+    },
+    {
+      "id": "CLM-0003",
+      "statement": "The server is built on the rmcp crate: Cargo.toml depends on rmcp and the tools are registered with rmcp's #[tool_router]/#[tool_handler] macros",
+      "kind": "constraint",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "user prompt: 'Please make sure to use the rmcp crate'",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "Cargo.toml",
+        "src/server.rs"
+      ],
+      "tags": [
+        "rmcp"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0003",
+          "kind": "analysis",
+          "locator": "Cargo.toml:19; cargo tree -e normal --depth 1",
+          "summary": "Cargo.toml declares rmcp 3.7.0 with features server, macros, transport-io; cargo tree resolves rmcp v3.7.0 as a direct dependency.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.003580991Z"
+        },
+        {
+          "id": "EVD-0004",
+          "kind": "inspection",
+          "locator": "src/server.rs:108 #[tool_router]; 10 x #[tool(...)]; #[tool_handler(...)] impl ServerHandler",
+          "summary": "The ClaimsServer impl is annotated #[tool_router] with 10 #[tool] methods, and ServerHandler is implemented via rmcp's #[tool_handler] macro.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.010290505Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "rmcp 3.7.0 is a resolved direct dependency and the tool surface is built with its tool_router/tool_handler macros.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0003",
+            "EVD-0004"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.681118477Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.681118477Z"
+    },
+    {
+      "id": "CLM-0004",
+      "statement": "tools/list returns exactly the 10 tools of spec section 4: add_claim, add_claims, get_claim, list_claims, update_claim, retire_claim, add_evidence, record_verdict, trace, audit_report",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "spec section 4",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "tools"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0005",
+          "kind": "demonstration",
+          "locator": "tools/list response (id 2) from target/release/claims-mcp",
+          "summary": "Returned exactly: add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, record_verdict, retire_claim, trace, update_claim (10 tools); read-only hints on audit_report, get_claim, list_claims, trace.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.016569300Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "tools/list on the release binary returned exactly the 10 spec tools, no more, no fewer.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0005"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.701270593Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.701270593Z"
+    },
+    {
+      "id": "CLM-0005",
+      "statement": "The catalog is persisted as a JSON document with schema_version 1 at the --catalog path (default claims.json, env CLAIMS_CATALOG)",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "concept.md: 'stored as a json file in the repo'; spec 3.1, 5",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/main.rs",
+        "src/store.rs"
+      ],
+      "tags": [
+        "storage"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0006",
+          "kind": "demonstration",
+          "locator": "release binary run with no --catalog in a temp dir; then with CLAIMS_CATALOG=<tmp>/env.json",
+          "summary": "Without --catalog, add_claim created ./claims.json starting with \"schema_version\": 1; with CLAIMS_CATALOG set, env.json was created containing CLM-0001.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.022643994Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Default path and env override both observed creating a schema_version 1 JSON catalog.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0006"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.709919625Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.709919625Z"
+    },
+    {
+      "id": "CLM-0006",
+      "statement": "A catalog mutation whose operation fails leaves the catalog file byte-identical",
+      "kind": "safety",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "spec 5.1",
+      "derived_from": [
+        "CLM-0005"
+      ],
+      "artifacts": [
+        "src/store.rs"
+      ],
+      "tags": [
+        "storage",
+        "durability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0007",
+          "kind": "test",
+          "locator": "cargo test -- --exact store::tests::failed_operation_leaves_file_untouched",
+          "summary": "Passes: a mutate whose closure adds a claim and then returns Err leaves the catalog file bytes equal to the pre-call bytes.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.029448919Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Test directly compares file bytes before and after a failing mutation; passes.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0007"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.718054108Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.718054108Z"
+    },
+    {
+      "id": "CLM-0007",
+      "statement": "Concurrent writers sharing one catalog file never lose updates",
+      "kind": "safety",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "spec 5.1 (lock file, re-read per call)",
+      "derived_from": [
+        "CLM-0005"
+      ],
+      "artifacts": [
+        "src/store.rs"
+      ],
+      "tags": [
+        "storage",
+        "durability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0008",
+          "kind": "test",
+          "locator": "cargo test -- --exact store::tests::concurrent_writers_never_lose_updates",
+          "summary": "Passes (and passed 3/3 runs earlier): 4 threads, each with its own CatalogStore on the same file, 10 add_claim mutations each; final read sees 40 claims and load-time validation found no duplicate ids.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.035593073Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Contention test with 4 independent store handles x 10 writes ends with all 40 claims and valid ids, across repeated runs.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0008"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.725128340Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.725128340Z"
+    },
+    {
+      "id": "CLM-0008",
+      "statement": "A catalog file whose next_claim_seq is not above its highest claim id is rejected on load instead of being used",
+      "kind": "safety",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "spec 3.1 (ids never reused); final review",
+      "derived_from": [
+        "CLM-0005"
+      ],
+      "artifacts": [
+        "src/store.rs",
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "storage",
+        "durability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0009",
+          "kind": "test",
+          "locator": "cargo test -- --exact store::tests::inconsistent_catalog_is_rejected_on_load",
+          "summary": "Passes: a file with next_claim_seq 1 and claim CLM-0001 makes read return ClaimsError::Validation instead of the catalog.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.041710157Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Test loads exactly the stale-counter case and gets a Validation error rather than a catalog.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0009"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.731571141Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.731571141Z"
+    },
+    {
+      "id": "CLM-0009",
+      "statement": "Saving an unchanged catalog produces a byte-identical file ending in a newline",
+      "kind": "non_functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "concept.md: 'durable format'; spec 3.1 determinism",
+      "derived_from": [
+        "CLM-0005"
+      ],
+      "artifacts": [
+        "src/store.rs"
+      ],
+      "tags": [
+        "storage",
+        "format"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0010",
+          "kind": "test",
+          "locator": "cargo test -- --exact store::tests::output_is_deterministic_and_ends_with_newline",
+          "summary": "Passes: two saves of the same catalog produce identical bytes and the last byte is a newline.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.048499272Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Test asserts byte equality across two saves and a trailing newline; passes.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0010"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.737863133Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.737863133Z"
+    },
+    {
+      "id": "CLM-0010",
+      "statement": "trace returns a claim's ancestors via derived_from and its active descendants, each with its shortest depth",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "concept.md: 'Requirements Traceability'; spec 4",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/report.rs"
+      ],
+      "tags": [
+        "traceability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0011",
+          "kind": "test",
+          "locator": "cargo test -- --exact report::tests::trace_walks_both_directions_with_depth",
+          "summary": "Passes: on root<-mid<-leaf, trace(mid, both) returns ancestor root and descendant leaf; trace(root, down, None) returns depths [1, 2]; max_depth 1 returns one descendant.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.054316606Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "trace test shows both directions with shortest depths and depth limiting; its child CLM-0011 (cycle prevention) is supported.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0011"
+          ],
+          "recorded_at": "2026-10-23T12:51:59.522149644Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:59.522149644Z"
+    },
+    {
+      "id": "CLM-0011",
+      "statement": "update_claim rejects a derived_from change that would create a cycle or a self-link",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec 3.4 rule 2",
+      "derived_from": [
+        "CLM-0010"
+      ],
+      "artifacts": [
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "traceability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0012",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::update_claim_rejects_cycles_and_self_links",
+          "summary": "Passes: linking root to its own descendant and linking root to itself both return ClaimsError::Cycle.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.059717090Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both cycle and self-link updates are asserted to fail with Cycle; passes.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0012"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.744443255Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.744443255Z"
+    },
+    {
+      "id": "CLM-0012",
+      "statement": "Verdicts use the FEVER labels supported, refuted, not_enough_info and are kept as append-only history per claim",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "concept.md: 'FEVER framework'; spec 3.4",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/model.rs",
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "fever"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0013",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::verdict_history_is_append_only model::tests::enums_use_snake_case_names",
+          "summary": "Both pass: after refuted then not_enough_info, the claim holds 2 verdict records with the first still refuted; verdict labels serialize as snake_case (e.g. not_enough_info).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.065633004Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Labels serialize as the FEVER names and earlier verdicts survive later ones; child CLM-0013 (evidence-backed verdicts) is supported.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0013"
+          ],
+          "recorded_at": "2026-10-23T12:51:59.535858108Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:59.535858108Z"
+    },
+    {
+      "id": "CLM-0013",
+      "statement": "record_verdict rejects 'supported' unless it cites evidence on the same claim with stance 'supports'",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec 3.4 rule 4",
+      "derived_from": [
+        "CLM-0012"
+      ],
+      "artifacts": [
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "fever"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0014",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::supported_verdict_requires_supporting_evidence catalog::tests::verdict_rejects_evidence_from_another_claim",
+          "summary": "Both pass: 'supported' citing only neutral evidence returns Validation; citing evidence attached to a different claim returns ForeignEvidence; citing own supports evidence succeeds.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.071576448Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Tests cover both halves: neutral-only evidence is rejected and evidence from another claim is rejected.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0014"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.750714197Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.750714197Z"
+    },
+    {
+      "id": "CLM-0014",
+      "statement": "Claims carry an IEEE 1012 integrity level restricted to 1-4 and a verification method (inspection, analysis, demonstration, test, formal_proof)",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "concept.md: 'IEEE 1012'; spec 3.2",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/model.rs"
+      ],
+      "tags": [
+        "ieee1012"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0015",
+          "kind": "test",
+          "locator": "cargo test -- --exact model::tests::integrity_level_rejects_out_of_range",
+          "summary": "Passes: integrity levels 0 and 5 fail to deserialize, 4 succeeds. The tool schema (seen in this session) also lists verification_method values inspection, analysis, demonstration, test, formal_proof.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.077298482Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Range 1-4 enforced at deserialization (0 and 5 rejected); the five verification methods are the enum values exposed in the tool schema.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0015"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.756906468Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.756906468Z"
+    },
+    {
+      "id": "CLM-0015",
+      "statement": "audit_report returns all eight gap categories (no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links) and a traceability matrix",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "spec 4.1",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/report.rs"
+      ],
+      "tags": [
+        "report"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0016",
+          "kind": "demonstration",
+          "locator": "audit_report tool call (id 10) on release binary",
+          "summary": "Response top-level keys: gaps, matrix, totals; gaps keys exactly: dangling_links, decomposition, no_evidence, not_enough_info, refuted, rigor, stale, unverified.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.082998686Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Live report contained exactly the eight gap keys plus totals and matrix.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0016"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.763501210Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.763501210Z"
+    },
+    {
+      "id": "CLM-0016",
+      "statement": "skills/claims-audit/SKILL.md has valid skill frontmatter and references every one of the server's 10 tools by name",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "concept.md: 'a skill that is tailor-made to use this mcp'",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "skill"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0017",
+          "kind": "analysis",
+          "locator": "python frontmatter parse + backticked tool-name scan of skills/claims-audit/SKILL.md",
+          "summary": "Frontmatter parses with keys name (claims-audit) and description (551 chars); all 10 tool names appear in backticks; missing list is empty.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.088588550Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Frontmatter parses with name and description, and every server tool is referenced by name.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0017"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.769726412Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.769726412Z"
+    },
+    {
+      "id": "CLM-0017",
+      "statement": ".mcp.json registers the claims server for this repo with the catalog at claims.json",
+      "kind": "interface",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "spec section 9",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        ".mcp.json"
+      ],
+      "tags": [
+        "skill",
+        "config"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0018",
+          "kind": "demonstration",
+          "locator": ".mcp.json; this audit session's mcp__claims__* tools; ./claims.json",
+          "summary": ".mcp.json defines server 'claims' running cargo run --release --quiet -- --catalog claims.json; this session loaded the mcp__claims__* tools from it and the claims registered here were written to ./claims.json in the repo root.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.093984194Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "This very audit runs through the server registered by .mcp.json and writes to ./claims.json.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0018"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.777059784Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.777059784Z"
+    },
+    {
+      "id": "CLM-0018",
+      "statement": "The store's lock and temp sidecar files are ignored by git",
+      "kind": "constraint",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "spec 5.2",
+      "derived_from": [
+        "CLM-0005"
+      ],
+      "artifacts": [
+        ".gitignore"
+      ],
+      "tags": [
+        "storage"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0019",
+          "kind": "inspection",
+          "locator": ".gitignore:2-3; git check-ignore -v .claims.json.lock .claims.json.tmp",
+          "summary": "Both paths are matched by .gitignore lines 2 and 3; git status lists claims.json as untracked but not .claims.json.lock, which exists on disk.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:07.100669179Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "git check-ignore matches both sidecar names and the existing lock file does not appear in git status.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0019"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.784328066Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:47:36.781375391Z",
+      "updated_at": "2026-10-23T12:51:48.784328066Z"
+    },
+    {
+      "id": "CLM-0019",
+      "statement": "The implementation conforms to the design spec docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+      "kind": "constraint",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "spec"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0038",
+          "kind": "analysis",
+          "locator": "children: CLM-0020, CLM-0021, CLM-0022, CLM-0023, CLM-0024, CLM-0025, CLM-0026, CLM-0027, CLM-0028, CLM-0029, CLM-0030, CLM-0031, CLM-0032, CLM-0033",
+          "summary": "All 14 children are supported. Together they cover spec section 2 (no command execution), 3.4 rules 3/5/6, section 5 module boundaries, 5.1/6 schema and parse error handling, 5.2 template changes, 6 error mapping and no-unwrap, 9 deliverables and quality gates. Rules 1, 2, 4 and section 4/4.1 are covered under CLM-0001's children (CLM-0004, -0010/-0011, -0012/-0013, -0015).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:51:59.542965480Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every decomposed spec requirement is independently supported; see EVD-0038 for the coverage mapping.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0038"
+          ],
+          "recorded_at": "2026-10-23T12:52:04.854896553Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:52:04.854896553Z"
+    },
+    {
+      "id": "CLM-0020",
+      "statement": "The server never executes commands or spawns processes (no std::process::Command or tokio::process use in src/)",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "analysis",
+      "source": "spec 2 non-goals; spec 1 'pure ledger'",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "security"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0020",
+          "kind": "analysis",
+          "locator": "grep -rn 'process::\\|Command\\|tokio::process\\|spawn(' src/",
+          "summary": "Only 2 matches: src/main.rs:42 std::process::exit(1) on startup failure, and src/store.rs:328 std::thread::spawn inside the #[cfg(test)] contention test. No Command, tokio::process, or process spawning anywhere in src/.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.051156405Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Exhaustive grep finds no command execution or process spawning; the only hits are process::exit and a test-only thread.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0020"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.790300588Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.790300588Z"
+    },
+    {
+      "id": "CLM-0021",
+      "statement": "Retired claims reject update_claim, add_evidence, and record_verdict",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec 3.4 rule 3",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "spec"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0021",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::retired_claims_reject_changes_and_ids_are_not_reused",
+          "summary": "Passes, but only asserts add_evidence and update_claim return Retired on a retired claim; record_verdict on a retired claim is not exercised by this test.",
+          "stance": "neutral",
+          "recorded_at": "2026-10-23T12:50:55.065198265Z"
+        },
+        {
+          "id": "EVD-0022",
+          "kind": "demonstration",
+          "locator": "release binary: retire_claim CLM-0001 then record_verdict (id 6), add_evidence (id 7), update_claim (id 8)",
+          "summary": "All three calls on the retired claim returned isError=true with text 'claim CLM-0001 is retired'.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.079727775Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The unit test leaves record_verdict uncovered (EVD-0021, neutral), but the live demonstration shows all three operations rejected on a retired claim.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0021",
+            "EVD-0022"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.796527609Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.796527609Z"
+    },
+    {
+      "id": "CLM-0022",
+      "statement": "A claim with a blank statement is rejected, and duplicate tags or artifacts are removed keeping the first occurrence",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "spec 3.4 rule 5",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "spec"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0023",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::add_claim_rejects_empty_statement_and_batch_refs catalog::tests::add_claim_assigns_sequential_ids_and_cleans_input",
+          "summary": "Both pass: a whitespace-only statement returns Validation; tags [\"a\",\" a \",\"\",\"b\"] are stored as [\"a\",\"b\"]. Artifacts go through the same clean_list helper (src/catalog.rs:405-406), though only tags are asserted.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.091225003Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Blank statements rejected and duplicate removal shown for tags; artifacts share the same helper.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0023"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.803363391Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.803363391Z"
+    },
+    {
+      "id": "CLM-0023",
+      "statement": "add_claims is all-or-nothing, and an @N reference must point at an earlier entry of the same batch",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec 3.4 rule 6",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/catalog.rs"
+      ],
+      "tags": [
+        "spec"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0024",
+          "kind": "test",
+          "locator": "cargo test -- --exact catalog::tests::add_claims_is_all_or_nothing catalog::tests::add_claims_resolves_batch_refs",
+          "summary": "Both pass: a batch whose entry 1 references @1 (not earlier) fails with Validation and the catalog equals its prior state; @0 from entry 1 resolves to the batch's first new id.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.098746278Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Failed batch leaves the catalog equal to its prior state, and a non-earlier @N is rejected.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0024"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.809089563Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.809089563Z"
+    },
+    {
+      "id": "CLM-0024",
+      "statement": "Only store.rs touches the filesystem and only server.rs (plus main.rs startup) uses rmcp",
+      "kind": "non_functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "spec 5",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "architecture"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0025",
+          "kind": "analysis",
+          "locator": "per-file grep counts of std::fs|fs::|File:: and rmcp in src/*.rs",
+          "summary": "Filesystem references: store.rs 14, every other file 0. rmcp references: server.rs 5, main.rs 2 (ServiceExt and stdio_pipes), every other file 0.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.107674825Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Per-file counts show filesystem access only in store.rs and rmcp only in server.rs and main.rs.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0025"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.815012925Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.815012925Z"
+    },
+    {
+      "id": "CLM-0025",
+      "statement": "A catalog file with an unsupported schema_version is rejected and left unmodified",
+      "kind": "safety",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "spec 3.1, 6",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/store.rs"
+      ],
+      "tags": [
+        "spec",
+        "durability"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0026",
+          "kind": "demonstration",
+          "locator": "release binary --catalog v2.json (schema_version 2) + add_claim; sha256sum before/after",
+          "summary": "add_claim returned isError=true 'catalog v2.json has schema_version 2; this server supports 1'; the file's sha256 was unchanged afterwards.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.116190611Z"
+        },
+        {
+          "id": "EVD-0027",
+          "kind": "test",
+          "locator": "cargo test -- --exact store::tests::unsupported_schema_version_is_rejected",
+          "summary": "Passes: reading a schema_version 2 file returns UnsupportedSchema{found: 2}. The test exercises read only, not mutate.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.125040687Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A mutation against a schema_version 2 file errored and the file hash was unchanged; the unit test covers the read path.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0026",
+            "EVD-0027"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.820795666Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.820795666Z"
+    },
+    {
+      "id": "CLM-0026",
+      "statement": "Domain errors are returned as tool results with isError true and the error's Display text, not as JSON-RPC protocol errors",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "spec 6",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "spec",
+        "errors"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0028",
+          "kind": "demonstration",
+          "locator": "release binary responses ids 6, 7, 8, 9",
+          "summary": "Each domain failure (retired claim x3, 'claim CLM-0099 not found') came back as a normal result with isError=true and the Display text; no JSON-RPC error objects were returned.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.132086572Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Four distinct domain failures all came back as isError results with Display text and no protocol errors.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0028"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.826746828Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.826746828Z"
+    },
+    {
+      "id": "CLM-0027",
+      "statement": "When the catalog file is not valid JSON, the tool error names the file path and the serde line/column",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "spec 6",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/store.rs",
+        "src/error.rs"
+      ],
+      "tags": [
+        "spec",
+        "errors"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0029",
+          "kind": "demonstration",
+          "locator": "release binary --catalog bad.json (invalid JSON) + list_claims",
+          "summary": "Returned isError=true: 'catalog bad.json is not a valid claims catalog: key must be a string at line 2 column 3' (path plus line/column).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.138254446Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Error text includes the catalog path and 'line 2 column 3'.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0029"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.832912429Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.832912429Z"
+    },
+    {
+      "id": "CLM-0028",
+      "statement": "There is no .unwrap() call in src/ outside #[cfg(test)] code",
+      "kind": "constraint",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "spec 6; .claude/CLAUDE.md",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "quality"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0030",
+          "kind": "analysis",
+          "locator": "grep -rn '\\.unwrap()' src/",
+          "summary": "No matches anywhere in src/, test code included.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.144425370Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "No .unwrap() exists anywhere in src/.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0030"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.838612701Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.838612701Z"
+    },
+    {
+      "id": "CLM-0029",
+      "statement": "The template's console-subscriber, ctrlc, lazy_static, dotenv dependencies and tokio_unstable rustflag are removed, and dotenvy is used instead of dotenv",
+      "kind": "constraint",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "spec 5.2",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "Cargo.toml",
+        ".cargo/config.toml"
+      ],
+      "tags": [
+        "spec",
+        "deps"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0031",
+          "kind": "inspection",
+          "locator": "Cargo.toml; ls .cargo; src/main.rs:37",
+          "summary": "Cargo.toml has no console-subscriber, ctrlc, lazy_static, dotenv, or tracing-log entries; .cargo/ (which held the tokio_unstable rustflag) no longer exists; dotenvy 0.15.7 is declared and main.rs calls dotenvy::dotenv().",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.160176081Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All listed template crates and the rustflag config are gone; dotenvy is declared and used.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0031"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.844820483Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.844820483Z"
+    },
+    {
+      "id": "CLM-0030",
+      "statement": "cargo test, cargo clippy --all-targets -- -D warnings, and cargo fmt --check all pass",
+      "kind": "constraint",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec 9",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "quality"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0032",
+          "kind": "test",
+          "locator": "cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test",
+          "summary": "fmt exited 0 with no diff; clippy finished with no warnings or errors; cargo test: 56 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.167506837Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All three gates were run in this audit and passed.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0032"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.850735794Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.850735794Z"
+    },
+    {
+      "id": "CLM-0031",
+      "statement": "Every pub item in src/ has a doc comment",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "analysis",
+      "source": "spec 9; .claude/CLAUDE.md",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0033",
+          "kind": "analysis",
+          "locator": "python scan of src/*.rs non-test pub items for a preceding /// line",
+          "summary": "Flagged 5 items (model.rs:44 macro pub struct $name, ClaimKind, ClaimLevel, VerificationMethod, CurrentVerdict); manual reading shows all 5 have doc comments separated by multi-line #[derive(...)] attributes, and $name receives its docs via $(#[$meta])* from documented invocations. The scan's flags are false positives.",
+          "stance": "neutral",
+          "recorded_at": "2026-10-23T12:50:55.173507521Z"
+        },
+        {
+          "id": "EVD-0034",
+          "kind": "analysis",
+          "locator": "RUSTDOCFLAGS='-W missing_docs' cargo doc --no-deps --document-private-items",
+          "summary": "0 'missing documentation' warnings.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.179050685Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "rustdoc missing_docs reports nothing, and the 5 heuristic flags were checked by hand and are documented.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0033",
+            "EVD-0034"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.856577686Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.856577686Z"
+    },
+    {
+      "id": "CLM-0032",
+      "statement": "README.md documents build, configuration, the tool reference, and skill installation via cp -r skills/claims-audit ~/.claude/skills/",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "spec 9",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "README.md"
+      ],
+      "tags": [
+        "spec",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0035",
+          "kind": "inspection",
+          "locator": "README.md sections Build (l.21), Run (l.27, CLAIMS_CATALOG table l.35), Tools (l.68), Install the skill (l.59-63)",
+          "summary": "README has Build with cargo build --release, a configuration table (--catalog, CLAIMS_CATALOG, RUST_LOG), a 10-row tool table, and 'cp -r skills/claims-audit ~/.claude/skills/'.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.184866159Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All four required README topics are present, including the exact install command.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0035"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.862563648Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.862563648Z"
+    },
+    {
+      "id": "CLM-0033",
+      "statement": "A timestamped changelog entry exists under changelog/",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "spec 9; .claude/CLAUDE.md",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "changelog/"
+      ],
+      "tags": [
+        "spec",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0036",
+          "kind": "inspection",
+          "locator": "ls changelog/",
+          "summary": "Two entries: 2026-10-23T12-39-45Z.md and 2026-10-23T12-44-33Z.md.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T12:50:55.190521693Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Two UTC-timestamped changelog files exist.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0036"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.868489289Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.868489289Z"
+    },
+    {
+      "id": "CLM-0034",
+      "statement": "The implementation plan docs/superpowers/plans/2026-10-23-claims-mcp.md reproduces the committed source: its code blocks and expected test counts match the repo",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "docs/superpowers/plans/2026-10-23-claims-mcp.md",
+      "derived_from": [],
+      "artifacts": [
+        "docs/superpowers/plans/2026-10-23-claims-mcp.md"
+      ],
+      "tags": [
+        "plan",
+        "docs",
+        "process-artifact"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0037",
+          "kind": "inspection",
+          "locator": "python: plan rust code blocks reassembled per module vs src/*.rs; plan 'N passed' strings vs cargo test",
+          "summary": "Only main.rs matches the plan; error.rs, model.rs, catalog.rs, report.rs, store.rs, server.rs all differ (post-review fixes were never back-ported). The plan's only expected test count is 46; cargo test reports 56.",
+          "stance": "refutes",
+          "recorded_at": "2026-10-23T12:50:55.196122367Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "refuted",
+          "rationale": "Six of seven modules differ from the plan's code blocks and the plan's expected test count (46) does not match the actual 56; following the plan today would reproduce pre-review code.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0037"
+          ],
+          "recorded_at": "2026-10-23T12:51:48.874207141Z"
+        }
+      ],
+      "created_at": "2026-10-23T12:48:15.994077102Z",
+      "updated_at": "2026-10-23T12:51:48.874207141Z"
+    }
+  ]
+}
