@@ -54,9 +54,9 @@ Pick one:
   Expand-Archive "$archive.zip" -DestinationPath .
   ```
 
-  Each archive also contains this README, `LICENSE`, `NOTICE`, and the `skills/` directory. The macOS binaries are
-  not signed or notarized; if Gatekeeper blocks one, clear the quarantine flag with
-  `xattr -d com.apple.quarantine ~/.local/bin/claims-mcp`.
+  Each archive also contains this README, `LICENSE`, `NOTICE`, and the `skills/` directory. The
+  macOS binaries are not signed or notarized; if Gatekeeper blocks one, clear the quarantine flag
+  with `xattr -d com.apple.quarantine ~/.local/bin/claims-mcp`.
 
 - **Install with cargo** (Rust 1.89 or newer):
 
