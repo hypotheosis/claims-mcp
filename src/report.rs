@@ -320,6 +320,12 @@ fn breadth_first<'c, I: IntoIterator<Item = ClaimId>>(
 
 #[cfg(test)]
 mod tests {
+    use std::ffi::{OsStr, OsString};
+    use std::path::Path;
+    use std::process::Command;
+
+    use chrono::DateTime;
+
     use super::*;
     use crate::catalog::tests::{at, evidence, new_claim, verdict};
     use crate::catalog::NewClaim;
@@ -472,6 +478,130 @@ mod tests {
         let (catalog, ..) = chain();
         let value = serde_json::to_value(audit_report(&catalog, true)).expect("serialize");
         assert_eq!(value["totals"]["by_verdict"]["supported"], 1);
+    }
+
+    /// Compiles `report/claims-report.typ` over `catalog` and checks that it produces a PDF
+    /// with no warnings and that its `<audit-report>` metadata equals `audit_report`.
+    ///
+    /// The Typst CLI is an external tool, so the check is skipped (with a note on stderr) when
+    /// `typst` is not on `PATH`.
+    fn assert_template_matches(catalog: &Catalog) {
+        let typst_installed = Command::new("typst")
+            .arg("--version")
+            .output()
+            .is_ok_and(|output| output.status.success());
+        if !typst_installed {
+            eprintln!("skipping Typst template check: `typst` is not on PATH");
+            return;
+        }
+        let dir = tempfile::tempdir().expect("temp dir");
+        let catalog_path = dir.path().join("claims.json");
+        std::fs::write(
+            &catalog_path,
+            serde_json::to_vec(catalog).expect("serialize catalog"),
+        )
+        .expect("write catalog");
+        let template = Path::new(env!("CARGO_MANIFEST_DIR")).join("report/claims-report.typ");
+        // Rust note: `OsString` is the platform's native string type; `Command` args take it
+        // directly, so paths need no lossy conversion to `String`.
+        let mut catalog_input = OsString::from("catalog=");
+        catalog_input.push(&catalog_path);
+        // `--root /` lets the template read both the repo template and the temp catalog.
+        let typst = |subcommand: &str, extra: &[&OsStr]| {
+            let output = Command::new("typst")
+                .args([
+                    OsStr::new(subcommand),
+                    OsStr::new("--root"),
+                    OsStr::new("/"),
+                ])
+                .arg(&template)
+                .args(extra)
+                .args([OsStr::new("--input"), &catalog_input])
+                .output()
+                .expect("run typst");
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert!(
+                output.status.success(),
+                "typst {subcommand} failed: {stderr}"
+            );
+            assert!(
+                stderr.trim().is_empty(),
+                "typst {subcommand} warned: {stderr}"
+            );
+            output.stdout
+        };
+
+        typst("compile", &[dir.path().join("audit.pdf").as_os_str()]);
+        let queried = typst(
+            "query",
+            &["<audit-report>", "--field", "value", "--one"].map(OsStr::new),
+        );
+
+        let from_template: serde_json::Value =
+            serde_json::from_slice(&queried).expect("typst query emits JSON");
+        let from_rust = serde_json::to_value(audit_report(catalog, true)).expect("serialize");
+        assert_eq!(from_template, from_rust);
+    }
+
+    #[test]
+    fn typst_template_matches_repo_catalog() {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("claims.json");
+        let catalog: Catalog =
+            serde_json::from_slice(&std::fs::read(path).expect("read claims.json"))
+                .expect("parse claims.json");
+        assert_template_matches(&catalog);
+    }
+
+    #[test]
+    fn typst_template_handles_empty_catalog() {
+        assert_template_matches(&Catalog::default());
+    }
+
+    /// Every gap category is non-empty, a claim is retired, and one stale check depends on
+    /// sub-second timestamp precision.
+    #[test]
+    fn typst_template_matches_every_gap_and_retired_claims() {
+        let (mut catalog, root, mid, leaf) = chain();
+        catalog
+            .add_claim(child_of("sibling", mid), at(3))
+            .expect("unverified child makes mid a decomposition gap");
+        catalog
+            .retire_claim(root, "superseded", at(4))
+            .expect("retire root leaves mid dangling");
+        let nanos_later = DateTime::from_timestamp(2, 5).expect("valid timestamp");
+        catalog
+            .add_evidence(leaf, evidence(Stance::Neutral), nanos_later)
+            .expect("evidence 5ns after the verdict makes leaf stale");
+
+        let mut critical = new_claim("critical");
+        critical.integrity_level = Some(IntegrityLevel::try_from(4).expect("level"));
+        critical.verification_method = VerificationMethod::Inspection;
+        let refuted = catalog.add_claim(critical, at(5)).expect("rigor").id;
+        let refute = catalog
+            .add_evidence(refuted, evidence(Stance::Refutes), at(6))
+            .expect("refuting evidence");
+        catalog
+            .record_verdict(refuted, verdict(Verdict::Refuted, vec![refute.id]), at(7))
+            .expect("refuted");
+        let undecided = catalog
+            .add_claim(new_claim("undecided"), at(5))
+            .expect("nei");
+        catalog
+            .record_verdict(
+                undecided.id,
+                verdict(Verdict::NotEnoughInfo, Vec::new()),
+                at(7),
+            )
+            .expect("not enough info");
+
+        let gaps = serde_json::to_value(audit_report(&catalog, false).gaps).expect("gaps");
+        let all_gaps_present = gaps
+            .as_object()
+            .expect("gaps object")
+            .values()
+            .all(|members| members.as_array().is_some_and(|ids| !ids.is_empty()));
+        assert!(all_gaps_present, "fixture must exercise every gap: {gaps}");
+        assert_template_matches(&catalog);
     }
 
     #[test]

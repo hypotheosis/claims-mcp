@@ -1,0 +1,43 @@
+# Free-text sidecar for report/claims-report.typ (pass with --input notes=report/audit-notes.toml).
+# Describes the first self-audit of claims-mcp (catalog at 969620b).
+
+artifact = "claims-mcp"
+version = "0.1.0"
+repository = "https://github.com/hypotheosis/claims-mcp"
+method = "skills/claims-audit"
+
+assessment = """
+claims-mcp was audited against concept.md and the design spec. Of 34 active claims, 33 are \
+supported and 1 is refuted. The refuted claim (CLM-0034) concerns a process artifact, not the \
+server: the implementation plan no longer matches the committed source and is tracked as issue \
+#1. Every integrity level 3-4 claim is verified by test, analysis, or demonstration, and no gap \
+other than the refutation is open.
+"""
+
+[[points]]
+title = "Independence"
+body = """
+The audit was not independent: the model that produced claims-mcp also audited it. Weigh the \
+verdicts accordingly and spot-check the evidence locators, starting with integrity level 4.
+"""
+
+[[points]]
+title = "Test coverage versus test names"
+body = """
+Some tests cover less than their names suggest. Evidence summaries say what each test observed; \
+read those rather than the test name.
+"""
+
+[[points]]
+title = "Heuristic checks"
+body = """
+Some evidence comes from heuristic checks (text searches and scripted comparisons) that can \
+report false positives. Their locators name the exact command so the result can be reproduced.
+"""
+
+[[points]]
+title = "Hierarchy corrections"
+body = """
+The claim hierarchy was corrected during the audit. The catalog records the final structure; \
+git history of claims.json shows the corrections.
+"""

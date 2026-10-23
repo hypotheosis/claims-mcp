@@ -144,6 +144,12 @@ Call `audit_report` and summarize for the user:
   | `dangling_links` | Parent was retired | Re-link or retire the child |
 
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
+- Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report. Build it
+  from a shell, not through this server (it never executes commands): `just report`, or
+  `typst compile --root . report/claims-report.typ audit.pdf --input catalog=claims.json
+  --input commit=<sha>`. Free text (the assessment and points for the evaluator) goes in a
+  TOML sidecar passed as `--input notes=<path>`. Tag a refuted claim `issue:N` to link its
+  tracking issue.
 
 ### 6. Re-audit after fixes
 

@@ -1535,7 +1535,8 @@
       "tags": [
         "plan",
         "docs",
-        "process-artifact"
+        "process-artifact",
+        "issue:1"
       ],
       "status": {
         "state": "active"
@@ -1562,7 +1563,7 @@
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.874207141Z"
+      "updated_at": "2026-10-23T13:01:09.126348384Z"
     }
   ]
 }

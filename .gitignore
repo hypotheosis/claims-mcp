@@ -2,3 +2,4 @@
 .claims.json.lock
 .claims.json.tmp
 .env
+/audit.pdf
