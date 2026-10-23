@@ -5,10 +5,10 @@
     "by": "server",
     "mac": "edff89add80492d0de6f8244858809a43256f097df2bfd30b469c2e57ad905d1"
   },
-  "next_evidence_seq": 122,
+  "next_evidence_seq": 123,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "597e7130e1737665ab28562717f929c9731488fa56ba4a9e67d7421866e5c3d3"
+    "mac": "3eab72c592c99aad2daf9362639cc56157c0d2d867e34878907131c8be654ec1"
   },
   "claims": [
     {
@@ -3584,6 +3584,18 @@
             "by": "server",
             "mac": "0d8b53da0274b6c97c098f193494fa2b07aa809625e2dd8e3ff7361789ec9f0d"
           }
+        },
+        {
+          "id": "EVD-0122",
+          "kind": "analysis",
+          "locator": "HEAD 45f4a10: for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print FILENAME\":\"FNR\": \"$0}' $f; done | grep -E 'env::|env!|std::env|env *='; src/report.rs:326 #[cfg(test)]",
+          "summary": "Corrects EVD-0087's wording. The REQUIRE_TYPST read at report.rs:501 is inside the #[cfg(test)] module that starts at report.rs:326, so it is test code. Non-test code has no std::env reads at all. The only environment input is clap's `env = \"CLAIMS_CATALOG\"` binding on --catalog (main.rs:35), which selects the catalog path and has no effect on integrity checking.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T16:43:26.478958877Z",
+          "seal": {
+            "by": "server",
+            "mac": "e9c08a51827dcc09a0e8f06af9d12d501899515f78e8d9c3f05c2f253e82d2ca"
+          }
         }
       ],
       "verdicts": [
@@ -3599,13 +3611,27 @@
             "by": "server",
             "mac": "bdcd452a09ded39d0f519cbf5df12af4a93e19fdf786595b68b47aae7d45d1bc"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-adjudicated to cite corrected evidence (PR #13 review). EVD-0087 wrongly called a test-only env read non-test. EVD-0122 shows non-test code has no env reads besides the CLAIMS_CATALOG path binding, and the CLI surface has no integrity switch (EVD-0087), so the conclusion is unchanged.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0122",
+            "EVD-0087"
+          ],
+          "recorded_at": "2026-10-23T16:43:31.625056303Z",
+          "seal": {
+            "by": "server",
+            "mac": "6b5a06253187a3c59cdf09b0baa31f29ccfde8df8e17a47423900b64c51fe996"
+          }
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.752836663Z",
+      "updated_at": "2026-10-23T16:43:31.625056303Z",
       "seal": {
         "by": "server",
-        "mac": "976dcc44d19668d4b490372f5bbc70872397d906475d0b9ca6ffd1eaefa3a1ea"
+        "mac": "8b53cef27cad85e527f85334f12311f36e5c2abdd88bb424f601a31893910249"
       }
     },
     {
