@@ -1,7 +1,7 @@
 # claims-mcp Implementation Plan
 
 > **Historical document. Do not execute this plan.** It records the original pre-review
-> implementation plan as written at commit `7baf774` and has not been updated since. The code
+> implementation plan as written at commit `7baf774`; its body has not been updated since. The code
 > in `src/` is authoritative. The plan's code blocks and expected test counts no longer match
 > the repository. Changes made after the plan include post-review fixes (load-time catalog
 > validation, checked id arithmetic, the `RetiredParent` error, batch error indexes, the
