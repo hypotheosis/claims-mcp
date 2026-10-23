@@ -27,6 +27,10 @@ pub enum ClaimsError {
     #[error("claim {0} is retired")]
     Retired(ClaimId),
 
+    /// A `derived_from` link would point at a retired claim.
+    #[error("cannot link to retired claim {0}")]
+    RetiredParent(ClaimId),
+
     /// Adding the requested `derived_from` link would make the hierarchy cyclic.
     #[error("linking {child} to parent {parent} would create a cycle")]
     Cycle {

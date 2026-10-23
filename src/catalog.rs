@@ -197,6 +197,52 @@ impl Catalog {
         &self.claims
     }
 
+    /// Checks invariants that a hand-edited or merged file could break: ids strictly
+    /// increasing (lookups binary-search), every id below its `next_*_seq` counter (ids are
+    /// never reused), evidence ids unique, and every `derived_from` link resolving.
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::Validation`] describing the first problem found.
+    pub fn validate(&self) -> Result<()> {
+        let inconsistent = |problem: String| {
+            Err(ClaimsError::Validation(format!(
+                "catalog is inconsistent: {problem}"
+            )))
+        };
+        if let Some(pair) = self.claims.windows(2).find(|pair| pair[0].id >= pair[1].id) {
+            return inconsistent(format!("{} is listed after {}", pair[1].id, pair[0].id));
+        }
+        let mut evidence_ids = HashSet::new();
+        for claim in &self.claims {
+            if claim.id >= ClaimId::new(self.next_claim_seq) {
+                return inconsistent(format!(
+                    "{} is not below next_claim_seq {}",
+                    claim.id, self.next_claim_seq
+                ));
+            }
+            if let Some(parent) = claim
+                .derived_from
+                .iter()
+                .find(|p| self.index_of(**p).is_none())
+            {
+                return inconsistent(format!("{} derives from missing {parent}", claim.id));
+            }
+            for evidence in &claim.evidence {
+                if evidence.id >= EvidenceId::new(self.next_evidence_seq) {
+                    return inconsistent(format!(
+                        "{} is not below next_evidence_seq {}",
+                        evidence.id, self.next_evidence_seq
+                    ));
+                }
+                if !evidence_ids.insert(evidence.id) {
+                    return inconsistent(format!("{} appears more than once", evidence.id));
+                }
+            }
+        }
+        Ok(())
+    }
+
     /// Looks up a claim by id.
     ///
     /// # Errors
@@ -273,7 +319,7 @@ impl Catalog {
     /// # Errors
     ///
     /// [`ClaimsError::Validation`] for empty statements or batch references, and
-    /// [`ClaimsError::ClaimNotFound`] / [`ClaimsError::Retired`] for bad parents.
+    /// [`ClaimsError::ClaimNotFound`] / [`ClaimsError::RetiredParent`] for bad parents.
     pub fn add_claim(&mut self, new_claim: NewClaim, now: DateTime<Utc>) -> Result<Claim> {
         if new_claim
             .derived_from
@@ -285,10 +331,9 @@ impl Catalog {
             ));
         }
         let mut created = self.add_claims(vec![new_claim], now)?;
-        // `add_claims` returns exactly one claim per input, so this pop always succeeds.
-        created
+        Ok(created
             .pop()
-            .ok_or_else(|| ClaimsError::Validation("no claim was created".to_owned()))
+            .expect("add_claims returns exactly one claim per input"))
     }
 
     /// Creates several claims atomically. `@N` in `derived_from` refers to the earlier
@@ -301,7 +346,9 @@ impl Catalog {
     /// # Errors
     ///
     /// [`ClaimsError::Validation`] for empty input, empty statements, or forward/self `@N`
-    /// references; [`ClaimsError::ClaimNotFound`] / [`ClaimsError::Retired`] for bad parents.
+    /// references; [`ClaimsError::ClaimNotFound`] / [`ClaimsError::RetiredParent`] for bad
+    /// parents. When the batch has more than one entry, errors are wrapped as
+    /// `Validation("claims[i]: ...")` so the caller knows which entry failed.
     pub fn add_claims(
         &mut self,
         new_claims: Vec<NewClaim>,
@@ -312,50 +359,73 @@ impl Catalog {
                 "claims must not be empty".to_owned(),
             ));
         }
+        let batch_size = new_claims.len();
         let first_seq = self.next_claim_seq;
-        let mut created = Vec::with_capacity(new_claims.len());
+        // Reserve the whole id range up front with checked arithmetic, so a huge batch or a
+        // hand-edited `next_claim_seq` near u32::MAX is an error instead of a wrapped id.
+        let next_seq = u32::try_from(batch_size)
+            .ok()
+            .and_then(|count| first_seq.checked_add(count))
+            .ok_or_else(|| ClaimsError::Validation("claim id space exhausted".to_owned()))?;
+        let mut created = Vec::with_capacity(batch_size);
         for (index, new_claim) in new_claims.into_iter().enumerate() {
-            let derived_from = new_claim
-                .derived_from
-                .iter()
-                .map(|parent| self.resolve_ref(*parent, index, first_seq))
-                .collect::<Result<Vec<_>>>()?;
-            created.push(Claim {
-                id: ClaimId::new(first_seq + index as u32),
-                statement: required_text("statement", &new_claim.statement)?,
-                kind: new_claim.kind,
-                level: new_claim.level,
-                integrity_level: new_claim.integrity_level,
-                verification_method: new_claim.verification_method,
-                source: optional_text(new_claim.source),
-                derived_from: dedup_ids(derived_from),
-                artifacts: clean_list(new_claim.artifacts),
-                tags: clean_list(new_claim.tags),
-                status: ClaimStatus::Active,
-                evidence: Vec::new(),
-                verdicts: Vec::new(),
-                created_at: now,
-                updated_at: now,
-            });
+            let claim = self
+                .build_claim(new_claim, index, first_seq, now)
+                .map_err(|error| batch_error(batch_size, index, error))?;
+            created.push(claim);
         }
-        self.next_claim_seq = first_seq + created.len() as u32;
+        self.next_claim_seq = next_seq;
         self.claims.extend(created.iter().cloned());
         Ok(created)
+    }
+
+    /// Validates one batch entry and builds the claim it describes (nothing is inserted).
+    fn build_claim(
+        &self,
+        new_claim: NewClaim,
+        index: usize,
+        first_seq: u32,
+        now: DateTime<Utc>,
+    ) -> Result<Claim> {
+        let derived_from = new_claim
+            .derived_from
+            .iter()
+            .map(|parent| self.resolve_ref(*parent, index, first_seq))
+            .collect::<Result<Vec<_>>>()?;
+        Ok(Claim {
+            // Cannot overflow: `add_claims` checked `first_seq + batch size` already.
+            id: ClaimId::new(first_seq + index as u32),
+            statement: required_text("statement", &new_claim.statement)?,
+            kind: new_claim.kind,
+            level: new_claim.level,
+            integrity_level: new_claim.integrity_level,
+            verification_method: new_claim.verification_method,
+            source: optional_text(new_claim.source),
+            derived_from: dedup_ids(derived_from),
+            artifacts: clean_list(new_claim.artifacts),
+            tags: clean_list(new_claim.tags),
+            status: ClaimStatus::Active,
+            evidence: Vec::new(),
+            verdicts: Vec::new(),
+            created_at: now,
+            updated_at: now,
+        })
     }
 
     /// Applies metadata changes to an active claim.
     ///
     /// # Errors
     ///
-    /// [`ClaimsError::ClaimNotFound`], [`ClaimsError::Retired`], [`ClaimsError::Validation`]
-    /// for an empty statement, and [`ClaimsError::Cycle`] if a new parent is a descendant.
+    /// [`ClaimsError::ClaimNotFound`], [`ClaimsError::Retired`], [`ClaimsError::RetiredParent`],
+    /// [`ClaimsError::Validation`] for an empty statement, and [`ClaimsError::Cycle`] if a new
+    /// parent is a descendant.
     pub fn update_claim(
         &mut self,
         id: ClaimId,
         update: ClaimUpdate,
         now: DateTime<Utc>,
     ) -> Result<Claim> {
-        self.active_index(id)?;
+        let index = self.active_index(id)?;
         let statement = update
             .statement
             .as_deref()
@@ -365,7 +435,12 @@ impl Catalog {
             Some(parents) => {
                 let parents = dedup_ids(parents);
                 for parent in &parents {
-                    self.check_parent(*parent)?;
+                    // Links that already exist may stay even if that parent was retired
+                    // later (the audit report lists them as dangling_links); new links must
+                    // point at active claims.
+                    if !self.claims[index].derived_from.contains(parent) {
+                        self.check_parent(*parent)?;
+                    }
                     if self.reaches(*parent, id) {
                         return Err(ClaimsError::Cycle {
                             child: id,
@@ -378,7 +453,6 @@ impl Catalog {
             None => None,
         };
 
-        let index = self.active_index(id)?;
         let claim = &mut self.claims[index];
         if let Some(statement) = statement {
             claim.statement = statement;
@@ -442,6 +516,10 @@ impl Catalog {
         now: DateTime<Utc>,
     ) -> Result<Evidence> {
         let index = self.active_index(claim_id)?;
+        let next_seq = self
+            .next_evidence_seq
+            .checked_add(1)
+            .ok_or_else(|| ClaimsError::Validation("evidence id space exhausted".to_owned()))?;
         let evidence = Evidence {
             id: EvidenceId::new(self.next_evidence_seq),
             kind: new_evidence.kind,
@@ -450,7 +528,7 @@ impl Catalog {
             stance: new_evidence.stance,
             recorded_at: now,
         };
-        self.next_evidence_seq += 1;
+        self.next_evidence_seq = next_seq;
         let claim = &mut self.claims[index];
         claim.evidence.push(evidence.clone());
         claim.updated_at = now;
@@ -530,9 +608,16 @@ impl Catalog {
         }
     }
 
-    /// A new or changed `derived_from` entry must name an existing, active claim.
+    /// A new `derived_from` entry must name an existing, active claim.
     fn check_parent(&self, parent: ClaimId) -> Result<()> {
-        self.active_index(parent).map(|_| ())
+        let index = self
+            .index_of(parent)
+            .ok_or(ClaimsError::ClaimNotFound(parent))?;
+        if self.claims[index].is_active() {
+            Ok(())
+        } else {
+            Err(ClaimsError::RetiredParent(parent))
+        }
     }
 
     /// Resolves a batch entry's parent reference to a concrete id.
@@ -565,6 +650,15 @@ impl Catalog {
             }
         }
         false
+    }
+}
+
+/// Prefixes an error with the failing entry's index when a batch has several entries.
+fn batch_error(batch_size: usize, index: usize, error: ClaimsError) -> ClaimsError {
+    if batch_size > 1 {
+        ClaimsError::Validation(format!("claims[{index}]: {error}"))
+    } else {
+        error
     }
 }
 
@@ -746,7 +840,7 @@ pub(crate) mod tests {
         ));
         assert!(matches!(
             catalog.add_claim(child_of("y", ClaimRef::Existing(claim.id)), at(2)),
-            Err(ClaimsError::Retired(_))
+            Err(ClaimsError::RetiredParent(_))
         ));
         let next = catalog
             .add_claim(new_claim("z"), at(3))
@@ -963,5 +1057,88 @@ pub(crate) mod tests {
         let detail = catalog.detail(root.id).expect("detail");
         assert_eq!(detail.children, vec![kept.id]);
         assert_eq!(detail.current_verdict, CurrentVerdict::Unverified);
+    }
+
+    #[test]
+    fn validate_detects_inconsistent_files() {
+        let mut catalog = Catalog::default();
+        let a = catalog.add_claim(new_claim("a"), at(0)).expect("a");
+        catalog.add_claim(new_claim("b"), at(0)).expect("b");
+        catalog
+            .add_evidence(a.id, evidence(Stance::Supports), at(1))
+            .expect("e");
+        assert!(catalog.validate().is_ok());
+
+        let mut stale_counter = catalog.clone();
+        stale_counter.next_claim_seq = 2;
+        assert!(stale_counter.validate().is_err());
+
+        let mut unsorted = catalog.clone();
+        unsorted.claims.swap(0, 1);
+        assert!(unsorted.validate().is_err());
+
+        let mut duplicate_evidence = catalog.clone();
+        let copied = duplicate_evidence.claims[0].evidence[0].clone();
+        duplicate_evidence.claims[1].evidence.push(copied);
+        assert!(duplicate_evidence.validate().is_err());
+
+        let mut missing_parent = catalog;
+        missing_parent.claims[1].derived_from.push(ClaimId::new(99));
+        assert!(missing_parent.validate().is_err());
+    }
+
+    #[test]
+    fn exhausted_id_space_is_an_error_not_a_wrap() {
+        let mut catalog = Catalog::default();
+        let claim = catalog.add_claim(new_claim("a"), at(0)).expect("a");
+        catalog.next_claim_seq = u32::MAX;
+        assert!(matches!(
+            catalog.add_claim(new_claim("b"), at(1)),
+            Err(ClaimsError::Validation(_))
+        ));
+        catalog.next_evidence_seq = u32::MAX;
+        assert!(matches!(
+            catalog.add_evidence(claim.id, evidence(Stance::Neutral), at(1)),
+            Err(ClaimsError::Validation(_))
+        ));
+    }
+
+    #[test]
+    fn batch_errors_name_the_failing_entry() {
+        let mut catalog = Catalog::default();
+        let error = catalog
+            .add_claims(vec![new_claim("ok"), new_claim("  ")], at(0))
+            .expect_err("blank statement in entry 1");
+        assert!(error.to_string().contains("claims[1]"), "{error}");
+    }
+
+    #[test]
+    fn update_keeps_existing_retired_parent_but_rejects_new_one() {
+        let mut catalog = Catalog::default();
+        let old_parent = catalog.add_claim(new_claim("old"), at(0)).expect("old");
+        let other = catalog.add_claim(new_claim("other"), at(0)).expect("other");
+        let leaf = catalog
+            .add_claim(child_of("leaf", ClaimRef::Existing(old_parent.id)), at(0))
+            .expect("leaf");
+        catalog
+            .retire_claim(old_parent.id, "superseded", at(1))
+            .expect("retire old");
+        catalog
+            .retire_claim(other.id, "gone", at(1))
+            .expect("retire other");
+
+        let keep = ClaimUpdate {
+            derived_from: Some(vec![old_parent.id]),
+            ..ClaimUpdate::default()
+        };
+        assert!(catalog.update_claim(leaf.id, keep, at(2)).is_ok());
+        let add_retired = ClaimUpdate {
+            derived_from: Some(vec![old_parent.id, other.id]),
+            ..ClaimUpdate::default()
+        };
+        assert!(matches!(
+            catalog.update_claim(leaf.id, add_retired, at(2)),
+            Err(ClaimsError::RetiredParent(id)) if id == other.id
+        ));
     }
 }
