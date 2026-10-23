@@ -40,8 +40,9 @@ using these tools.
 {
   "schema_version": 2,
   "next_claim_seq": 8,
+  "next_claim_seq_seal": { "by": "server", "mac": "<64 hex digits>" },
   "next_evidence_seq": 15,
-  "seal": { "by": "server", "mac": "<64 hex digits>" },
+  "next_evidence_seq_seal": { "by": "server", "mac": "<64 hex digits>" },
   "claims": [
     {
       "id": "CLM-0007",
@@ -94,13 +95,15 @@ using these tools.
 - `schema_version` is `2`. A `1` (written before integrity seals, issue #9) is still read, but
   the server refuses to write to it until `claims-mcp seal --adopt` migrates it. Any other value
   is an error and the file is not touched.
-- **Integrity seals** (issue #9): the header and every claim, evidence item, and verdict carry
-  `seal: {by, mac}`, an HMAC-SHA256 under a key built into the binary. `by` is `server`, or
+- **Integrity seals** (issue #9): each id counter (`next_*_seq_seal`) and every claim, evidence
+  item, and verdict (`seal`) carry `{by, mac}`, an HMAC-SHA256 under a key built into the binary. `by` is `server`, or
   `adopt` for records sealed by `seal --adopt`. Each MAC covers the record and its place in the
   catalog: evidence binds its claim id; a verdict binds its claim id, index, and the previous
   verdict's MAC; a claim binds its own fields, its evidence ids, and its latest verdict's MAC;
-  the header binds `schema_version` and both counters. Any gap below `next_claim_seq` means a
-  deleted claim. The server verifies every seal on every call and refuses all writes while any
+  each counter binds `schema_version` and its value. Any gap below `next_claim_seq` means a
+  deleted claim, and lowering the counter to hide the newest claim's deletion breaks its seal.
+  Sealing the counters separately lets a branch that added a claim merge with one that added
+  evidence. `seal --adopt` refuses a v1 file that carries seals (a lowered version). The server verifies every seal on every call and refuses all writes while any
   check fails; reads and `audit_report` still work. This deters casual hand edits; it is not
   cryptographic security, because the key is in the public source. See `src/seal.rs` and the
   README's "Integrity seals" section.

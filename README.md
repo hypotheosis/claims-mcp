@@ -151,19 +151,20 @@ Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
 The catalog is meant to change only through the tools, which enforce its rules: verdicts must
 cite evidence, the history is append-only, claims are retired instead of deleted. To stop an
 agent from skipping the tools and editing `claims.json` directly, every claim, evidence item,
-and verdict, plus the catalog header, carries a `seal`: an HMAC-SHA256 over the record's content
-and its place in the catalog, under a key built into the binary.
+and verdict, plus each of the two id counters, carries a seal: an HMAC-SHA256 over the record's
+content and its place in the catalog, under a key built into the binary.
 
 - **Every call verifies every seal.** If any check fails, the server **refuses every write**
   until the file is restored. Reads and `audit_report` keep working, so the damage can be
   inspected. There is no option to turn this off.
 - **What counts as tampering:** a changed field, an added record without a seal, a deleted
-  claim, evidence item, or verdict, reordered verdicts, evidence moved to another claim, and
-  lowered id counters.
+  claim, evidence item, or verdict, reordered verdicts, evidence moved to another claim, a
+  changed id counter, and a `schema_version` lowered to 1.
 - **Recovering:** restore the file from git (`git checkout -- claims.json`, or revert the
   commit that edited it), then redo the change through the tools.
 - **Not affected:** reformatting the file or reordering its keys (seals cover content, not
-  layout), and git merges of branches that changed *different* claims.
+  layout), and git merges of branches that changed *different* claims. Each counter has its
+  own seal, so a branch that added a claim merges with one that added evidence.
 
 This is a deterrent, not cryptographic security. The key is in this repository's source, so
 anyone who reads it can forge seals. What it stops is the casual edit: in your project, an agent
@@ -190,10 +191,10 @@ claims-mcp --catalog claims.json seal --adopt   # then commit claims.json
 It seals every unsealed record and labels it `adopt`. `verify` and `audit_report` list adopted
 records separately from ones the server recorded. Adoption **never** re-seals a record whose seal
 is present but wrong, so it cannot hide an edit to a sealed record. It also refuses when a claim
-is missing. The one exception is the catalog header (the id counters): when two branches both
-added claims or evidence, the header's seal conflicts on merge, and `seal --adopt` re-seals it
-once every other record verifies. If two branches changed the *same* claim, keep one side and
-redo the other side's change through the tools.
+is missing, and when a `schema_version 1` file carries seals (a genuine v1 file has none, so the
+version was lowered by hand). Removing a seal by hand and adopting the record is possible, but
+the record then shows as adopted in every report and in the git diff. If two branches changed the
+*same* claim, keep one side and redo the other side's change through the tools.
 
 Agents should never run `seal --adopt`: the server's own refusal message says so. To keep agents
 away from the file entirely, add deny rules to the project's `.claude/settings.json`:
