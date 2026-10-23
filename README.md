@@ -80,6 +80,39 @@ Then ask Claude to "audit this change against the task", or invoke `/claims-audi
 | `trace` | Ancestors and descendants of a claim, optionally depth-limited |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
 
+## Generate a PDF report
+
+[`report/claims-report.typ`](report/claims-report.typ) renders a catalog as a self-contained
+PDF audit report with [Typst](https://typst.app): result and assessment, findings, coverage by
+integrity level, all eight gap categories, the claim hierarchy, the traceability matrix, and an
+evidence appendix with the full verdict history. It runs outside the server, which never
+executes commands.
+
+```bash
+just report                       # claims.json -> audit.pdf, stamped with the current commit
+# or, without just:
+typst compile --root . report/claims-report.typ audit.pdf \
+  --input catalog=claims.json \
+  --input commit=$(git rev-parse --short HEAD) \
+  --input notes=report/audit-notes.toml
+```
+
+Paths are relative to `--root`. All inputs are optional:
+
+| Input | Meaning |
+|---|---|
+| `catalog` | Catalog to report on (default `claims.json`) |
+| `commit` | Catalog commit shown on the cover and in the reproduce section |
+| `notes` | TOML sidecar with `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator; see [`report/audit-notes.toml`](report/audit-notes.toml) |
+| `date` | Report date (default today) |
+| `artifact`, `version`, `repository`, `method`, `assessment` | Override the matching sidecar key |
+
+Tag a claim `issue:N` to link it to issue N of `repository` in the findings. The template applies
+the gap rules of spec section 4.1; `cargo test typst_template` checks that its totals, gaps, and
+matrix match `audit_report`. When `typst` is not installed that check is skipped and still
+counts as passed, so a green `cargo test` does not prove it ran; set `REQUIRE_TYPST=1` (as CI
+should) to make a missing `typst` fail the tests instead.
+
 ## Catalog format
 
 See [the design spec](docs/superpowers/specs/2026-10-23-claims-mcp-design.md), section 3,
@@ -88,7 +121,7 @@ for the full schema. Ids look like `CLM-0007` and `EVD-0014` and are never reuse
 ## Development
 
 ```bash
-cargo test
-cargo clippy --all-targets -- -D warnings
-cargo fmt --check
+just fmt      # cargo fmt
+just clippy   # cargo clippy --all-targets -- -D warnings
+just test     # cargo test
 ```
