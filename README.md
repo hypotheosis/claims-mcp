@@ -245,11 +245,11 @@ its children. Open leaves are ranked into tiers:
 | 2. Unproven | Other open claims at integrity level 3-4 (not_enough_info, unverified, stale, no evidence) |
 | 3. Everything else | Counts per `area:` tag |
 
-Tiers 1 and 2 are sorted by integrity level, then id. Each item shows its `issue:` tags and its next
-step: the text after the last `Fix:` in the latest verdict rationale (the `claims-audit` skill
-requires one on every `refuted` and `not_enough_info` verdict), or else the rationale's first
-sentence before the marker. Items beyond `--limit` are counted per area. The command exits 0
-whenever the catalog can be read; use `verify` to gate CI.
+Tiers 1 and 2 are sorted by integrity level, then id. Each item shows its `issue:` tags and its
+next step: the text after the last `Fix:` in the latest verdict rationale (the `claims-audit`
+skill requires one on every `refuted` and `not_enough_info` verdict), or else the rationale's
+first sentence before the marker. Items beyond `--limit` are counted per area. The command exits
+0 whenever the catalog can be read; use `verify` to gate CI.
 
 ## Generate a PDF report
 
