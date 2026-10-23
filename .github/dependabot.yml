@@ -1,0 +1,18 @@
+# Weekly dependency updates. Actions are pinned by commit SHA in the workflows; Dependabot bumps
+# the SHA and its version comment together.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      cargo:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
