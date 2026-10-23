@@ -1,10 +1,14 @@
 {
   "schema_version": 2,
   "next_claim_seq": 38,
+  "next_claim_seq_seal": {
+    "by": "adopt",
+    "mac": "17da0b369393860ec1b8cc3bc6612ad6bc3332c56e8b8eb720dcf80247bb1dc9"
+  },
   "next_evidence_seq": 47,
-  "seal": {
-    "by": "server",
-    "mac": "ff466501187b6627cb14cbb3a17329456f476256275c97533e3e3e603d55279e"
+  "next_evidence_seq_seal": {
+    "by": "adopt",
+    "mac": "42e0f7afdb4e0ba4f33228705fd13e18d6c15c6243e1525eaa1e53d1c6775c8e"
   },
   "claims": [
     {
