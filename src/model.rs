@@ -13,6 +13,26 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::error::ClaimsError;
 
+/// Parses a non-empty run of ASCII digits.
+///
+/// Rust note: `str::parse::<u32>` also accepts a leading `+`, which the published JSON schema
+/// patterns reject, so the digits are checked explicitly first.
+fn parse_digits<T: FromStr>(digits: &str) -> Option<T> {
+    let all_digits = !digits.is_empty() && digits.bytes().all(|byte| byte.is_ascii_digit());
+    all_digits.then(|| digits.parse().ok()).flatten()
+}
+
+/// Deserializes any `FromStr` type from a JSON string, reporting parse errors through serde.
+fn deserialize_parsed<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: FromStr,
+    T::Err: fmt::Display,
+{
+    let text = String::deserialize(deserializer)?;
+    text.parse().map_err(serde::de::Error::custom)
+}
+
 /// Generates a numeric id newtype that is written as `PREFIX-0007`.
 ///
 /// Rust note: `macro_rules!` is compile-time code generation (closer to a template than a
@@ -41,6 +61,11 @@ macro_rules! prefixed_id {
             type Err = ClaimsError;
 
             /// Parses `PREFIX-n` with the prefix in any letter case.
+            ///
+            /// # Errors
+            ///
+            /// [`ClaimsError::Validation`] if the prefix is wrong or `n` is not plain digits
+            /// that fit in a `u32`.
             fn from_str(text: &str) -> Result<Self, Self::Err> {
                 let invalid = || {
                     ClaimsError::Validation(format!(
@@ -52,7 +77,7 @@ macro_rules! prefixed_id {
                 if !prefix.eq_ignore_ascii_case($prefix) {
                     return Err(invalid());
                 }
-                digits.parse::<u32>().map(Self).map_err(|_| invalid())
+                parse_digits(digits).map(Self).ok_or_else(invalid)
             }
         }
 
@@ -64,10 +89,7 @@ macro_rules! prefixed_id {
 
         impl<'de> Deserialize<'de> for $name {
             fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-                // `Cow` borrows from the input when possible and only allocates if the JSON
-                // string contained escapes.
-                let text = Cow::<str>::deserialize(deserializer)?;
-                text.parse().map_err(serde::de::Error::custom)
+                deserialize_parsed(deserializer)
             }
         }
 
@@ -415,9 +437,14 @@ pub enum ClaimRef {
 impl FromStr for ClaimRef {
     type Err = ClaimsError;
 
+    /// Parses `@N` as a batch reference or anything else as a [`ClaimId`].
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::Validation`] if neither form parses.
     fn from_str(text: &str) -> Result<Self, Self::Err> {
         match text.trim().strip_prefix('@') {
-            Some(index) => index.parse().map(Self::Batch).map_err(|_| {
+            Some(index) => parse_digits(index).map(Self::Batch).ok_or_else(|| {
                 ClaimsError::Validation(format!("'{text}' is not a valid batch reference"))
             }),
             None => text.parse().map(Self::Existing),
@@ -427,8 +454,7 @@ impl FromStr for ClaimRef {
 
 impl<'de> Deserialize<'de> for ClaimRef {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let text = Cow::<str>::deserialize(deserializer)?;
-        text.parse().map_err(serde::de::Error::custom)
+        deserialize_parsed(deserializer)
     }
 }
 
@@ -514,5 +540,51 @@ mod tests {
         );
         assert_eq!("@2".parse::<ClaimRef>().ok(), Some(ClaimRef::Batch(2)));
         assert!("@x".parse::<ClaimRef>().is_err());
+    }
+
+    #[test]
+    fn ids_reject_signs_and_overflow() {
+        assert!("CLM-+7".parse::<ClaimId>().is_err());
+        assert!("CLM--1".parse::<ClaimId>().is_err());
+        assert!("CLM-99999999999".parse::<ClaimId>().is_err());
+        assert!("@+2".parse::<ClaimRef>().is_err());
+    }
+
+    #[test]
+    fn claim_round_trips_spec_example() {
+        let example = serde_json::json!({
+            "id": "CLM-0007",
+            "statement": "parse_config rejects files larger than 1 MiB",
+            "kind": "functional",
+            "level": "software",
+            "integrity_level": 3,
+            "verification_method": "test",
+            "source": "prompt: task-42 / spec.md#limits",
+            "derived_from": ["CLM-0002"],
+            "artifacts": ["src/config.rs"],
+            "tags": ["config"],
+            "status": { "state": "active" },
+            "evidence": [{
+                "id": "EVD-0014",
+                "kind": "test",
+                "locator": "tests/config.rs:88 oversized_file_rejected",
+                "summary": "test passes; returns ConfigError::TooLarge",
+                "stance": "supports",
+                "recorded_at": "2026-10-23T14:02:11Z"
+            }],
+            "verdicts": [{
+                "verdict": "supported",
+                "rationale": "Direct test covers the boundary and passes.",
+                "auditor": "claude-opus-5-5",
+                "evidence_ids": ["EVD-0014"],
+                "recorded_at": "2026-10-23T14:03:40Z"
+            }],
+            "created_at": "2026-10-23T13:58:00Z",
+            "updated_at": "2026-10-23T14:03:40Z"
+        });
+        let claim: Claim = serde_json::from_value(example.clone()).expect("spec example parses");
+        assert_eq!(claim.current_verdict(), CurrentVerdict::Supported);
+        assert!(claim.is_active());
+        assert_eq!(serde_json::to_value(&claim).expect("serialize"), example);
     }
 }
