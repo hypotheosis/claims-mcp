@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use crate::catalog::{ClaimFilter, ClaimUpdate, NewClaim, NewEvidence, NewVerdict};
 use crate::error;
 use crate::model::ClaimId;
-use crate::report::{self, TraceDirection};
+use crate::report::{self, next_steps, TraceDirection};
 use crate::store::CatalogStore;
 
 /// Parameters for `add_claims`.
@@ -87,6 +87,20 @@ pub struct AuditReportParams {
     /// Include the traceability matrix (default true).
     #[serde(default = "default_true")]
     pub include_matrix: bool,
+}
+
+/// Parameters for `next_steps`.
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct NextStepsParams {
+    /// Items listed in each of tiers 1 and 2 (default 10); the rest are counted per area.
+    /// 0 lists everything.
+    #[serde(default = "default_next_steps_limit")]
+    pub limit: usize,
+}
+
+/// Serde default for `NextStepsParams::limit`.
+fn default_next_steps_limit() -> usize {
+    next_steps::DEFAULT_LIMIT
 }
 
 /// Serde default for boolean parameters that are on unless the caller says otherwise.
@@ -258,6 +272,24 @@ impl ClaimsServer {
                 .await,
         )
     }
+
+    #[tool(
+        annotations(read_only_hint = true),
+        description = "TL;DR of the audit: open leaf claims ranked into tiers, each with one \
+        next step taken from the 'Fix:' in its latest verdict rationale. Tier 0 is an \
+        integrity failure (restore the catalog from git first), tier 1 refuted claims, tier 2 \
+        other open claims at integrity level 3-4, tier 3 the rest counted per area. Tiers 1 \
+        and 2 list at most `limit` items (default 10, 0 for all). Use audit_report for the \
+        full gap lists."
+    )]
+    async fn next_steps(&self, Parameters(params): Parameters<NextStepsParams>) -> ToolResult {
+        let limit = params.limit;
+        respond(
+            self.store
+                .read(move |catalog| Ok(next_steps::next_steps(catalog, limit)))
+                .await,
+        )
+    }
 }
 
 #[tool_handler(
@@ -345,12 +377,18 @@ mod tests {
         read_only.sort();
         assert_eq!(
             read_only,
-            vec!["audit_report", "get_claim", "list_claims", "trace"]
+            vec![
+                "audit_report",
+                "get_claim",
+                "list_claims",
+                "next_steps",
+                "trace"
+            ]
         );
     }
 
     #[test]
-    fn registers_all_ten_tools() {
+    fn registers_all_eleven_tools() {
         let (_directory, server) = server();
         let mut names: Vec<String> = server
             .tool_router
@@ -368,12 +406,40 @@ mod tests {
                 "audit_report",
                 "get_claim",
                 "list_claims",
+                "next_steps",
                 "record_verdict",
                 "retire_claim",
                 "trace",
                 "update_claim",
             ]
         );
+    }
+
+    #[tokio::test]
+    async fn next_steps_lists_open_leaves_as_json() {
+        let (_directory, server) = server();
+        server
+            .add_claim(Parameters(claim_input("unjudged", Vec::new())))
+            .await
+            .expect("add_claim");
+
+        let result = server
+            .next_steps(Parameters(NextStepsParams { limit: 10 }))
+            .await
+            .expect("next_steps");
+
+        let steps = json_of(&result);
+        assert_eq!(steps["summary"]["open_leaves"], 1);
+        assert_eq!(steps["wrong"]["total"], 0);
+        assert_eq!(steps["other"][0]["area"], "(none)");
+        assert_eq!(steps["integrity"]["verified"], true);
+    }
+
+    #[test]
+    fn next_steps_limit_defaults_to_ten() {
+        let params: NextStepsParams =
+            serde_json::from_value(serde_json::json!({})).expect("empty object parses");
+        assert_eq!(params.limit, 10);
     }
 
     #[tokio::test]
