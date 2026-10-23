@@ -1,0 +1,3 @@
+This app will be a stdio-based mcp server that can be run to maintain a catalog of claims stored as a json file in the repo.  It will provide a durable format for facilitating Formal Verification, Conformance testing, Requirements Traceability, Verification and Validation, such as in IEEE 1012.  Facilitating things like using the FEVER framework for formally validating whether a produced artifact by a large language model matches the description of what it was told to produce.
+
+This app should also contain a skill that is tailor-made to use this mcp to facilitate the process of claims auditing.
