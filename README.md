@@ -329,7 +329,8 @@ just test     # cargo test
 - `claims-mcp verify`, which fails if `claims.json` was edited outside the tools
 - `cargo test` on Windows and macOS, and `cargo check` on the minimum supported Rust version
   (`rust-version` in `Cargo.toml`)
-- `just report` on the PR head commit; the PDF is uploaded as the run's
+- `just report` and `just report full` on the PR head commit; both PDFs (`audit.pdf`, the
+  summary, and `audit-full.pdf`, every record) are uploaded as the run's
   `audit-report-pr-<number>-<commit>` artifact (open the run's summary page to download it)
 
 ### Releasing
