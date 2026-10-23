@@ -1,12 +1,12 @@
 # Free-text sidecar for report/claims-report.typ (pass with --input notes=report/audit-notes.toml).
 #
 # SNAPSHOT: these notes record the auditor's judgment on the first self-audit of claims-mcp
-# (catalog at 969620b, re-audited in PR #3). They are not a default. Rewrite the assessment and
-# points whenever the catalog is re-audited. Counts, verdicts, and gaps are deliberately left
+# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 with a note saying so. They are
+# not a default. Rewrite the assessment and points whenever the catalog is re-audited. Counts, verdicts, and gaps are deliberately left
 # out: the report computes those from the catalog, so prose here cannot contradict them.
 
 artifact = "claims-mcp"
-version = "0.1.0"
+version = "0.2.0"
 repository = "https://github.com/hypotheosis/claims-mcp"
 method = "skills/claims-audit"
 
@@ -15,6 +15,11 @@ claims-mcp was audited against concept.md and the design spec. The server itself
 audited requirement. The one refutation (CLM-0034) concerns a process artifact, not the \
 server: the implementation plan no longer matches the committed source, which is tracked as \
 issue #1.
+
+This assessment dates from the 0.1.0 audit and was not redone for 0.2.0. Version 0.2.0 adds \
+integrity seals (issue #9). Their behavior was not re-audited as claims, except CLM-0037, which \
+replaces CLM-0005 for the catalog's new schema version. The Integrity section shows the seal \
+check for this catalog.
 """
 
 [[points]]
