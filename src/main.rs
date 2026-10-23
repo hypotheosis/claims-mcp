@@ -177,14 +177,31 @@ async fn tldr(store: &CatalogStore, limit: usize, json: bool) -> anyhow::Result<
         .read(move |catalog| Ok(next_steps::next_steps(catalog, limit)))
         .await
         .context("failed to read the catalog")?;
-    let mut out = std::io::stdout().lock();
+    // Render fully before writing so a closed pipe is seen in exactly one place.
+    let mut buffer = Vec::new();
     if json {
-        serde_json::to_writer(&mut out, &steps)?;
-        writeln!(out)?;
+        serde_json::to_writer(&mut buffer, &steps)?;
+        writeln!(buffer)?;
     } else {
-        write_tldr(&mut out, &store.path().display().to_string(), &steps)?;
+        write_tldr(&mut buffer, &store.path().display().to_string(), &steps)?;
     }
+    write_ignoring_broken_pipe(&mut std::io::stdout().lock(), &buffer)?;
     Ok(())
+}
+
+/// Writes `bytes` to `out` in one call. A closed reader (`claims-mcp tldr | head`) is not an
+/// error.
+///
+/// # Errors
+///
+/// Any I/O error other than `BrokenPipe`.
+fn write_ignoring_broken_pipe(out: &mut impl Write, bytes: &[u8]) -> std::io::Result<()> {
+    // Rust note: `match` on `Result` handles each case; the guard `if ...` narrows the `Err`
+    // arm to one error kind, and every other error falls through to the last arm unchanged.
+    match out.write_all(bytes) {
+        Err(error) if error.kind() == std::io::ErrorKind::BrokenPipe => Ok(()),
+        other => other,
+    }
 }
 
 /// Markdown form of the TL;DR (spec section 6).
@@ -381,6 +398,29 @@ mod tests {
                 count: 2,
             }],
         }
+    }
+
+    /// A writer whose reader has gone away, or that fails some other way.
+    struct FailingWriter(std::io::ErrorKind);
+
+    impl Write for FailingWriter {
+        fn write(&mut self, _bytes: &[u8]) -> std::io::Result<usize> {
+            Err(self.0.into())
+        }
+
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+
+    #[test]
+    fn broken_pipe_is_success_and_other_errors_propagate() {
+        let mut closed = FailingWriter(std::io::ErrorKind::BrokenPipe);
+        let mut denied = FailingWriter(std::io::ErrorKind::PermissionDenied);
+
+        assert!(write_ignoring_broken_pipe(&mut closed, b"x").is_ok());
+        let error = write_ignoring_broken_pipe(&mut denied, b"x").expect_err("must fail");
+        assert_eq!(error.kind(), std::io::ErrorKind::PermissionDenied);
     }
 
     fn rendered_tldr(steps: &NextSteps) -> String {

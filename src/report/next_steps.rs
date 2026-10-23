@@ -24,6 +24,8 @@ const STALE_PREFIX: &str = "Re-verify (new evidence since the last verdict): ";
 const NO_EVIDENCE_STEP: &str = "No evidence attached; gather evidence, then record a verdict.";
 /// Step for a claim with evidence but no verdict.
 const NO_VERDICT_STEP: &str = "Evidence attached but no verdict; record one.";
+/// Step for a verdict whose rationale names no next step.
+const NO_STEP_IN_RATIONALE: &str = "Rationale names no next step; read the latest verdict.";
 
 /// Result of the `next_steps` tool and of `claims-mcp tldr --json`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -167,13 +169,16 @@ fn build_tier(mut open: Vec<(&Claim, bool)>, limit: usize) -> Tier {
         total: open.len(),
         items: listed
             .iter()
-            .map(|&(claim, stale)| next_step(claim, stale))
+            // Rust note: `|&(claim, stale)|` destructures each `&(&Claim, bool)` in the closure
+            // header, like `for claim, stale in pairs` in Python.
+            .map(|&(claim, stale)| to_next_step(claim, stale))
             .collect(),
-        omitted: area_counts(rest.iter().map(|(claim, _)| area_of(claim)).collect()),
+        omitted: area_counts(rest.iter().map(|(claim, _)| area_of(claim))),
     }
 }
 
-fn next_step(claim: &Claim, stale: bool) -> NextStep {
+/// Builds the output row for one open leaf.
+fn to_next_step(claim: &Claim, stale: bool) -> NextStep {
     NextStep {
         id: claim.id,
         integrity_level: claim.integrity_level,
@@ -191,9 +196,11 @@ fn next_step(claim: &Claim, stale: bool) -> NextStep {
     }
 }
 
-/// Spec section 5: the text after the last `Fix:`, else the rationale's first sentence, else
-/// a fixed phrase for a claim without a verdict.
+/// Spec section 5: the text after the last `Fix:`, else the first sentence before it, else a
+/// fixed phrase (for a claim without a verdict, or a rationale with no usable text).
 fn next_step_text(claim: &Claim, stale: bool) -> String {
+    // Rust note: `let ... else` binds on a match or runs the `else` block, which must leave the
+    // function (here by returning), so `latest` is a plain value afterwards.
     let Some(latest) = claim.verdicts.last() else {
         let step = if claim.evidence.is_empty() {
             NO_EVIDENCE_STEP
@@ -202,7 +209,7 @@ fn next_step_text(claim: &Claim, stale: bool) -> String {
         };
         return step.to_owned();
     };
-    let step = fix_text(&latest.rationale).unwrap_or_else(|| first_sentence(&latest.rationale));
+    let step = fix_text(&latest.rationale).unwrap_or_else(|| fallback_step(&latest.rationale));
     if stale {
         format!("{STALE_PREFIX}{step}")
     } else {
@@ -213,8 +220,23 @@ fn next_step_text(claim: &Claim, stale: bool) -> String {
 /// The trimmed text after the last `Fix:`, or `None` when there is no marker or nothing
 /// follows it.
 fn fix_text(rationale: &str) -> Option<&str> {
+    // Rust note: `?` on an `Option` returns `None` from this function when the value is `None`.
+    // `rfind` gives a byte offset and `Fix:` is ASCII, so adding its length is a char boundary.
     let start = rationale.rfind(FIX_MARKER)? + FIX_MARKER.len();
+    // Rust note: `Some(x).filter(pred)` keeps the value only when `pred` is true, else `None`.
     Some(rationale[start..].trim()).filter(|text| !text.is_empty())
+}
+
+/// First sentence of the text before the last `Fix:` (the whole rationale without a marker),
+/// or `NO_STEP_IN_RATIONALE` when that text is empty.
+fn fallback_step(rationale: &str) -> &str {
+    // `rfind` returns a byte offset at the start of the ASCII marker, a char boundary.
+    let before = rationale
+        .rfind(FIX_MARKER)
+        .map_or(rationale, |index| &rationale[..index]);
+    Some(first_sentence(before))
+        .filter(|sentence| !sentence.is_empty())
+        .unwrap_or(NO_STEP_IN_RATIONALE)
 }
 
 /// Text up to and including the first `. `, or the whole rationale, trimmed.
@@ -236,9 +258,11 @@ fn area_of(claim: &Claim) -> &str {
 }
 
 /// Counts per area, sorted by count descending, then by area name.
-fn area_counts(areas: Vec<&str>) -> Vec<AreaCount> {
+fn area_counts<'a>(areas: impl IntoIterator<Item = &'a str>) -> Vec<AreaCount> {
     let mut counts: BTreeMap<&str, usize> = BTreeMap::new();
     for area in areas {
+        // Rust note: `entry(..).or_default()` returns a `&mut usize`, inserting 0 if the key is
+        // new; `*` dereferences it so `+= 1` updates the map (like Python's `defaultdict(int)`).
         *counts.entry(area).or_default() += 1;
     }
     let mut sorted: Vec<AreaCount> = counts
@@ -285,6 +309,17 @@ mod tests {
         let mut input = verdict(outcome, vec![cited]);
         input.rationale = rationale.to_owned();
         catalog.record_verdict(id, input, at(2)).expect("verdict");
+    }
+
+    /// Records a verdict that cites no evidence, with `rationale`, at time 2.
+    fn judge_without_evidence(catalog: &mut Catalog, id: ClaimId, rationale: &str) {
+        let mut input = verdict(Verdict::NotEnoughInfo, Vec::new());
+        input.rationale = rationale.to_owned();
+        catalog.record_verdict(id, input, at(2)).expect("verdict");
+    }
+
+    fn step_of(tier: &Tier) -> &str {
+        &tier.items[0].next_step
     }
 
     fn ids(tier: &Tier) -> Vec<ClaimId> {
@@ -338,6 +373,84 @@ mod tests {
             .map(|item| item.next_step.as_str())
             .collect();
         assert_eq!(texts, vec!["add a test.", "Untested here."]);
+    }
+
+    #[test]
+    fn fallback_uses_text_before_the_marker_or_a_fixed_phrase() {
+        let mut catalog = Catalog::default();
+        let named = leaf(&mut catalog, "a", Some(4), &[]);
+        judge(&mut catalog, named, Verdict::NotEnoughInfo, "Untested Fix:");
+        let bare = leaf(&mut catalog, "b", Some(3), &[]);
+        judge(&mut catalog, bare, Verdict::NotEnoughInfo, "Fix:");
+
+        let items = next_steps(&catalog, 0).unproven.items;
+
+        assert_eq!(items[0].next_step, "Untested");
+        assert_eq!(items[1].next_step, NO_STEP_IN_RATIONALE);
+    }
+
+    #[test]
+    fn stale_claim_with_a_fix_prefixes_the_fix_text() {
+        let mut catalog = Catalog::default();
+        let claim = leaf(&mut catalog, "s", Some(3), &[]);
+        judge(
+            &mut catalog,
+            claim,
+            Verdict::NotEnoughInfo,
+            "Untested. Fix: add a test.",
+        );
+        catalog
+            .add_evidence(claim, evidence(Stance::Supports), at(10))
+            .expect("late evidence");
+
+        let steps = next_steps(&catalog, 0);
+
+        assert_eq!(
+            step_of(&steps.unproven),
+            format!("{STALE_PREFIX}add a test.")
+        );
+    }
+
+    #[test]
+    fn stale_refuted_claim_stays_in_tier_one() {
+        let mut catalog = Catalog::default();
+        let claim = leaf(&mut catalog, "r", Some(3), &[]);
+        judge(&mut catalog, claim, Verdict::Refuted, "Wrong.");
+        catalog
+            .add_evidence(claim, evidence(Stance::Supports), at(10))
+            .expect("late evidence");
+
+        let steps = next_steps(&catalog, 0);
+
+        assert_eq!(ids(&steps.wrong), vec![claim]);
+        assert!(steps.wrong.items[0].stale);
+        assert_eq!(steps.unproven.total, 0);
+    }
+
+    #[test]
+    fn wrong_tier_counts_omitted_items_per_area() {
+        let mut catalog = Catalog::default();
+        let first = leaf(&mut catalog, "a", Some(4), &["area:A"]);
+        judge(&mut catalog, first, Verdict::Refuted, "Wrong.");
+        let second = leaf(&mut catalog, "b", Some(3), &["area:B"]);
+        judge(&mut catalog, second, Verdict::Refuted, "Wrong.");
+
+        let wrong = next_steps(&catalog, 1).wrong;
+
+        assert_eq!(ids(&wrong), vec![first]);
+        assert_eq!(wrong.omitted, vec![area("B", 1)]);
+    }
+
+    #[test]
+    fn verdict_without_evidence_is_open_and_uses_its_rationale() {
+        let mut catalog = Catalog::default();
+        let claim = leaf(&mut catalog, "n", Some(4), &[]);
+        judge_without_evidence(&mut catalog, claim, "Nothing checked yet. More text.");
+
+        let steps = next_steps(&catalog, 0);
+
+        assert_eq!(steps.summary.open_leaves, 1);
+        assert_eq!(step_of(&steps.unproven), "Nothing checked yet.");
     }
 
     #[test]
