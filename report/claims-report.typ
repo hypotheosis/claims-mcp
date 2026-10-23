@@ -33,7 +33,11 @@
 
 #let artifact = setting("artifact", "unnamed artifact")
 #let version = setting("version", none)
-#let repository = setting("repository", none)
+// A trailing slash would turn issue links into `.../repo//issues/N`.
+#let repository = {
+  let url = setting("repository", none)
+  if url == none { none } else { url.trim("/", at: end) }
+}
 #let method = setting("method", "skills/claims-audit")
 #let assessment = setting("assessment", none)
 #let commit = inputs.at("commit", default: none)
