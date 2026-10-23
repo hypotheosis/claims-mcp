@@ -1,0 +1,138 @@
+---
+name: claims-audit
+description: Audit whether an artifact does what it was supposed to do by recording atomic claims, independently gathered evidence, and FEVER verdicts (supported / refuted / not_enough_info) in the claims-mcp catalog. Use whenever the user asks to audit, verify, validate, or fact-check work against its instructions or spec; build or check requirements traceability; run IEEE 1012 style verification and validation or conformance checks; or confirm that an LLM or agent actually produced what it was told to produce. Requires the `claims` MCP server (claims-mcp).
+---
+
+# Claims Audit
+
+Audit an artifact against the instruction or specification it was produced from. Every
+conclusion must be traceable: claim -> evidence -> verdict, stored in the claims catalog
+through the `claims` MCP tools.
+
+**Core rule:** a verdict is only as good as the evidence you gathered *yourself*. Never
+accept the producing agent's own summary, commit message, or "done" report as evidence.
+
+## Tools
+
+| Tool | Use it to |
+|---|---|
+| `add_claims` | Register a whole claim hierarchy in one call (`@N` links to earlier entries) |
+| `add_claim` | Add a single claim discovered later |
+| `list_claims` | Find claims by verdict, kind, level, tag, artifact, or text |
+| `get_claim` | Read one claim with evidence, verdict history, and children |
+| `update_claim` | Fix metadata (tags, artifacts, method, level) |
+| `retire_claim` | Withdraw a claim that was wrong or is superseded |
+| `add_evidence` | Record one finding with a precise locator and an honest stance |
+| `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
+| `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
+| `audit_report` | Totals, gap lists, and the traceability matrix |
+
+## Workflow
+
+### 1. Scope
+
+- Identify the **artifact** under audit (files, modules, a PR, generated output).
+- Identify the **source** it was produced from: the prompt, task, ticket, or spec section.
+  Quote or cite it; this becomes the `source` field on every claim.
+- Call `list_claims` with a relevant `text` or `artifact` filter first. If claims already
+  exist, continue from step 3 rather than registering duplicates.
+
+### 2. Extract claims
+
+Break the source into claims that are:
+
+- **Atomic**: one assertion. If it contains "and", it is probably two claims.
+- **Falsifiable**: there is an observation that would show it false.
+- **Observable**: phrased as behavior or a property of the artifact, not as intent.
+
+| Weak | Strong |
+|---|---|
+| "Handles errors well" | "parse_config returns ConfigError::TooLarge for files over 1 MiB" |
+| "Fast and secure" | Split into a performance claim and a security claim with concrete bounds |
+| "Uses the rmcp crate" | "Cargo.toml depends on rmcp and the server is built with rmcp's tool_router" |
+
+Build the hierarchy from broad to narrow: `system` (the task as a whole) -> `software` ->
+`component` -> `unit` -> `artifact`. Register it in **one** `add_claims` call, linking each
+entry to its parent with `"derived_from": ["@0"]` (the 0-based index of an earlier entry).
+
+Set on each claim:
+
+- `kind`: functional, non_functional, interface, performance, safety, security,
+  documentation, or constraint.
+- `integrity_level` (IEEE 1012):
+
+  | Level | Use when failure would cause |
+  |---|---|
+  | 4 | Safety harm, security breach, or data loss |
+  | 3 | Loss of a core function the source explicitly asked for |
+  | 2 | Degraded or secondary function |
+  | 1 | Cosmetic, style, or documentation issues |
+
+- `verification_method`, matched to the integrity level: `inspection` is acceptable at
+  levels 1-2; levels 3-4 need `test`, `analysis`, `demonstration`, or `formal_proof`.
+  The report flags violations as `rigor` gaps.
+- `artifacts`: the paths the claim is about, so `list_claims` with `artifact` can find it.
+
+### 3. Gather evidence
+
+For each claim (start with the highest integrity level):
+
+1. Inspect the artifact yourself: read the code, run the tests, run the program, check
+   output. Use the verification method the claim names.
+2. Record **every** relevant finding with `add_evidence`:
+   - `locator`: precise and reproducible, such as `src/store.rs:88`,
+     `cargo test store::tests::atomic_save`, or the exact command run.
+   - `summary`: what you observed, not what you concluded.
+   - `stance`: `supports`, `refutes`, or `neutral`. Record refuting and neutral findings
+     too; leaving them out biases the audit.
+3. One finding per evidence item. Do not merge a passing test and a code reading into one.
+
+### 4. Adjudicate (FEVER)
+
+Call `record_verdict` with `auditor` set to your model id or name:
+
+- **supported**: at least one cited item directly shows the claim holds, and no
+  unaddressed refuting evidence exists.
+- **refuted**: at least one cited item directly shows the claim does not hold.
+- **not_enough_info**: the evidence cannot decide it. This is a legitimate, honest
+  outcome; use it instead of guessing.
+
+The server enforces that `supported` cites supporting evidence and `refuted` cites refuting
+evidence. Your `rationale` must explain *why* the cited evidence decides the claim.
+
+Never infer support from the absence of failure ("no errors, so it works"). Absence of
+evidence is `not_enough_info`.
+
+### 5. Report
+
+Call `audit_report` and summarize for the user:
+
+- Totals by verdict, and the share of level 3-4 claims that are supported.
+- Every non-empty gap list, with what each means and a concrete remediation:
+
+  | Gap | Meaning | Remediation |
+  |---|---|---|
+  | `refuted` | The artifact does not do what was asked | Fix the artifact, then re-audit |
+  | `not_enough_info` | Could not be decided | Add a test or analysis that decides it |
+  | `unverified` / `no_evidence` | Not yet audited | Continue step 3 |
+  | `stale` | Evidence arrived after the verdict | Re-adjudicate |
+  | `rigor` | High-integrity claim checked only by inspection | Add a test or analysis |
+  | `decomposition` | A parent's sub-claims are not all supported | Resolve the children first |
+  | `dangling_links` | Parent was retired | Re-link or retire the child |
+
+- Offer the traceability `matrix` as a table when the user needs a V&V record.
+
+### 6. Re-audit after fixes
+
+Focus on `refuted`, `not_enough_info`, and `stale` claims: gather new evidence, then record
+a new verdict. History is append-only, so the earlier verdict remains as the audit trail.
+
+## Anti-patterns
+
+- **Self-certification**: using the producer's claims ("I implemented X") as evidence.
+- **Compound claims**: one claim covering several behaviors, which hides partial failure.
+- **Moving the goalposts**: editing a judged claim's statement until it passes. Retire it
+  with a reason and add a corrected claim instead.
+- **Silent refutations**: finding a problem and not recording it as `refutes` evidence.
+- **Ignoring rigor gaps** on integrity level 3-4 claims.
+- **Batch rubber-stamping**: recording `supported` for many claims after one shallow check.
