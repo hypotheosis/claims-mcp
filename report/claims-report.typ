@@ -1,4 +1,6 @@
-// PDF audit report for a claims-mcp catalog.
+// PDF audit report for a claims-mcp catalog. The rendered text is written for readers of the
+// audited project, who may not know claims-mcp: it introduces the tool once (`about-ledger`)
+// and refers to nothing that exists only in the claims-mcp repository.
 //
 //   typst compile --root . report/claims-report.typ audit.pdf \
 //     --input catalog=claims.json --input commit=$(git rev-parse --short HEAD) \
@@ -19,7 +21,7 @@
 //   artifact, version, repository, method, assessment
 //               override the matching sidecar keys
 //
-// Gap rules follow spec section 4.1 exactly, as in src/report.rs. The computed totals, gaps,
+// Gap rules follow claims-mcp's design spec, section 4.1, as in src/report.rs. The computed totals, gaps,
 // and matrix, plus the integrity input, are exposed as <audit-report> metadata so
 // `typst query` can be compared with `audit_report`; see the `typst_template` tests in
 // src/report.rs. <report-layout> exposes the findings grouping and collapsed roll-up
@@ -57,10 +59,12 @@
   let url = setting("repository", none)
   if url == none { none } else { url.trim("/", at: end) }
 }
-#let method = setting("method", "skills/claims-audit")
+#let method = setting("method", "claims-audit skill (claims-mcp)")
 #let assessment = setting("assessment", none)
 #let commit = inputs.at("commit", default: none)
 #let report-date = inputs.at("date", default: datetime.today().display())
+// Where readers of another project's report can find the tool that recorded the ledger.
+#let claims-mcp-url = "https://github.com/hypotheosis/claims-mcp"
 #let points = notes.at("points", default: ())
 
 // ---------------------------------------------------------------------------------------------
@@ -383,15 +387,15 @@
     ([Method], raw(method)),
     ([Claims], [#active.len() active, #retired.len() retired]),
     ([Integrity], integrity-status()),
-    ([Detail], if full [full] else [summary (render with `detail=full` for every record)]),
+    ([Detail], if full [full] else [summary (see Reproduce for the full report)]),
   ))
   pagebreak()
 }
 
 #let retired-claims() = {
   heading(level: 2)[Retired claims]
-  [Retired claims are excluded from every total, gap, and table except this list and the
-    evidence appendix.]
+  [Retired claims are excluded from every total, gap, and table except this list#if full [ and
+    the evidence appendix].]
   if retired.len() == 0 {
     par(emph[No claims are retired.])
   } else if full {
@@ -419,16 +423,27 @@
   }
 }
 
+// The one place the report explains claims-mcp; later sections name it without explanation.
+#let about-ledger() = par[
+  This report summarizes a claims ledger kept with
+  #link(claims-mcp-url)[claims-mcp], an open-source requirements-traceability tool. Each
+  requirement of #artifact is recorded as an atomic _claim_; an auditor attaches _evidence_
+  (tests, analysis, inspection, demonstration) and records a _verdict_ on each claim:
+  supported, refuted, or not enough info. Claims can be derived from broader claims, which
+  forms the hierarchy used to group the findings.
+]
+
 #let section-result() = {
   heading[Result]
+  about-ledger()
   if tampered {
     block(width: 100%, fill: rgb("#f3d0d0"), stroke: 0.8pt + luma(60), inset: 8pt, radius: 3pt)[
-      *INTEGRITY CHECK FAILED.* The catalog was changed outside claims-mcp (see the Integrity
-      section). Its verdicts and evidence cannot be trusted, so this report is not a clean
+      *INTEGRITY CHECK FAILED.* The claims ledger was changed outside claims-mcp (see the
+      Integrity section). Its verdicts and evidence cannot be trusted, so this report is not a clean
       result.
     ]
   } else if seal-check == none {
-    par(emph[Integrity seals were not checked. Render with `just report` to include them.])
+    par(emph[Integrity seals were not checked; see the Integrity section.])
   }
   let evidence = active.map(claim => claim.evidence).flatten()
   let stances = count-by(evidence, item => item.stance)
@@ -482,10 +497,10 @@
 
 #let section-integrity() = {
   heading[Integrity]
-  [claims-mcp seals every claim, evidence item, and verdict when a tool records it. A record
-    whose seal fails was changed outside the server.]
+  [claims-mcp seals every claim, evidence item, and verdict as it is recorded. A record whose
+    seal fails was changed afterwards by other means, such as editing the ledger file by hand.]
   if seal-check == none {
-    par(emph[Not checked: no `integrity` input was given.])
+    par(emph[Not checked: the report was rendered without the result of `claims-mcp verify`.])
     return
   }
   if seal-check.verified {
@@ -498,8 +513,8 @@
     )
   }
   if seal-check.adopted.len() > 0 {
-    par[#seal-check.adopted.len() records were sealed by `claims-mcp seal --adopt` (migrated)
-      rather than recorded through the server#if full [:] else [.]]
+    par[#seal-check.adopted.len() records were sealed when an older ledger was migrated
+      (`claims-mcp seal --adopt`) rather than as they were recorded#if full [:] else [.]]
     if full { text(size: 7.5pt, seal-check.adopted.map(raw).join(", ")) }
   }
 }
@@ -622,7 +637,7 @@
 
 #let section-gaps() = {
   heading[Gap summary]
-  [All eight gap categories of spec section 4.1 were checked, over active claims only.]
+  [Every active claim was checked against all eight gap categories below.]
   data-table(
     columns: (auto, 1fr, auto),
     header: ([Gap], [Meaning], [Count]),
@@ -656,8 +671,8 @@
 
 #let section-hierarchy() = {
   heading[Claim hierarchy]
-  [Active claims, indented under their parents by `derived_from`. A claim with several parents
-    appears under each. Roots are claims with no active parent.]
+  [Active claims, each indented under the claims it was derived from. A claim with several
+    parents appears under each. Roots are claims with no active parent.]
   let roots = active.filter(claim => claim.derived_from.all(parent => parent in retired-set))
   for root in roots {
     tree-node(root.id, 0)
@@ -739,7 +754,9 @@
     " \\\n  --input integrity=" + inputs.integrity
   } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
-  [Regenerate this PDF:]
+  [Regenerate this PDF with the #link(claims-mcp-url)[claims-mcp] command-line tool and its
+    report template (`report/claims-report.typ` in the claims-mcp repository; adjust the path
+    to where it is on your machine) using #link("https://typst.app")[Typst]:]
   raw(
     block: true,
     lang: "sh",
@@ -758,14 +775,12 @@
       + integrity-flag,
   )
   if not full {
-    [This is the summary. Pass `--input detail=full` (or `just report full`) for every
-      finding in full, every claim per gap, the claim hierarchy, the traceability matrix, and the
-      evidence appendix with each claim's verdict history.]
+    par[This is the summary. Render with `--input detail=full` for every finding in full, every
+      claim per gap, the claim hierarchy, the traceability matrix, and the evidence appendix
+      with each claim's verdict history.]
   }
-  [Re-run the checks. `cargo test` runs the server's tests; `cargo test typst_template` also
-    confirms that this template's totals, gaps, and matrix match `audit_report` (it needs the
-    Typst CLI on `PATH`). Each evidence locator names the test, command, or file to re-inspect.]
-  raw(block: true, lang: "sh", "cargo test\ncargo test typst_template")
+  par[To re-check a verdict, follow the locators of its evidence: each names the test, command,
+    or file in #artifact to re-run or re-inspect.]
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -786,6 +801,8 @@
   },
 )
 #show heading.where(level: 1): set block(above: 1.6em, below: 0.9em)
+// External links (claims-mcp, Typst, issues) are underlined so print readers can spot them.
+#show link: underline
 
 #cover()
 
