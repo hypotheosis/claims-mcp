@@ -93,7 +93,8 @@ checked by assertions in `report/text-tests.typ`.
 - Backtick spans in statements, sources, reasons, summaries, and rationales render as inline
   code.
 - Every free-text table cell gets zero-width break opportunities after `/ _ . : , = -` (the
-  existing `wrappable` helper), so no cell overflows into its neighbour.
+  existing `wrappable` helper), so no cell overflows into its neighbour. A hyphen after an
+  uppercase letter gets none, so `CLM-0042` and `EVD-0007` never split.
 - In full mode, each evidence item renders as a full-width block: a header line
   `EVD-NNNN · kind · stance · recorded_at`, then the locator, then the summary. This replaces
   the six-column evidence tables in finding cards and the appendix.
