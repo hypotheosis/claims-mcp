@@ -296,6 +296,30 @@
   )
 }
 
+// Meanings shown both in the glossary and where the terms are used, so each is written once.
+#let integrity-levels = (
+  "4": [safety, security, or data loss],
+  "3": [a core function fails],
+  "2": [a function is degraded],
+  "1": [cosmetic or documentation],
+)
+#let verification-methods = (
+  inspection: [someone reads the code, documents, or output],
+  analysis: [reasoning, calculation, or static analysis],
+  demonstration: [running the system and observing its behavior],
+  test: [executing a defined test with pass/fail criteria],
+  formal_proof: [a machine-checked or rigorous mathematical proof],
+)
+#let level-meanings = {
+  integrity-levels.pairs().map(((level, meaning)) => [#level #meaning]).join("; ")
+}
+#let method-meanings = {
+  verification-methods
+    .pairs()
+    .map(((name, meaning)) => [_#name.replace("_", " ")_, #meaning])
+    .join("; ")
+}
+
 #let id-text(id) = raw(id)
 #let ids(list) = if list.len() == 0 { [none] } else { list.map(id-text).join(", ") }
 #let or-dash(value) = if value == none { [-] } else { [#value] }
@@ -430,7 +454,8 @@
   requirement of #artifact is recorded as an atomic _claim_; an auditor attaches _evidence_
   (tests, analysis, inspection, demonstration) and records a _verdict_ on each claim:
   supported, refuted, or not enough info. Claims can be derived from broader claims, which
-  forms the hierarchy used to group the findings.
+  forms the hierarchy used to group the findings. Every term the report uses is defined in the
+  Glossary (@glossary).
 ]
 
 #let section-result() = {
@@ -593,8 +618,7 @@
 #let section-coverage() = {
   heading[Coverage by integrity level]
   [Each claim's _integrity level_ (IL, from the IEEE 1012 verification standard) rates the
-    consequence if it is wrong: 4 safety, security, or data loss; 3 a core function fails; 2 a
-    function is degraded; 1 cosmetic or documentation. Higher levels call for more rigorous
+    consequence if it is wrong: #level-meanings. Higher levels call for more rigorous
     verification.]
   let rows = ("4", "3", "2", "1", "unassigned").map(key => {
     let group = active.filter(claim => integrity-key(claim) == key)
@@ -622,7 +646,7 @@
   heading(level: 2)[Rigor check]
   let critical = active.filter(claim => integrity(claim) in (3, 4)).len()
   [Claims at integrity level 3 or 4 should be verified by test, analysis, demonstration, or
-    formal proof, not by _inspection_ alone (someone reading the code or documents). ]
+    formal proof, not by _inspection_ alone (#verification-methods.inspection). ]
   if critical == 0 {
     [No active claim has integrity level 3 or 4.]
   } else if gaps.rigor.len() == 0 {
@@ -645,7 +669,7 @@
 )
 
 #let section-gaps() = {
-  heading[Gap summary]
+  [#heading[Gap summary] <gaps>]
   [Every active claim was checked against all eight gap categories below.]
   data-table(
     columns: (auto, 1fr, auto),
@@ -746,6 +770,85 @@
   claims.map(evidence-entry).join()
 }
 
+#let glossary-group(title, ..entries) = {
+  heading(level: 2, title)
+  for (term, meaning) in entries.pos() {
+    terms.item(term, meaning)
+  }
+}
+
+#let section-glossary() = {
+  [#heading[Glossary] <glossary>]
+  glossary-group(
+    [Claims],
+    ([Claim (`CLM-NNNN`)], [One atomic, checkable statement about #artifact: a requirement,
+      or a promise its documentation or code makes.]),
+    ([Source], [Where the claim's statement comes from, such as a document and section.]),
+    ([Parent, child], [A child claim is derived from a broader parent claim and narrows it. A
+      parent holds only if all of its children do.]),
+    ([Root], [A claim with no active parent: the broadest statements in the ledger.]),
+    ([Area], [A claim directly below a root. Findings are grouped by area.]),
+    ([Retired], [A claim withdrawn from the audit, for example because more precise claims
+      replaced it. It is kept with its reason but excluded from every total and gap.]),
+    ([Claim level], [Where a claim sits in the requirements hierarchy, broadest first:
+      _system_ (the whole system or a top-level task), _software_, _component_ (one module),
+      _unit_ (one function or type), _artifact_ (a concrete produced file or output).]),
+    ([Integrity level (IL)], [How serious it would be if the claim were wrong, from the IEEE
+      1012 verification standard: #level-meanings. Higher levels call for more rigorous
+      verification.]),
+    ([Verification method], [How a claim is meant to be verified: #method-meanings.]),
+  )
+  glossary-group(
+    [Evidence],
+    ([Evidence (`EVD-NNNN`)], [Something the auditor observed about a claim, recorded with a
+      locator, a kind, a stance, and a summary of what it shows.]),
+    ([Locator], [Where to find the evidence again: a file and line, a test name, a command, or
+      a URL.]),
+    ([Kind], [The form of the evidence: _test_ (an executed test), _inspection_ (reading an
+      artifact), _analysis_ (reasoning or static analysis), _demonstration_ (running the
+      system), _proof_ (proof output), _log_ (captured log or command output), or _other_.]),
+    ([Stance], [Whether the evidence _supports_ the claim (shows it holds), _refutes_ it (shows
+      it does not), or is _neutral_ (relevant but decides nothing).]),
+    ([Roll-up], [Evidence on a parent claim that summarizes its children's verdicts. Its
+      locator reads "children of CLM-NNNN", followed by counts and the children not yet
+      supported.]),
+  )
+  glossary-group(
+    [Verdicts and findings],
+    ([#marker("supported")], [The cited evidence shows the claim holds.]),
+    ([#marker("refuted")], [The cited evidence shows the claim does not hold.]),
+    ([#marker("not_enough_info")], [The evidence gathered cannot decide the claim.]),
+    ([#marker("unverified")], [No verdict has been recorded yet.]),
+    ([Current verdict], [A claim's latest verdict. Verdicts are never edited; a new verdict is
+      appended, so earlier ones remain as history.]),
+    ([Rationale], [The auditor's explanation of why the cited evidence leads to the verdict.]),
+    ([Auditor], [The person or AI model that recorded a verdict.]),
+    ([Finding], [An active claim whose current verdict is refuted or not enough info.]),
+    ([Next step], [For a finding, the text after "Fix:" in its rationale: the one action
+      that would fix the claim or decide it.]),
+    ([Gap], [A category of open problem, such as a claim with no evidence or a stale verdict.
+      The eight categories are defined in the Gap summary (@gaps).]),
+    ([Rigor gap], [A claim at integrity level 3 or 4 that relies on inspection alone.]),
+  )
+  glossary-group(
+    [Integrity],
+    ([Seal], [A keyed checksum (HMAC) that claims-mcp computes over each claim, evidence item,
+      and verdict as it is recorded. A record whose seal no longer matches was changed
+      afterwards by other means.]),
+    ([Adopted record], [A record sealed when an older ledger without seals was migrated. Its
+      seal shows it has not changed since the migration, not since it was first recorded.]),
+  )
+  if full {
+    glossary-group(
+      [Report sections],
+      ([Traceability matrix], [One row per active claim, tracing it from its source through its
+        parents, verification method, and evidence to its current verdict.]),
+      ([Evidence appendix], [Every evidence item of every claim, followed by the claim's full
+        verdict history.]),
+    )
+  }
+}
+
 #let section-reproduce() = {
   heading[Reproduce]
   // `git describe --dirty` appends "-dirty" when the catalog had uncommitted changes; that
@@ -830,5 +933,6 @@
     section-matrix()
     section-evidence()
   }
+  section-glossary()
   section-reproduce()
 }

@@ -266,7 +266,9 @@ executes commands. It has two detail levels:
   IDs in each gap, the claim hierarchy, the traceability matrix, and an evidence appendix with
   each claim's full verdict history.
 
-Both collapse long claim ID lists into ranges and roll-up evidence into child counts.
+Both collapse long claim ID lists into ranges and roll-up evidence into child counts, and both
+end with a glossary that defines every term the report uses (verdicts, stances, integrity levels,
+verification methods, seals), so readers need not know claims-mcp.
 
 ```bash
 just report                       # summary: claims.json -> audit.pdf
