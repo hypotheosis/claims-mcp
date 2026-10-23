@@ -1,5 +1,13 @@
 # Report Detail Modes Implementation Plan
 
+> **Historical record.** This plan describes the code as first implemented. Review follow-ups
+> in PR #16 changed it afterwards: roots and childless areas are findings rather than group
+> heads, refuted heads are kept, the `wrappable`, `compress-runs` and `reason-key` regexes were
+> tightened, the reproduce note says `just report full` (the `just report detail=full` below is
+> invalid), the report text was made readable outside claims-mcp, a glossary was added, and the
+> full report is 796 pages, not 795. Treat `report/claims-report.typ`, `report/text.typ`, the
+> spec and the changelog, not the code blocks below, as the description of the shipped code.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make the Typst PDF audit report readable on large catalogs by adding a `summary`
