@@ -6,7 +6,7 @@
 # out: the report computes those from the catalog, so prose here cannot contradict them.
 
 artifact = "claims-mcp"
-version = "0.1.0"
+version = "0.2.0"
 repository = "https://github.com/hypotheosis/claims-mcp"
 method = "skills/claims-audit"
 
