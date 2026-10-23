@@ -1,5 +1,8 @@
 //! `claims-mcp`: a stdio MCP server that maintains a JSON catalog of verifiable claims.
 
+mod error;
+mod model;
+
 use tracing_subscriber::EnvFilter;
 
 fn main() {
