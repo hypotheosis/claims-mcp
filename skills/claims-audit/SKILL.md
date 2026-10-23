@@ -138,11 +138,12 @@ evidence is `not_enough_info`.
 #### Parent claims
 
 Judge leaf claims first. Once every active child of a parent is `supported`, record one
-`analysis` evidence item on the parent with locator `children: CLM-0003, CLM-0004` and a
-summary explaining how the children together cover the parent, then record the parent's
-verdict citing it. If any child is `refuted`, record `refutes` evidence on the parent naming
-that child and mark the parent `refuted`. Until then the report lists the parent under
-`decomposition`.
+`analysis` evidence item on the parent with locator `children of CLM-0002` (the parent's own
+id; do not list the children, since the report counts them from the catalog) and a summary
+explaining how the children together cover the parent, then record the parent's verdict citing
+it. If any child is `refuted`, record `refutes` evidence on the parent with the same locator,
+naming the refuted children in the summary, and mark the parent `refuted`. Until then the
+report lists the parent under `decomposition`.
 
 ### 5. Report
 

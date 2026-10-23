@@ -26,7 +26,7 @@ Pick one:
 
 - **Download a release.** Each [GitHub release](https://github.com/hypotheosis/claims-mcp/releases)
   has an archive per platform, a `.sha256` checksum for each, and the audit report for that
-  version:
+  version (`audit.pdf`, the summary, and `audit-full.pdf`, every record):
 
   | Platform | Archive |
   |---|---|
@@ -256,17 +256,26 @@ first sentence before the marker. Items beyond `--limit` are counted per area. T
 ## Generate a PDF report
 
 [`report/claims-report.typ`](report/claims-report.typ) renders a catalog as a self-contained
-PDF audit report with [Typst](https://typst.app): result and assessment, integrity seal status,
-findings, coverage by integrity level, all eight gap categories, the claim hierarchy, the
-traceability matrix, and an evidence appendix with the full verdict history. It runs outside the
-server, which never executes commands.
+PDF audit report with [Typst](https://typst.app). It runs outside the server, which never
+executes commands. It has two detail levels:
+
+- **summary** (default): result and assessment, integrity seal status, findings grouped by
+  area (refuted claims in full, the rest as one-line next steps), coverage by integrity level,
+  and gap counts.
+- **full**: everything in the summary, plus every finding in full with its evidence, the claim
+  IDs in each gap, the claim hierarchy, the traceability matrix, and an evidence appendix with
+  each claim's full verdict history.
+
+Both collapse long claim ID lists into ranges and roll-up evidence into child counts.
 
 ```bash
-just report                       # claims.json -> audit.pdf, stamped with the current commit
+just report                       # summary: claims.json -> audit.pdf
+just report full                  # full: claims.json -> audit-full.pdf
 # or, without just:
 claims-mcp --catalog claims.json verify --json > target/integrity.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
+  --input detail=summary \
   --input commit=$(git rev-parse --short HEAD) \
   --input notes=report/audit-notes.toml \
   --input integrity=target/integrity.json
@@ -277,6 +286,7 @@ Paths are relative to `--root`. All inputs are optional:
 | Input | Meaning |
 |---|---|
 | `catalog` | Catalog to report on (default `claims.json`) |
+| `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
 | `notes` | TOML sidecar with `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator; see [`report/audit-notes.toml`](report/audit-notes.toml) |
@@ -285,7 +295,8 @@ Paths are relative to `--root`. All inputs are optional:
 
 Tag a claim `issue:N` to link it to issue N of `repository` in the findings. The template applies
 the gap rules of spec section 4.1; `cargo test typst_template` checks that its totals, gaps, and
-matrix match `audit_report`. When `typst` is not installed that check is skipped and still
+matrix match `audit_report` in both detail levels, and that its text helpers pass
+`report/text-tests.typ`. When `typst` is not installed that check is skipped and still
 counts as passed, so a green `cargo test` does not prove it ran; set `REQUIRE_TYPST=1` (as CI
 should) to make a missing `typst` fail the tests instead.
 
