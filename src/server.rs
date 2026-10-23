@@ -275,13 +275,13 @@ impl ClaimsServer {
 
     #[tool(
         annotations(read_only_hint = true),
-        description = "TL;DR of the audit: open leaf claims ranked into tiers, each with one \
-        next step taken from the 'Fix:' in its latest verdict rationale. Tier 0 is an \
-        integrity failure (make `claims-mcp verify` pass first, usually by restoring the catalog \
-        from git), tier 1 refuted claims, tier 2 \
-        other open claims at integrity level 3-4, tier 3 the rest counted per area. Tiers 1 \
-        and 2 list at most `limit` items (default 10, 0 for all). Use audit_report for the \
-        full gap lists."
+        description = "TL;DR of the audit: open claims ranked into tiers, each with one next \
+        step taken from the 'Fix:' in its latest verdict rationale. Open claims are leaves that \
+        need work, plus parents whose active children are all done but which still need their \
+        roll-up verdict. Tier 0 is an integrity failure (make `claims-mcp verify` pass first, \
+        usually by restoring the catalog from git), tier 1 refuted claims, tier 2 other open \
+        claims at integrity level 3-4, tier 3 the rest counted per area. Tiers 1 and 2 list at \
+        most `limit` items (default 10, 0 for all). Use audit_report for the full gap lists."
     )]
     async fn next_steps(&self, Parameters(params): Parameters<NextStepsParams>) -> ToolResult {
         let limit = params.limit;

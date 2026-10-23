@@ -26,7 +26,7 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 | `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
 | `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
-| `next_steps` | Ranked TL;DR: open leaf claims by tier, each with one next step |
+| `next_steps` | Ranked TL;DR: open claims by tier, each with one next step |
 
 ## Errors and constraints
 

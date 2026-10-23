@@ -222,7 +222,7 @@ away from the file entirely, add deny rules to the project's `.claude/settings.j
 | `record_verdict` | Append a FEVER verdict; it must cite evidence that backs it |
 | `trace` | Ancestors and descendants of a claim, optionally depth-limited |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
-| `next_steps` | Ranked TL;DR: open leaf claims in priority tiers, each with one next step |
+| `next_steps` | Ranked TL;DR: open claims in priority tiers, each with one next step |
 
 ## TL;DR of next steps
 
@@ -235,8 +235,10 @@ claims-mcp --catalog claims.json tldr --limit 0   # every item
 claims-mcp --catalog claims.json tldr --json      # same data as the next_steps tool
 ```
 
-Only active **leaf** claims (no active children) are listed: a parent's verdict rolls up from
-its children. Open leaves are ranked into tiers:
+Active **leaf** claims (no active children) are listed when they need work. A parent's verdict
+rolls up from its children, so a parent is listed only once every active child is done and its
+own verdict is not (missing, refuted, not_enough_info or stale): its step is then to record the
+roll-up verdict. Open claims are ranked into tiers:
 
 | Tier | Contents |
 |---|---|

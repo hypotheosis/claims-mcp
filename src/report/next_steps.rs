@@ -26,6 +26,10 @@ const NO_EVIDENCE_STEP: &str = "No evidence attached; gather evidence, then reco
 const NO_VERDICT_STEP: &str = "Evidence attached but no verdict; record one.";
 /// Step for a verdict whose rationale names no next step.
 const NO_STEP_IN_RATIONALE: &str = "Rationale names no next step; read the latest verdict.";
+/// Step for a parent whose active children are all done but whose own verdict is not.
+const ROLLUP_STEP: &str =
+    "All active children are done; record the parent's roll-up verdict (claims-audit skill, \
+     Parent claims).";
 
 /// Result of the `next_steps` tool and of `claims-mcp tldr --json`.
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -35,11 +39,11 @@ pub struct NextSteps {
     pub integrity: IntegrityReport,
     /// Claim counts.
     pub summary: NextStepsSummary,
-    /// Tier 1: refuted leaves.
+    /// Tier 1: refuted open claims.
     pub wrong: Tier,
-    /// Tier 2: other open leaves at integrity level 3 or 4.
+    /// Tier 2: other open claims at integrity level 3 or 4.
     pub unproven: Tier,
-    /// Tier 3: the remaining open leaves, counted per area.
+    /// Tier 3: the remaining open claims, counted per area.
     pub other: Vec<AreaCount>,
 }
 
@@ -50,6 +54,9 @@ pub struct NextStepsSummary {
     pub active_claims: usize,
     /// Active claims with at least one active child; their verdicts roll up from children.
     pub rollup_claims: usize,
+    /// Roll-up claims whose active children are all done but which are not done themselves;
+    /// they are listed in the tiers with a "record the roll-up verdict" step.
+    pub rollups_ready: usize,
     /// Leaves that still need work.
     pub open_leaves: usize,
     /// Leaves that are supported, not stale, and have evidence.
@@ -59,7 +66,7 @@ pub struct NextStepsSummary {
 /// One priority tier.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct Tier {
-    /// Number of open leaves in the tier, listed or not.
+    /// Number of open claims in the tier, listed or not.
     pub total: usize,
     /// The highest-priority items, at most the requested limit.
     pub items: Vec<NextStep>,
@@ -67,7 +74,7 @@ pub struct Tier {
     pub omitted: Vec<AreaCount>,
 }
 
-/// One open leaf claim and what to do about it.
+/// One open claim (a leaf, or a roll-up ready for its verdict) and what to do about it.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct NextStep {
     /// Claim id.
@@ -78,6 +85,8 @@ pub struct NextStep {
     pub verdict: CurrentVerdict,
     /// `true` when evidence was recorded after the latest verdict.
     pub stale: bool,
+    /// `true` for a roll-up claim whose active children are all done.
+    pub rollup_ready: bool,
     /// Suffix of the claim's first `area:` tag, or `(none)`.
     pub area: String,
     /// Claim statement, in full.
@@ -97,8 +106,20 @@ pub struct AreaCount {
     pub count: usize,
 }
 
-/// Ranks the open leaf claims of `catalog` into tiers. Tiers 1 and 2 list at most `limit`
-/// items each (`0` lists everything); the rest are counted per area.
+/// One open claim waiting to be ranked into a tier.
+///
+/// Rust note: `'c` ties the borrow to the catalog, and `Copy` lets the tuple-like struct be
+/// passed around by value as cheaply as the `&Claim` it wraps.
+#[derive(Debug, Clone, Copy)]
+struct OpenClaim<'c> {
+    claim: &'c Claim,
+    stale: bool,
+    rollup_ready: bool,
+}
+
+/// Ranks the open claims of `catalog` into tiers: leaves that need work, and roll-ups whose
+/// children are all done but which still need their own verdict. Tiers 1 and 2 list at most
+/// `limit` items each (`0` lists everything); the rest are counted per area.
 ///
 /// One child-index build plus one pass over the claims, then a sort of each listed tier.
 ///
@@ -120,20 +141,36 @@ pub fn next_steps(catalog: &Catalog, limit: usize) -> NextSteps {
 
     for claim in catalog.claims().iter().filter(|claim| claim.is_active()) {
         summary.active_claims += 1;
-        if children.contains_key(&claim.id) {
-            summary.rollup_claims += 1;
-            continue;
-        }
         let stale = is_stale(claim);
-        if is_done(claim, stale) {
+        let done = is_done(claim, stale);
+        let rollup_ready = if let Some(claim_children) = children.get(&claim.id) {
+            // A parent's own work starts once its children are done; until then the work is
+            // in the children, so the parent is counted but not listed.
+            summary.rollup_claims += 1;
+            let children_done = claim_children
+                .iter()
+                .all(|child| is_done(child, is_stale(child)));
+            if done || !children_done {
+                continue;
+            }
+            summary.rollups_ready += 1;
+            true
+        } else if done {
             summary.done_leaves += 1;
             continue;
-        }
-        summary.open_leaves += 1;
+        } else {
+            summary.open_leaves += 1;
+            false
+        };
+        let open = OpenClaim {
+            claim,
+            stale,
+            rollup_ready,
+        };
         if claim.current_verdict() == CurrentVerdict::Refuted {
-            wrong.push((claim, stale));
+            wrong.push(open);
         } else if is_high_integrity(claim) {
-            unproven.push((claim, stale));
+            unproven.push(open);
         } else {
             other_areas.push(area_of(claim));
         }
@@ -148,17 +185,17 @@ pub fn next_steps(catalog: &Catalog, limit: usize) -> NextSteps {
     }
 }
 
-/// A leaf needs no work when it is supported, not stale, and has evidence.
+/// A claim needs no work when it is supported, not stale, and has evidence.
 fn is_done(claim: &Claim, stale: bool) -> bool {
     claim.current_verdict() == CurrentVerdict::Supported && !stale && !claim.evidence.is_empty()
 }
 
 /// Sorts a tier by integrity level (highest first, unassigned last) then id, lists the first
 /// `limit` items, and counts the rest per area.
-fn build_tier(mut open: Vec<(&Claim, bool)>, limit: usize) -> Tier {
+fn build_tier(mut open: Vec<OpenClaim<'_>>, limit: usize) -> Tier {
     // Rust note: `Reverse` flips the ordering. `Option` sorts `None` before `Some`, so
     // reversed it puts unassigned levels last. Ids are unique, so an unstable sort is exact.
-    open.sort_unstable_by_key(|(claim, _)| (Reverse(claim.integrity_level), claim.id));
+    open.sort_unstable_by_key(|open| (Reverse(open.claim.integrity_level), open.claim.id));
     let shown = if limit == 0 {
         open.len()
     } else {
@@ -167,26 +204,34 @@ fn build_tier(mut open: Vec<(&Claim, bool)>, limit: usize) -> Tier {
     let (listed, rest) = open.split_at(shown);
     Tier {
         total: open.len(),
-        items: listed
-            .iter()
-            // Rust note: `|&(claim, stale)|` destructures each `&(&Claim, bool)` in the closure
-            // header, like `for claim, stale in pairs` in Python.
-            .map(|&(claim, stale)| to_next_step(claim, stale))
-            .collect(),
-        omitted: area_counts(rest.iter().map(|(claim, _)| area_of(claim))),
+        // Rust note: `|&open|` copies each `&OpenClaim` out of the slice (it is `Copy`), like
+        // `for open in listed` in Python.
+        items: listed.iter().map(|&open| to_next_step(open)).collect(),
+        omitted: area_counts(rest.iter().map(|open| area_of(open.claim))),
     }
 }
 
-/// Builds the output row for one open leaf.
-fn to_next_step(claim: &Claim, stale: bool) -> NextStep {
+/// Builds the output row for one open claim.
+fn to_next_step(open: OpenClaim<'_>) -> NextStep {
+    let OpenClaim {
+        claim,
+        stale,
+        rollup_ready,
+    } = open;
+    let next_step = if rollup_ready {
+        ROLLUP_STEP.to_owned()
+    } else {
+        next_step_text(claim, stale)
+    };
     NextStep {
         id: claim.id,
         integrity_level: claim.integrity_level,
         verdict: claim.current_verdict(),
         stale,
+        rollup_ready,
         area: area_of(claim).to_owned(),
         statement: claim.statement.clone(),
-        next_step: next_step_text(claim, stale),
+        next_step,
         issues: claim
             .tags
             .iter()
@@ -517,6 +562,7 @@ mod tests {
             NextStepsSummary {
                 active_claims: 5,
                 rollup_claims: 0,
+                rollups_ready: 0,
                 open_leaves: 4,
                 done_leaves: 1,
             }
@@ -559,6 +605,50 @@ mod tests {
         assert_eq!(ids(&steps.unproven), vec![orphan_parent]);
         assert_eq!(steps.other, vec![area("(none)", 1)]);
         assert!(!ids(&steps.unproven).contains(&child));
+    }
+
+    /// Adds an active child of `parent` at time 0, with integrity level 1 and no verdict.
+    fn child(catalog: &mut Catalog, parent: ClaimId) -> ClaimId {
+        let mut input = NewClaim {
+            derived_from: vec![ClaimRef::Existing(parent)],
+            ..new_claim("child")
+        };
+        input.integrity_level = Some(IntegrityLevel::try_from(1).expect("level"));
+        catalog.add_claim(input, at(0)).expect("child").id
+    }
+
+    #[test]
+    fn roll_ups_with_all_children_done_are_listed_until_judged() {
+        let mut catalog = Catalog::default();
+        let unjudged = leaf(&mut catalog, "unjudged parent", Some(4), &["area:AUTH"]);
+        let done_child = child(&mut catalog, unjudged);
+        judge(&mut catalog, done_child, Verdict::Supported, "Tested.");
+        let refuted = leaf(&mut catalog, "refuted parent", Some(2), &[]);
+        let fixed_child = child(&mut catalog, refuted);
+        judge(&mut catalog, fixed_child, Verdict::Supported, "Tested.");
+        judge(&mut catalog, refuted, Verdict::Refuted, "Child failed.");
+        let judged = leaf(&mut catalog, "judged parent", Some(4), &[]);
+        let judged_child = child(&mut catalog, judged);
+        judge(&mut catalog, judged_child, Verdict::Supported, "Tested.");
+        judge(
+            &mut catalog,
+            judged,
+            Verdict::Supported,
+            "Children cover it.",
+        );
+        let waiting = leaf(&mut catalog, "waiting parent", Some(4), &[]);
+        child(&mut catalog, waiting);
+
+        let steps = next_steps(&catalog, 0);
+
+        assert_eq!(ids(&steps.unproven), vec![unjudged]);
+        assert_eq!(ids(&steps.wrong), vec![refuted]);
+        assert!(steps.unproven.items[0].rollup_ready);
+        assert_eq!(steps.unproven.items[0].next_step, ROLLUP_STEP);
+        assert_eq!(steps.wrong.items[0].next_step, ROLLUP_STEP);
+        assert_eq!(steps.summary.rollup_claims, 4);
+        assert_eq!(steps.summary.rollups_ready, 2);
+        assert_eq!(steps.other, vec![area("(none)", 1)]);
     }
 
     #[test]

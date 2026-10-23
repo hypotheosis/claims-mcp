@@ -55,7 +55,7 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
-    /// Print a TL;DR: open leaf claims ranked into priority tiers, each with its next step.
+    /// Print a TL;DR: open claims ranked into priority tiers, each with its next step.
     Tldr {
         /// Items listed in each of tiers 1 and 2; the rest are counted per area. 0 lists
         /// everything.
@@ -209,9 +209,9 @@ fn write_tldr(out: &mut impl Write, path: &str, steps: &NextSteps) -> std::io::R
     let summary = &steps.summary;
     let leaves = summary.done_leaves + summary.open_leaves;
     writeln!(out, "# TL;DR: {path}\n")?;
-    writeln!(
+    write!(
         out,
-        "{} active {}: {} {} ({} done, {} open), {} {}.\n",
+        "{} active {}: {} {} ({} done, {} open), {} {}",
         summary.active_claims,
         plural(summary.active_claims, "claim", "claims"),
         leaves,
@@ -221,6 +221,10 @@ fn write_tldr(out: &mut impl Write, path: &str, steps: &NextSteps) -> std::io::R
         summary.rollup_claims,
         plural(summary.rollup_claims, "roll-up", "roll-ups")
     )?;
+    if summary.rollups_ready > 0 {
+        write!(out, " ({} ready for a verdict)", summary.rollups_ready)?;
+    }
+    writeln!(out, ".\n")?;
     if !steps.integrity.verified {
         writeln!(out, "## 0. STOP: integrity check failed\n")?;
         let failed = steps.integrity.problems.len();
@@ -403,6 +407,7 @@ mod tests {
             summary: NextStepsSummary {
                 active_claims: 6,
                 rollup_claims: 1,
+                rollups_ready: 0,
                 open_leaves: 4,
                 done_leaves: 1,
             },
@@ -413,6 +418,7 @@ mod tests {
                     integrity_level: Some(IntegrityLevel::try_from(4).expect("level")),
                     verdict: CurrentVerdict::Refuted,
                     stale: false,
+                    rollup_ready: false,
                     area: "AUTH".to_owned(),
                     statement: "Tokens expire.".to_owned(),
                     next_step: "Add an expiry test.".to_owned(),
@@ -507,6 +513,17 @@ mod tests {
 
         assert!(text.contains("1 active claim: 1 leaf (0 done, 1 open), 1 roll-up.\n"));
         assert!(text.contains("\n\n1 record failed the seal check."));
+    }
+
+    #[test]
+    fn tldr_summary_counts_roll_ups_ready_for_a_verdict() {
+        let mut steps = sample_steps(0);
+        steps.summary.rollup_claims = 3;
+        steps.summary.rollups_ready = 2;
+
+        let text = rendered_tldr(&steps);
+
+        assert!(text.contains("3 roll-ups (2 ready for a verdict).\n"));
     }
 
     #[test]

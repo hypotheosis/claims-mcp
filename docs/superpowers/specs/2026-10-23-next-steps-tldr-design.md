@@ -33,9 +33,15 @@ One shared function, two entry points:
 
 ## 3. Scope: actionable claims
 
-Only **active leaf claims** are listed: active claims with no active children. A parent's verdict
-is a roll-up of its children, so fixing the children fixes the parent. Active parents are counted
-in `rollup_claims` and do not appear in any tier.
+Listed claims are **active leaf claims** (no active children) and **ready roll-ups**. A
+parent's verdict is a roll-up of its children, so while any active child is not done, the work
+is in the children: the parent is counted in `rollup_claims` and not listed. Once every active
+child is done (as defined below), the parent's own work starts: if the parent is not done
+itself, it is a ready roll-up, counted in `rollups_ready` and ranked into the tiers like a leaf
+(by its own verdict and integrity level), with the fixed step `"All active children are done;
+record the parent's roll-up verdict (claims-audit skill, Parent claims)."` and
+`rollup_ready: true`. Without this, a catalog whose leaves are all done but whose parents were
+never rolled up would show no open work.
 
 A leaf is **open** when any of these hold:
 
