@@ -1,0 +1,20 @@
+# Weekly dependency updates. Actions are pinned by commit SHA in the workflows; Dependabot bumps
+# the SHA and its version comment together for actions pinned to a release tag.
+# `dtolnay/rust-toolchain` is pinned to a SHA on its `master` branch (it publishes no version
+# tags to resolve against), so it is bumped by hand.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      cargo:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

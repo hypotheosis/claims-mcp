@@ -192,6 +192,10 @@ should) to make a missing `typst` fail the tests instead.
 See [the design spec](docs/superpowers/specs/2026-10-23-claims-mcp-design.md), section 3,
 for the full schema. Ids look like `CLM-0007` and `EVD-0014` and are never reused.
 
+## Security
+
+Report vulnerabilities privately; see [`SECURITY.md`](SECURITY.md).
+
 ## Development
 
 ```bash
@@ -214,8 +218,9 @@ just test     # cargo test
 
 ### Releasing
 
-1. Set `version` in `Cargo.toml` to the new version, update `report/audit-notes.toml` to match,
-   and merge.
+1. In a pull request, set `version` in `Cargo.toml` to the new version, update
+   `report/audit-notes.toml` to match, and merge. `main` only accepts changes through pull
+   requests that pass CI and are up to date with `main`.
 2. Tag the merge commit and push the tag:
 
    ```bash
@@ -227,7 +232,10 @@ just test     # cargo test
 and points at a commit on `main` (and fails without publishing otherwise), reruns CI on the tagged commit, builds the five
 archives listed under [Install](#1-install-the-server), and publishes a GitHub release with
 the archives, their `.sha256` files, and the audit report. A pull request that changes
-`release.yml` runs the builds as a dry run without publishing.
+`release.yml` runs the builds as a dry run without publishing. Release tags (`v*`) cannot be
+moved or deleted once pushed, so a bad release is fixed with a new version. This includes a
+tag that fails the release checks: its version number is used up even though nothing was
+published.
 
 ## License
 
