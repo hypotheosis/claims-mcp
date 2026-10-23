@@ -143,19 +143,34 @@ impl CatalogStore {
         Ok(catalog)
     }
 
-    /// Writes the catalog to the temp file, flushes it to disk, and renames it into place.
+    /// Serializes the catalog and atomically replaces the catalog file with it.
     fn save(&self, catalog: &Catalog) -> Result<()> {
         let paths = &self.paths;
         let mut bytes = serde_json::to_vec_pretty(catalog)?;
         bytes.push(b'\n');
+        if let Err(error) = self.replace_catalog(&bytes) {
+            // Best effort: a leftover temp file is harmless (the next save truncates it), so a
+            // failure to remove it is ignored and the original error is reported.
+            let _ = fs::remove_file(&paths.temp);
+            return Err(error);
+        }
+        // The new catalog is already in place at this point. Reporting a failed directory sync
+        // as a failed mutation could make the caller retry and apply the change twice, so it is
+        // only logged.
+        if let Err(error) = sync_directory(&paths.directory) {
+            tracing::warn!("{error}");
+        }
+        Ok(())
+    }
 
+    /// Writes `bytes` to the temp file, flushes it to disk, and renames it over the catalog.
+    fn replace_catalog(&self, bytes: &[u8]) -> Result<()> {
+        let paths = &self.paths;
         let mut temp = File::create(&paths.temp).map_err(|source| io_error(&paths.temp, source))?;
-        temp.write_all(&bytes)
+        temp.write_all(bytes)
             .and_then(|()| temp.sync_all())
             .map_err(|source| io_error(&paths.temp, source))?;
-        fs::rename(&paths.temp, &paths.catalog)
-            .map_err(|source| io_error(&paths.catalog, source))?;
-        sync_directory(&paths.directory)
+        fs::rename(&paths.temp, &paths.catalog).map_err(|source| io_error(&paths.catalog, source))
     }
 }
 
@@ -179,6 +194,7 @@ fn io_error(path: &Path, source: std::io::Error) -> ClaimsError {
         source,
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -300,5 +316,34 @@ mod tests {
             .await
             .expect("read");
         assert_eq!(count, 1);
+    }
+
+    #[test]
+    fn concurrent_writers_never_lose_updates() {
+        let (_directory, store) = temp_store();
+        let writers: Vec<_> = (0..4)
+            .map(|writer| {
+                // A separate store per thread opens its own lock handle, like another process.
+                let store = CatalogStore::new(store.path());
+                std::thread::spawn(move || {
+                    for round in 0..10 {
+                        store
+                            .mutate_blocking(|catalog| {
+                                let statement = format!("writer {writer} round {round}");
+                                catalog.add_claim(new_claim(&statement), at(0))
+                            })
+                            .expect("mutate");
+                    }
+                })
+            })
+            .collect();
+        for handle in writers {
+            handle.join().expect("writer thread");
+        }
+        // Loading also runs Catalog::validate, so duplicate ids would fail this read.
+        let count = store
+            .read_blocking(|catalog| Ok(catalog.claims().len()))
+            .expect("read");
+        assert_eq!(count, 40);
     }
 }
