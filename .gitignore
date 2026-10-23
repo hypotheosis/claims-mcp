@@ -3,3 +3,4 @@
 .claims.json.tmp
 .env
 /audit.pdf
+/audit-full.pdf

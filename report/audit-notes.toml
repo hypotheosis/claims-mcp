@@ -1,5 +1,8 @@
 # Free-text sidecar for report/claims-report.typ (pass with --input notes=report/audit-notes.toml).
 #
+# These are claims-mcp's own notes for its self-audit. To report on another project, start from
+# report/audit-notes.example.toml instead of copying this file.
+#
 # SNAPSHOT: these notes record the auditor's judgment on the first self-audit of claims-mcp
 # (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 with a note saying so. They are
 # not a default. Rewrite the assessment and points whenever the catalog is re-audited. Counts, verdicts, and gaps are deliberately left

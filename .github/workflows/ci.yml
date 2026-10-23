@@ -1,10 +1,10 @@
 # Pull request checks: the pre-commit checklist from .claude/CLAUDE.md, the test suite on Linux,
 # Windows, and macOS (x86_64 Linux, x86_64 Windows, arm64 macOS; the release's aarch64 Linux and
-# x86_64 macOS builds are compiled but not tested), and the rendered audit report as a
-# downloadable artifact.
+# x86_64 macOS builds are compiled but not tested), and the rendered audit reports (summary and
+# full) as a downloadable artifact.
 #
 # release.yml also calls this workflow, so a tag publishes only after these checks pass on the
-# tagged commit, and the release reuses the audit report rendered here.
+# tagged commit, and the release reuses the audit reports rendered here.
 name: CI
 
 on:
@@ -98,6 +98,7 @@ jobs:
           typst-version: ${{ env.TYPST_VERSION }}
       - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
       - run: just report
+      - run: just report full
       - id: name
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -107,5 +108,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ steps.name.outputs.artifact }}
-          path: audit.pdf
+          path: |
+            audit.pdf
+            audit-full.pdf
           if-no-files-found: error
