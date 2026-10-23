@@ -484,13 +484,17 @@ mod tests {
     /// with no warnings and that its `<audit-report>` metadata equals `audit_report`.
     ///
     /// The Typst CLI is an external tool, so the check is skipped (with a note on stderr) when
-    /// `typst` is not on `PATH`.
+    /// `typst` is not on `PATH`, unless `REQUIRE_TYPST=1` is set (as CI should), which turns
+    /// the skip into a failure.
     fn assert_template_matches(catalog: &Catalog) {
         let typst_installed = Command::new("typst")
             .arg("--version")
             .output()
             .is_ok_and(|output| output.status.success());
         if !typst_installed {
+            // Rust note: `env::var` returns `Result`; `is_ok_and` is false for unset variables.
+            let required = std::env::var("REQUIRE_TYPST").is_ok_and(|value| value == "1");
+            assert!(!required, "REQUIRE_TYPST=1 but `typst` is not on PATH");
             eprintln!("skipping Typst template check: `typst` is not on PATH");
             return;
         }

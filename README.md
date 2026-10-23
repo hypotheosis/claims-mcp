@@ -109,7 +109,9 @@ Paths are relative to `--root`. All inputs are optional:
 
 Tag a claim `issue:N` to link it to issue N of `repository` in the findings. The template applies
 the gap rules of spec section 4.1; `cargo test typst_template` checks that its totals, gaps, and
-matrix match `audit_report` (the check is skipped when `typst` is not installed).
+matrix match `audit_report`. When `typst` is not installed that check is skipped and still
+counts as passed, so a green `cargo test` does not prove it ran; set `REQUIRE_TYPST=1` (as CI
+should) to make a missing `typst` fail the tests instead.
 
 ## Catalog format
 

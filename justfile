@@ -8,7 +8,8 @@ fmt:
 clippy:
     cargo clippy --all-targets -- -D warnings
 
-# Run all tests (the Typst template checks are skipped when `typst` is not installed).
+# Run all tests. The Typst template checks are skipped when `typst` is not installed,
+# unless REQUIRE_TYPST=1 is set.
 test:
     cargo test
 
