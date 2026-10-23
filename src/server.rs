@@ -4,15 +4,20 @@
 use chrono::Utc;
 use rmcp::handler::server::tool::ToolRouter;
 use rmcp::handler::server::wrapper::Parameters;
-use rmcp::model::{CallToolResult, ContentBlock};
-use rmcp::{tool, tool_handler, tool_router, ErrorData, ServerHandler};
+use rmcp::model::{
+    CallToolResult, ContentBlock, Implementation, ListResourcesResult, PaginatedRequestParams,
+    ReadResourceRequestParams, ReadResourceResponse, ReadResourceResult, Resource,
+    ResourceContents, ServerCapabilities, ServerConfig,
+};
+use rmcp::service::RequestContext;
+use rmcp::{tool, tool_handler, tool_router, ErrorData, RoleServer, ServerHandler};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::{ClaimFilter, ClaimUpdate, NewClaim, NewEvidence, NewVerdict};
 use crate::error;
 use crate::model::ClaimId;
-use crate::report::{self, next_steps, TraceDirection};
+use crate::report::{self, files, next_steps, TraceDirection};
 use crate::store::CatalogStore;
 
 /// Parameters for `add_claims`.
@@ -293,17 +298,74 @@ impl ClaimsServer {
     }
 }
 
-#[tool_handler(
-    router = self.tool_router,
-    name = "claims-mcp",
-    instructions = "Ledger of claims for requirements traceability, IEEE 1012 V&V, and \
-        FEVER-style auditing. Register atomic claims, attach evidence you gathered yourself, \
-        then record verdicts backed by that evidence. Use audit_report to find gaps, and \
-        next_steps for a ranked to-do list. Never edit the catalog file directly: every record \
-        is sealed, and the server refuses all writes after a hand edit until the file is \
-        restored from git."
-)]
-impl ServerHandler for ClaimsServer {}
+/// Server instructions sent to the client at initialization.
+const INSTRUCTIONS: &str = "Ledger of claims for requirements traceability, IEEE 1012 V&V, \
+    and FEVER-style auditing. Register atomic claims, attach evidence you gathered yourself, \
+    then record verdicts backed by that evidence. Use audit_report to find gaps, and next_steps \
+    for a ranked to-do list. Never edit the catalog file directly: every record is sealed, and \
+    the server refuses all writes after a hand edit until the file is restored from git. For a \
+    PDF audit report, the resources under claims://report/ hold the Typst template and a \
+    commented example of the notes file (claims://report/audit-notes.example.toml) that the \
+    auditor writes for the audited project; the `claims-mcp report init` command writes them \
+    into the project.";
+
+/// Rust note: `#[tool_handler]` fills in the tool methods of `ServerHandler`. It would also
+/// generate `get_info`, but only with the tools capability, so `get_info` is written here to
+/// add resources.
+#[tool_handler(router = self.tool_router)]
+impl ServerHandler for ClaimsServer {
+    fn get_info(&self) -> ServerConfig {
+        ServerConfig::new(
+            ServerCapabilities::builder()
+                .enable_tools()
+                .enable_resources()
+                .build(),
+        )
+        .with_server_info(Implementation::new("claims-mcp", env!("CARGO_PKG_VERSION")))
+        .with_instructions(INSTRUCTIONS.to_owned())
+    }
+
+    async fn list_resources(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ListResourcesResult, ErrorData> {
+        Ok(ListResourcesResult::with_all_items(report_resources()))
+    }
+
+    async fn read_resource(
+        &self,
+        request: ReadResourceRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> Result<ReadResourceResponse, ErrorData> {
+        read_report_resource(&request.uri).map(ReadResourceResponse::from)
+    }
+}
+
+/// One resource per embedded report file.
+fn report_resources() -> Vec<Resource> {
+    files::FILES
+        .iter()
+        .map(|file| {
+            Resource::new(file.uri(), file.name)
+                .with_description(file.description)
+                .with_mime_type(file.mime_type)
+                // Rust note: `as u64` widens `usize`, which never loses data on 32- or 64-bit.
+                .with_size(file.contents.len() as u64)
+        })
+        .collect()
+}
+
+/// The embedded report file at `uri`, or a `resource_not_found` error naming it.
+fn read_report_resource(uri: &str) -> Result<ReadResourceResult, ErrorData> {
+    let file = files::by_uri(uri)
+        .ok_or_else(|| ErrorData::resource_not_found(format!("no resource at {uri}"), None))?;
+    Ok(ReadResourceResult::new(vec![ResourceContents::text(
+        file.contents,
+        uri,
+    )
+    .with_mime_type(file.mime_type)]))
+}
 
 /// Every tool returns this. Domain errors become `Ok` results with `is_error: true` so the
 /// calling agent sees the message; only response encoding failures are protocol errors.
@@ -387,6 +449,62 @@ mod tests {
                 "trace"
             ]
         );
+    }
+
+    /// A real MCP client connected over an in-memory pipe lists every report file as a
+    /// resource and reads back exactly the embedded contents.
+    #[tokio::test]
+    async fn client_lists_and_reads_report_resources() {
+        use rmcp::ServiceExt;
+
+        let (_directory, server) = server();
+        // Rust note: `duplex` returns two connected in-memory byte streams, one per side.
+        let (server_side, client_side) = tokio::io::duplex(64 * 1024);
+        let server_task = tokio::spawn(async move {
+            server
+                .serve(server_side)
+                .await
+                .expect("server starts")
+                .waiting()
+                .await
+        });
+        // `()` is rmcp's do-nothing client handler.
+        let client = ().serve(client_side).await.expect("client connects");
+
+        let info = client.peer_info().expect("server info");
+        assert!(info.capabilities.resources.is_some());
+        let instructions = info.instructions.as_deref().expect("instructions");
+        assert!(instructions.contains(&files::NOTES_EXAMPLE.uri()));
+        assert!(instructions.contains("claims-mcp report init"));
+
+        let listed = client.list_all_resources().await.expect("list resources");
+        let uris: Vec<_> = listed
+            .iter()
+            .map(|resource| resource.uri.as_str())
+            .collect();
+        let expected: Vec<_> = files::FILES.iter().map(files::ReportFile::uri).collect();
+        assert_eq!(uris, expected);
+
+        let read = client
+            .read_resource(ReadResourceRequestParams::new(files::NOTES_EXAMPLE.uri()))
+            .await
+            .expect("read notes example");
+        match read.contents.as_slice() {
+            [ResourceContents::TextResourceContents { text, .. }] => {
+                assert_eq!(text, files::NOTES_EXAMPLE.contents);
+            }
+            other => panic!("expected one text content, got {other:?}"),
+        }
+        assert!(client
+            .read_resource(ReadResourceRequestParams::new("claims://report/missing"))
+            .await
+            .is_err());
+
+        client.cancel().await.expect("client closes");
+        server_task
+            .await
+            .expect("server task")
+            .expect("server exits");
     }
 
     #[test]

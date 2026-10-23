@@ -1,6 +1,7 @@
 //! Read-only analyses over a catalog: the audit report, trace queries, and the next-steps
-//! TL;DR.
+//! TL;DR; plus the embedded files of the PDF report.
 
+pub mod files;
 pub mod next_steps;
 
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
@@ -996,6 +997,44 @@ mod tests {
                 detail,
                 &[run.pdf().as_os_str(), OsStr::new("--input"), &notes_input],
             );
+        }
+    }
+
+    /// What another project does with only the binary: `report init` into an empty directory,
+    /// then the documented `typst compile --root .` command with relative paths, in both
+    /// detail modes, using the notes file `init` created.
+    #[test]
+    fn typst_renders_from_report_init_in_an_empty_directory() {
+        if !typst_available() {
+            return;
+        }
+        let (catalog, _) = areas_fixture();
+        let project = tempfile::tempdir().expect("temp dir");
+        files::init(&project.path().join(files::DEFAULT_DIR)).expect("report init");
+        std::fs::write(
+            project.path().join("claims.json"),
+            serde_json::to_vec(&catalog).expect("serialize catalog"),
+        )
+        .expect("write catalog");
+        std::fs::write(
+            project.path().join("integrity.json"),
+            serde_json::to_vec(&seal::verify(&catalog)).expect("serialize integrity"),
+        )
+        .expect("write integrity");
+        for (detail, pdf) in [("summary", "audit.pdf"), ("full", "audit-full.pdf")] {
+            let output = Command::new("typst")
+                .current_dir(project.path())
+                .args(["compile", "--root", ".", "report/claims-report.typ", pdf])
+                .args(["--input", "catalog=claims.json"])
+                .args(["--input", &format!("detail={detail}")])
+                .args(["--input", "notes=report/audit-notes.toml"])
+                .args(["--input", "integrity=integrity.json"])
+                .output()
+                .expect("run typst");
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            assert!(output.status.success(), "{detail} failed: {stderr}");
+            assert!(stderr.trim().is_empty(), "{detail} warned: {stderr}");
+            assert!(project.path().join(pdf).is_file(), "{pdf} missing");
         }
     }
 

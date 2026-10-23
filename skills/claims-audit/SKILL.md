@@ -165,17 +165,19 @@ lead the report with tiers 0-2:
 
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
 - Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report:
-  1. Write the audited project's notes file, starting from `report/audit-notes.example.toml` in
-     the claims-mcp repository (never copy claims-mcp's own `report/audit-notes.toml`). Set
-     `artifact`, `version`, and `repository`; write an `assessment` that says what was audited,
+  1. Run `claims-mcp report init` from the project root. It writes the report template to
+     `report/` and creates `report/audit-notes.toml` from the commented example (it never
+     replaces an existing notes file). Without a shell, read the MCP resource
+     `claims://report/audit-notes.example.toml` and write the notes file from it. Fill it in
+     as the example's comments say: set `artifact`, `version`, and `repository`; write an `assessment` that says what was audited,
      whether the project meets it, and which findings decide that, citing claim ids and issues;
      and add `[[points]]` for caveats the reader should weigh, such as whether the audit was
      independent of the builder, heuristic evidence, and hierarchy changes during the audit.
      Do not restate counts or verdicts; the report computes them.
   2. Build the PDF from a shell, not through this server (it never executes commands):
      `claims-mcp --catalog <ledger> verify --json > integrity.json`, then `typst compile --root .
-     <claims-mcp>/report/claims-report.typ audit.pdf --input catalog=<ledger> --input
-     notes=<notes file> --input commit=<sha> --input integrity=integrity.json`. Add
+     report/claims-report.typ audit.pdf --input catalog=<ledger> --input
+     notes=report/audit-notes.toml --input commit=<sha> --input integrity=integrity.json`. Add
      `--input detail=full` for the full record (every evidence item and verdict). Paths are
      relative to `--root`, so the template, ledger, and notes must all be under it.
   Tag a refuted claim `issue:N` to link its tracking issue.

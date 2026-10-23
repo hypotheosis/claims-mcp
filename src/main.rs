@@ -18,6 +18,7 @@ use clap::{Parser, Subcommand};
 use rmcp::ServiceExt;
 use tracing_subscriber::EnvFilter;
 
+use crate::report::files::{self, InitAction};
 use crate::report::next_steps::{self, AreaCount, NextSteps, Tier};
 use crate::seal::IntegrityReport;
 use crate::server::ClaimsServer;
@@ -72,6 +73,24 @@ enum Command {
         #[arg(long, required = true)]
         adopt: bool,
     },
+    /// Work with the PDF report's Typst files, which are built into this binary.
+    Report {
+        /// What to do with them.
+        #[command(subcommand)]
+        action: ReportCommand,
+    },
+}
+
+/// `report` subcommands.
+#[derive(Debug, Subcommand)]
+enum ReportCommand {
+    /// Write the report template, its text helpers, and the commented notes example into DIR,
+    /// and create DIR/audit-notes.toml from the example unless it already exists.
+    Init {
+        /// Directory to write into, relative to the current directory.
+        #[arg(default_value = files::DEFAULT_DIR)]
+        dir: PathBuf,
+    },
 }
 
 /// Rust note: `current_thread` runs the async reactor on one thread. That is enough for a
@@ -90,6 +109,9 @@ async fn main() -> ExitCode {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
         }
         Some(Command::Seal { adopt: _ }) => adopt(&store).await.map(|()| ExitCode::SUCCESS),
+        Some(Command::Report {
+            action: ReportCommand::Init { dir },
+        }) => report_init(&dir).map(|()| ExitCode::SUCCESS),
     };
     outcome.unwrap_or_else(|error| {
         // `{:#}` prints the whole anyhow context chain on one line.
@@ -335,6 +357,19 @@ async fn adopt(store: &CatalogStore) -> anyhow::Result<()> {
         writeln!(out, "sealed {} records as adopted:", adopted.len())?;
         for record in &adopted {
             writeln!(out, "  {record}")?;
+        }
+    }
+    Ok(())
+}
+
+/// Writes the report files into `dir` and lists what was written and what was kept.
+fn report_init(dir: &std::path::Path) -> anyhow::Result<()> {
+    let done = files::init(dir)?;
+    let mut out = std::io::stdout().lock();
+    for (path, action) in &done {
+        match action {
+            InitAction::Wrote => writeln!(out, "wrote {}", path.display())?,
+            InitAction::Kept => writeln!(out, "kept {} (already exists)", path.display())?,
         }
     }
     Ok(())

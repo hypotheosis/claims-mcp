@@ -2,6 +2,9 @@
 // audited project, who may not know claims-mcp: it introduces the tool once (`about-ledger`)
 // and refers to nothing that exists only in the claims-mcp repository.
 //
+// This file and text.typ are compiled into the claims-mcp binary; `claims-mcp report init`
+// writes them to report/ in the audited project, next to a notes file to fill in.
+//
 //   typst compile --root . report/claims-report.typ audit.pdf \
 //     --input catalog=claims.json --input commit=$(git rev-parse --short HEAD) \
 //     --input notes=report/audit-notes.toml --input integrity=target/integrity.json
@@ -878,9 +881,9 @@
     " \\\n  --input integrity=" + inputs.integrity
   } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
-  [Regenerate this PDF with the #link(claims-mcp-url)[claims-mcp] command-line tool and its
-    report template (`report/claims-report.typ` in the claims-mcp repository; adjust the path
-    to where it is on your machine) using #link("https://typst.app")[Typst]:]
+  [Regenerate this PDF with the #link(claims-mcp-url)[claims-mcp] command-line tool and
+    #link("https://typst.app")[Typst]. `claims-mcp report init` writes the report template to
+    `report/` (it never replaces an existing `report/audit-notes.toml`); then run:]
   raw(
     block: true,
     lang: "sh",

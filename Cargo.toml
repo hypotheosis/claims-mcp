@@ -34,5 +34,7 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
 
 [dev-dependencies]
+# MCP client side, to list and read the server's resources over an in-memory pipe in tests.
+rmcp = { version = "3.7.0", features = ["client"] }
 # Isolated temp directories for store and server tests.
 tempfile = "3.27.0"
