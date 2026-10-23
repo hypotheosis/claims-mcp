@@ -1,13 +1,14 @@
 # Next-steps TL;DR Design
 
 Date: 2026-10-23
-Status: Approved (brainstorming), pending spec review
+Status: Implemented (branch claims-mcp/claims-tldr)
 
 ## 1. Purpose
 
 `audit_report` and the PDF report list every gap in a catalog. On a large catalog that is too
 much to act on: `bdc.json` (bolt_deployment_controller) has 1,049 active claims, 40 refuted and
-378 `not_enough_info`. The next step for almost every one of them is already written down: 407 of
+378 `not_enough_info` (these counts include roll-up parents, so the TL;DR's leaf-only tiers are
+smaller: 32 refuted leaves). The next step for almost every one of them is already written down: 407 of
 the 418 non-supported verdict rationales end with `Fix: <step>`. But those steps are spread across
 hundreds of records.
 
@@ -52,7 +53,7 @@ A leaf that is `supported`, not stale and has evidence is done and is not listed
 
 | Tier | Name | Contents |
 |---|---|---|
-| 0 | Stop | Present only when `seal::verify` fails: the catalog was edited outside the server, nothing below can be trusted, restore it from git. |
+| 0 | Stop | Present only when `seal::verify` fails: the integrity check failed, nothing below can be trusted until `claims-mcp verify` passes; the first problem is shown, and the usual cause is a hand edit, fixed by restoring the catalog from git. |
 | 1 | Wrong | Open leaves whose current verdict is `refuted`. |
 | 2 | Unproven, high integrity | Every other open leaf with integrity level 3 or 4. |
 | 3 | Everything else | Remaining open leaves (integrity 1, 2 or unassigned). Counts only, per area. |
@@ -146,8 +147,10 @@ OPS 30, POL 21, ...
   appended.
 - `next_step` is printed in full: it is the actionable part.
 - Issue tags are shown as `[#360, #361]`. Without issues the bracket is omitted.
-- When tier 0 applies, the document opens with a `## 0. STOP` section that names the problem
-  count and says to restore the catalog from git.
+- When tier 0 applies, the document opens with a `## 0. STOP` section that states the failed
+  record count, shows the first problem as `{record}: {problem}`, says nothing below can be
+  trusted until `claims-mcp verify` passes, and notes the usual cause is a hand edit, fixed by
+  restoring the catalog from git.
 - An empty tier prints `None.`
 
 ## 7. Making `Fix:` official
@@ -165,7 +168,7 @@ Only the first `limit` items per tier allocate owned strings; the overflow is co
 
 ## 9. Testing
 
-Unit tests in `src/report.rs`:
+Unit tests in `src/report/next_steps.rs`:
 
 - `next_step` extraction: one `Fix:`, several `Fix:` (last wins), `Fix:` with empty text (falls
   back to the first sentence), no `Fix:`, no verdict with and without evidence, the stale prefix.

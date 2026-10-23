@@ -277,7 +277,8 @@ impl ClaimsServer {
         annotations(read_only_hint = true),
         description = "TL;DR of the audit: open leaf claims ranked into tiers, each with one \
         next step taken from the 'Fix:' in its latest verdict rationale. Tier 0 is an \
-        integrity failure (restore the catalog from git first), tier 1 refuted claims, tier 2 \
+        integrity failure (make `claims-mcp verify` pass first, usually by restoring the catalog \
+        from git), tier 1 refuted claims, tier 2 \
         other open claims at integrity level 3-4, tier 3 the rest counted per area. Tiers 1 \
         and 2 list at most `limit` items (default 10, 0 for all). Use audit_report for the \
         full gap lists."
@@ -297,7 +298,7 @@ impl ClaimsServer {
     name = "claims-mcp",
     instructions = "Ledger of claims for requirements traceability, IEEE 1012 V&V, and \
         FEVER-style auditing. Register atomic claims, attach evidence you gathered yourself, \
-        then record verdicts backed by that evidence. Use audit_report to find gaps. Never edit \
+        then record verdicts backed by that evidence. Use audit_report to find gaps, next_steps for a ranked to-do list. Never edit \
         the catalog file directly: every record is sealed, and the server refuses all writes \
         after a hand edit until the file is restored from git."
 )]

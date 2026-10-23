@@ -240,7 +240,7 @@ its children. Open leaves are ranked into tiers:
 
 | Tier | Contents |
 |---|---|
-| 0. STOP | Shown only when the integrity check fails: restore the catalog from git first |
+| 0. STOP | Shown only when the integrity check fails: make `claims-mcp verify` pass first (usually: restore the catalog from git) |
 | 1. Wrong | Refuted claims |
 | 2. Unproven | Other open claims at integrity level 3-4 (not_enough_info, unverified, stale, no evidence) |
 | 3. Everything else | Counts per `area:` tag |

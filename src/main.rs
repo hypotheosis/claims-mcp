@@ -207,24 +207,35 @@ fn write_ignoring_broken_pipe(out: &mut impl Write, bytes: &[u8]) -> std::io::Re
 /// Markdown form of the TL;DR (spec section 6).
 fn write_tldr(out: &mut impl Write, path: &str, steps: &NextSteps) -> std::io::Result<()> {
     let summary = &steps.summary;
+    let leaves = summary.done_leaves + summary.open_leaves;
     writeln!(out, "# TL;DR: {path}\n")?;
     writeln!(
         out,
-        "{} active claims: {} leaves ({} done, {} open), {} roll-ups.\n",
+        "{} active {}: {} {} ({} done, {} open), {} {}.\n",
         summary.active_claims,
-        summary.done_leaves + summary.open_leaves,
+        plural(summary.active_claims, "claim", "claims"),
+        leaves,
+        plural(leaves, "leaf", "leaves"),
         summary.done_leaves,
         summary.open_leaves,
-        summary.rollup_claims
+        summary.rollup_claims,
+        plural(summary.rollup_claims, "roll-up", "roll-ups")
     )?;
     if !steps.integrity.verified {
         writeln!(out, "## 0. STOP: integrity check failed\n")?;
+        let failed = steps.integrity.problems.len();
         writeln!(
             out,
-            "{} records failed their seal check (`claims-mcp verify` lists them). The catalog \
-             was changed outside the server, so nothing below can be trusted. Restore it from \
-             git before acting on this list.\n",
-            steps.integrity.problems.len()
+            "{failed} {} failed the seal check. Nothing below can be trusted until \
+             `claims-mcp verify` passes.\n",
+            plural(failed, "record", "records")
+        )?;
+        if let Some(first) = steps.integrity.problems.first() {
+            writeln!(out, "First problem: {}: {}\n", first.record, first.problem)?;
+        }
+        writeln!(
+            out,
+            "The usual cause is a hand edit; fix it by restoring the catalog from git.\n"
         )?;
     }
     write_tier(out, "1. Wrong", &steps.wrong)?;
@@ -255,8 +266,8 @@ fn write_tier(out: &mut impl Write, heading: &str, tier: &Tier) -> std::io::Resu
         writeln!(
             out,
             " {}\n  - Next: {}",
-            truncated(&item.statement, STATEMENT_CHARS),
-            item.next_step
+            truncated(&single_line(&item.statement), STATEMENT_CHARS),
+            single_line(&item.next_step)
         )?;
     }
     if !tier.omitted.is_empty() {
@@ -264,6 +275,26 @@ fn write_tier(out: &mut impl Write, heading: &str, tier: &Tier) -> std::io::Resu
         writeln!(out, "\n...and {hidden} more: {}", area_list(&tier.omitted))?;
     }
     writeln!(out)
+}
+
+/// `singular` when `count` is exactly 1, otherwise `plural`.
+fn plural(count: usize, singular: &'static str, plural: &'static str) -> &'static str {
+    if count == 1 {
+        singular
+    } else {
+        plural
+    }
+}
+
+/// `text` with every `\n` and `\r` replaced by a space, so it cannot break a Markdown list item.
+///
+/// Borrows the input unchanged (no allocation) when it has no line break.
+fn single_line(text: &str) -> Cow<'_, str> {
+    if text.contains(['\n', '\r']) {
+        Cow::Owned(text.replace(['\n', '\r'], " "))
+    } else {
+        Cow::Borrowed(text)
+    }
 }
 
 /// `OPS 30, POL 21, ...`
@@ -434,7 +465,7 @@ mod tests {
         assert_eq!(
             rendered_tldr(&sample_steps(0)),
             "# TL;DR: claims.json\n\n\
-             6 active claims: 5 leaves (1 done, 4 open), 1 roll-ups.\n\n\
+             6 active claims: 5 leaves (1 done, 4 open), 1 roll-up.\n\n\
              ## 1. Wrong (2)\n\n\
              - **CLM-0012** IL4 [#360, #361] Tokens expire.\n  \
              - Next: Add an expiry test.\n\n\
@@ -452,9 +483,49 @@ mod tests {
         let stop = text
             .find("## 0. STOP: integrity check failed\n\n2 records failed")
             .expect("STOP section");
+        let first = text
+            .find("First problem: CLM-0000: seal does not match its content\n")
+            .expect("first problem line");
+        assert!(stop < first);
+        assert!(text.contains("until `claims-mcp verify` passes"));
+        assert!(text.contains("restoring the catalog from git"));
+        assert!(!text.contains("CLM-0001: seal"));
         let wrong = text.find("## 1. Wrong").expect("tier 1");
         assert!(stop < wrong);
         assert!(!rendered_tldr(&sample_steps(0)).contains("STOP"));
+    }
+
+    #[test]
+    fn tldr_uses_singular_nouns_for_a_count_of_one() {
+        let mut steps = sample_steps(1);
+        steps.summary.active_claims = 1;
+        steps.summary.rollup_claims = 1;
+        steps.summary.done_leaves = 0;
+        steps.summary.open_leaves = 1;
+
+        let text = rendered_tldr(&steps);
+
+        assert!(text.contains("1 active claim: 1 leaf (0 done, 1 open), 1 roll-up.\n"));
+        assert!(text.contains("\n\n1 record failed the seal check."));
+    }
+
+    #[test]
+    fn tldr_flattens_line_breaks_in_statements_and_steps() {
+        let mut steps = sample_steps(0);
+        steps.wrong.items[0].statement = "Tokens\r\nexpire.\nSoon.".to_owned();
+        steps.wrong.items[0].next_step = "Add a test.\nThen fix.".to_owned();
+
+        let text = rendered_tldr(&steps);
+
+        assert!(text.contains("Tokens  expire. Soon.\n  - Next: Add a test. Then fix.\n"));
+        assert!(matches!(single_line("one line"), Cow::Borrowed(_)));
+    }
+
+    #[test]
+    fn plural_picks_by_count() {
+        assert_eq!(plural(0, "leaf", "leaves"), "leaves");
+        assert_eq!(plural(1, "leaf", "leaves"), "leaf");
+        assert_eq!(plural(2, "leaf", "leaves"), "leaves");
     }
 
     #[test]

@@ -26,6 +26,7 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 | `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
 | `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
+| `next_steps` | Ranked TL;DR: open leaf claims by tier, each with one next step |
 
 ## Errors and constraints
 
@@ -127,7 +128,9 @@ A `refuted` or `not_enough_info` rationale must end with `Fix: <one concrete nex
 to change, or which test or evidence would decide the claim. `next_steps` and
 `claims-mcp tldr` show the text after the last `Fix:` as the claim's next step, so make it
 specific enough to act on without rereading the rationale ("Fix: add a test that sends a
-1024-bit RSA JWK and asserts it is rejected", not "Fix: add tests").
+1024-bit RSA JWK and asserts it is rejected", not "Fix: add tests"). The step must also stand
+alone, because items are re-sorted and truncated: never refer to other claims or text ("As
+above", "same as CLM-0012").
 
 Never infer support from the absence of failure ("no errors, so it works"). Absence of
 evidence is `not_enough_info`.
@@ -143,7 +146,8 @@ that child and mark the parent `refuted`. Until then the report lists the parent
 
 ### 5. Report
 
-Call `audit_report` and summarize for the user:
+Call `audit_report` and summarize for the user. On a large catalog, call `next_steps` first and
+lead the report with tiers 0-2:
 
 - Totals by verdict, and the share of level 3-4 claims that are supported.
 - Every non-empty gap list, with what each means and a concrete remediation:
