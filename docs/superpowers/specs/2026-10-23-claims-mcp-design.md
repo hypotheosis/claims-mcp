@@ -119,7 +119,8 @@ levels; 4 is the highest consequence).
 ### 3.4 Invariants enforced by `Catalog`
 
 1. Every `derived_from` id exists in the catalog. It may be retired, but a new or updated link may
-   not point at a retired claim.
+   not point at a retired claim. An existing link to a parent retired later may be kept (it is
+   reported as `dangling_links`).
 2. `derived_from` never forms a cycle, including self-links. This is checked by DFS on every add or
    update that changes links.
 3. Retired claims reject `add_evidence`, `record_verdict`, and `update_claim`.
@@ -132,7 +133,7 @@ levels; 4 is the highest consequence).
 5. `statement` must be non-empty after trimming. Duplicate tags and artifacts are removed (first
    occurrence wins).
 6. `add_claims` is all-or-nothing. Claims within one batch may reference each other through
-   `derived_from` using the batch-local placeholder `@N`, where N is the 0-based index in the batch.
+   `derived_from` using the batch-local placeholder `@N`, where N is the 0-based index in the batch. N must be smaller than the referring entry's own index.
    This lets a hierarchy be registered in one call.
 
 ## 4. MCP tool surface
@@ -146,12 +147,12 @@ server does not fail the protocol request.
 | `add_claim` | `statement`, `kind`, `level`, `verification_method`, optional `integrity_level`, `source`, `derived_from[]`, `artifacts[]`, `tags[]` | the full claim |
 | `add_claims` | `claims[]` (same shape as `add_claim`; `derived_from` accepts `@N`) | the created claims, in order |
 | `get_claim` | `id` | the claim, plus `current_verdict` and `children[]` (ids of active claims whose `derived_from` contains it) |
-| `list_claims` | optional `verdict` (includes `unverified`), `kind`, `level`, `tag`, `artifact` (substring), `text` (case-insensitive substring of the statement), `include_retired` (default false) | summaries: `id`, `statement`, `kind`, `level`, `integrity_level`, `current_verdict`, `evidence_count`, `status` |
+| `list_claims` | optional `verdict` (includes `unverified`), `kind`, `level`, `tag`, `artifact` (substring), `text` (case-insensitive substring of the statement), `include_retired` (default false) | summaries: `id`, `statement`, `kind`, `level`, `integrity_level`, `current_verdict`, `evidence_count`, `retired` (bool) |
 | `update_claim` | `id` plus any optional metadata field; list fields replace the whole list | the updated claim |
 | `retire_claim` | `id`, `reason` | the updated claim |
 | `add_evidence` | `claim_id`, `kind`, `locator`, `summary`, `stance` | the evidence item, including its id |
 | `record_verdict` | `claim_id`, `verdict`, `rationale`, `auditor`, `evidence_ids[]` | the claim, with the new verdict appended |
-| `trace` | `id`, `direction` (`up` / `down` / `both`, default `both`), optional `max_depth` (default unlimited) | a tree of `{id, statement, current_verdict, depth}` nodes for ancestors and descendants |
+| `trace` | `id`, `direction` (`up` / `down` / `both`, default `both`), optional `max_depth` (default unlimited) | breadth-first `ancestors` and `descendants` lists of `{id, statement, current_verdict, depth, retired}` nodes (each claim once, at its shortest depth) |
 | `audit_report` | optional `include_matrix` (default true) | the report described in 4.1 |
 
 ### 4.1 `audit_report` contents (active claims only)

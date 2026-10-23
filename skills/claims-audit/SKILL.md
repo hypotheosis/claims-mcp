@@ -20,12 +20,26 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 | `add_claim` | Add a single claim discovered later |
 | `list_claims` | Find claims by verdict, kind, level, tag, artifact, or text |
 | `get_claim` | Read one claim with evidence, verdict history, and children |
-| `update_claim` | Fix metadata (tags, artifacts, method, level) |
+| `update_claim` | Fix metadata (tags, artifacts, source) without changing what the claim means |
 | `retire_claim` | Withdraw a claim that was wrong or is superseded |
 | `add_evidence` | Record one finding with a precise locator and an honest stance |
 | `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
 | `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
+
+## Errors and constraints
+
+- A failed call returns an error message and changes nothing. A failed `add_claims` writes
+  nothing; the error names the entry as `claims[i]: ...` - fix that entry and resend the whole
+  batch.
+- `@N` must point at an earlier entry of the same batch, and only `add_claims` accepts it.
+- Retired claims reject `update_claim`, `add_evidence`, and `record_verdict`; add a replacement
+  claim instead.
+- A new `derived_from` link cannot point at a retired claim. An existing link to a parent retired
+  later is kept and reported under `dangling_links`.
+- Evidence cited by a verdict must belong to the same claim; `supported` needs cited `supports`
+  evidence and `refuted` needs cited `refutes` evidence.
+- `update_claim`: omitted fields are unchanged and list fields replace the whole list.
 
 ## Workflow
 
@@ -103,6 +117,15 @@ evidence. Your `rationale` must explain *why* the cited evidence decides the cla
 Never infer support from the absence of failure ("no errors, so it works"). Absence of
 evidence is `not_enough_info`.
 
+#### Parent claims
+
+Judge leaf claims first. Once every active child of a parent is `supported`, record one
+`analysis` evidence item on the parent with locator `children: CLM-0003, CLM-0004` and a
+summary explaining how the children together cover the parent, then record the parent's
+verdict citing it. If any child is `refuted`, record `refutes` evidence on the parent naming
+that child and mark the parent `refuted`. Until then the report lists the parent under
+`decomposition`.
+
 ### 5. Report
 
 Call `audit_report` and summarize for the user:
@@ -131,8 +154,9 @@ a new verdict. History is append-only, so the earlier verdict remains as the aud
 
 - **Self-certification**: using the producer's claims ("I implemented X") as evidence.
 - **Compound claims**: one claim covering several behaviors, which hides partial failure.
-- **Moving the goalposts**: editing a judged claim's statement until it passes. Retire it
-  with a reason and add a corrected claim instead.
+- **Moving the goalposts**: editing a judged claim's statement until it passes, or switching
+  `verification_method` / lowering `integrity_level` to clear a `rigor` gap. Retire it with a
+  reason and add a corrected claim instead.
 - **Silent refutations**: finding a problem and not recording it as `refutes` evidence.
 - **Ignoring rigor gaps** on integrity level 3-4 claims.
 - **Batch rubber-stamping**: recording `supported` for many claims after one shallow check.

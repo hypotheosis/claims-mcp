@@ -42,7 +42,8 @@ sharing one file are all safe. Add `.<name>.lock` and `.<name>.tmp` to `.gitigno
 ## Register with Claude Code
 
 This repository's `.mcp.json` registers the server as `claims`, backed by `claims.json` in the
-repository root. For another project, add:
+repository root. It uses `cargo run --release`, so the first start compiles the server; run
+`cargo build --release` once beforehand to avoid a client startup timeout. For another project, add:
 
 ```json
 {

@@ -7,7 +7,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::catalog::Catalog;
 use crate::error::Result;
-use crate::model::{Claim, ClaimId, ClaimKind, ClaimLevel, CurrentVerdict, VerificationMethod};
+use crate::model::{
+    Claim, ClaimId, ClaimKind, ClaimLevel, CurrentVerdict, IntegrityLevel, VerificationMethod,
+};
 
 /// Counts over active claims.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]
@@ -23,7 +25,7 @@ pub struct Totals {
     /// Active claims per hierarchy level.
     pub by_level: BTreeMap<ClaimLevel, usize>,
     /// Active claims per integrity level (`"1"`..`"4"` or `"unassigned"`).
-    pub by_integrity_level: BTreeMap<String, usize>,
+    pub by_integrity_level: BTreeMap<&'static str, usize>,
 }
 
 /// Claim ids per gap category (spec section 4.1). Only active claims are considered.
@@ -118,11 +120,14 @@ pub struct TraceResult {
 }
 
 /// Maps every claim id to its active children. Built once per report: O(n + e).
-fn children_index(catalog: &Catalog) -> HashMap<ClaimId, Vec<ClaimId>> {
-    let mut index: HashMap<ClaimId, Vec<ClaimId>> = HashMap::new();
+///
+/// Rust note: children are `&Claim` borrows into the catalog (lifetime `'c`), so no claim data
+/// is copied.
+fn children_index(catalog: &Catalog) -> HashMap<ClaimId, Vec<&Claim>> {
+    let mut index: HashMap<ClaimId, Vec<&Claim>> = HashMap::new();
     for claim in catalog.claims().iter().filter(|claim| claim.is_active()) {
         for parent in &claim.derived_from {
-            index.entry(*parent).or_default().push(claim.id);
+            index.entry(*parent).or_default().push(claim);
         }
     }
     index
@@ -131,11 +136,6 @@ fn children_index(catalog: &Catalog) -> HashMap<ClaimId, Vec<ClaimId>> {
 /// Builds the audit report in a single pass over the claims plus one child-index build.
 pub fn audit_report(catalog: &Catalog, include_matrix: bool) -> AuditReport {
     let children = children_index(catalog);
-    let verdict_of: HashMap<ClaimId, CurrentVerdict> = catalog
-        .claims()
-        .iter()
-        .map(|claim| (claim.id, claim.current_verdict()))
-        .collect();
     let retired: HashSet<ClaimId> = catalog
         .claims()
         .iter()
@@ -149,26 +149,19 @@ pub fn audit_report(catalog: &Catalog, include_matrix: bool) -> AuditReport {
     };
     let mut gaps = Gaps::default();
     let mut matrix = include_matrix.then(Vec::new);
-    let no_children = Vec::new();
+    let no_children: Vec<&Claim> = Vec::new();
 
     for claim in catalog.claims().iter().filter(|claim| claim.is_active()) {
         let verdict = claim.current_verdict();
         let claim_children = children.get(&claim.id).unwrap_or(&no_children);
         tally(&mut totals, claim, verdict);
-        classify_gaps(
-            &mut gaps,
-            claim,
-            verdict,
-            claim_children,
-            &verdict_of,
-            &retired,
-        );
+        classify_gaps(&mut gaps, claim, verdict, claim_children, &retired);
         if let Some(rows) = matrix.as_mut() {
             rows.push(MatrixRow {
                 id: claim.id,
                 statement: claim.statement.clone(),
                 derived_from: claim.derived_from.clone(),
-                children: claim_children.clone(),
+                children: claim_children.iter().map(|child| child.id).collect(),
                 verification_method: claim.verification_method,
                 evidence_locators: claim.evidence.iter().map(|e| e.locator.clone()).collect(),
                 current_verdict: verdict,
@@ -188,9 +181,14 @@ fn tally(totals: &mut Totals, claim: &Claim, verdict: CurrentVerdict) {
     *totals.by_verdict.entry(verdict).or_default() += 1;
     *totals.by_kind.entry(claim.kind).or_default() += 1;
     *totals.by_level.entry(claim.level).or_default() += 1;
-    let integrity = claim
-        .integrity_level
-        .map_or_else(|| "unassigned".to_owned(), |level| level.get().to_string());
+    // `IntegrityLevel` guarantees 1..=4, so the fallback arm only covers `None`.
+    let integrity = match claim.integrity_level.map(IntegrityLevel::get) {
+        Some(1) => "1",
+        Some(2) => "2",
+        Some(3) => "3",
+        Some(4) => "4",
+        _ => "unassigned",
+    };
     *totals.by_integrity_level.entry(integrity).or_default() += 1;
 }
 
@@ -198,8 +196,7 @@ fn classify_gaps(
     gaps: &mut Gaps,
     claim: &Claim,
     verdict: CurrentVerdict,
-    children: &[ClaimId],
-    verdict_of: &HashMap<ClaimId, CurrentVerdict>,
+    children: &[&Claim],
     retired: &HashSet<ClaimId>,
 ) {
     if claim.evidence.is_empty() {
@@ -226,7 +223,7 @@ fn classify_gaps(
     }
     if children
         .iter()
-        .any(|child| verdict_of.get(child) != Some(&CurrentVerdict::Supported))
+        .any(|child| child.current_verdict() != CurrentVerdict::Supported)
     {
         gaps.decomposition.push(claim.id);
     }
@@ -253,16 +250,20 @@ pub fn trace(
     let root = node(catalog.get(id)?, 0);
     let limit = max_depth.unwrap_or(usize::MAX);
     let ancestors = match direction {
-        TraceDirection::Up | TraceDirection::Both => {
-            breadth_first(catalog, id, limit, |claim| &claim.derived_from)
-        }
+        TraceDirection::Up | TraceDirection::Both => breadth_first(catalog, id, limit, |claim| {
+            claim.derived_from.iter().copied()
+        }),
         TraceDirection::Down => Vec::new(),
     };
     let descendants = match direction {
         TraceDirection::Down | TraceDirection::Both => {
             let children = children_index(catalog);
             breadth_first(catalog, id, limit, |claim| {
-                children.get(&claim.id).map_or(&[][..], Vec::as_slice)
+                children
+                    .get(&claim.id)
+                    .into_iter()
+                    .flatten()
+                    .map(|child| child.id)
             })
         }
         TraceDirection::Up => Vec::new(),
@@ -286,13 +287,14 @@ fn node(claim: &Claim, depth: usize) -> TraceNode {
 
 /// Breadth-first search so each claim appears once, at its shortest distance.
 ///
-/// Rust note: the `'c` lifetime says the neighbour slices borrow from data (the catalog or a
-/// child index) that outlives the search, so no per-node `Vec` copies are needed.
-fn breadth_first<'c>(
+/// Rust note: the `'c` lifetime says the neighbour iterators borrow from data (the catalog or a
+/// child index) that outlives the search, so no per-node `Vec` copies are needed. `I` is any
+/// iterator of ids that the `neighbours` closure returns.
+fn breadth_first<'c, I: IntoIterator<Item = ClaimId>>(
     catalog: &'c Catalog,
     start: ClaimId,
     limit: usize,
-    neighbours: impl Fn(&'c Claim) -> &'c [ClaimId],
+    neighbours: impl Fn(&'c Claim) -> I,
 ) -> Vec<TraceNode> {
     let mut visited = HashSet::from([start]);
     let mut queue = VecDeque::from([(start, 0_usize)]);
@@ -304,7 +306,7 @@ fn breadth_first<'c>(
         let Ok(claim) = catalog.get(current) else {
             continue;
         };
-        for &next in neighbours(claim) {
+        for next in neighbours(claim) {
             if visited.insert(next) {
                 if let Ok(next_claim) = catalog.get(next) {
                     nodes.push(node(next_claim, depth + 1));
@@ -321,7 +323,7 @@ mod tests {
     use super::*;
     use crate::catalog::tests::{at, evidence, new_claim, verdict};
     use crate::catalog::NewClaim;
-    use crate::model::{ClaimRef, IntegrityLevel, Stance, Verdict};
+    use crate::model::{ClaimRef, Stance, Verdict};
 
     fn child_of(statement: &str, parent: ClaimId) -> NewClaim {
         NewClaim {
@@ -463,6 +465,13 @@ mod tests {
             deep.descendants.iter().map(|n| n.depth).collect::<Vec<_>>(),
             vec![1, 2]
         );
+    }
+
+    #[test]
+    fn report_serializes_to_json() {
+        let (catalog, ..) = chain();
+        let value = serde_json::to_value(audit_report(&catalog, true)).expect("serialize");
+        assert_eq!(value["totals"]["by_verdict"]["supported"], 1);
     }
 
     #[test]

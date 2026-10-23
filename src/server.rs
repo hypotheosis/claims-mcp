@@ -85,8 +85,13 @@ pub struct TraceParams {
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct AuditReportParams {
     /// Include the traceability matrix (default true).
-    #[serde(default)]
-    pub include_matrix: Option<bool>,
+    #[serde(default = "default_true")]
+    pub include_matrix: bool,
+}
+
+/// Serde default for boolean parameters that are on unless the caller says otherwise.
+fn default_true() -> bool {
+    true
 }
 
 /// The claims MCP server. Cloning is cheap: the store is an `Arc` and the router is shared
@@ -136,6 +141,7 @@ impl ClaimsServer {
     }
 
     #[tool(
+        annotations(read_only_hint = true),
         description = "Get one claim with its evidence, verdict history, current verdict, \
         and active children."
     )]
@@ -148,6 +154,7 @@ impl ClaimsServer {
     }
 
     #[tool(
+        annotations(read_only_hint = true),
         description = "List claim summaries. Optional filters: verdict (unverified, \
         supported, refuted, not_enough_info), kind, level, tag, artifact substring, \
         case-insensitive text substring, include_retired."
@@ -161,9 +168,11 @@ impl ClaimsServer {
     }
 
     #[tool(
-        description = "Update a claim's metadata. Omitted fields are unchanged; list fields \
-        replace the whole list. Evidence and verdicts cannot be edited. To change what a \
-        claim means after it has been judged, retire it and add a new one instead."
+        description = "Update a claim's metadata. Omitted or null fields are unchanged; list \
+        fields replace the whole list ([] empties it); source \"\" removes the source; \
+        integrity_level cannot be removed. A new derived_from link must point at an active \
+        claim; an existing link to a parent retired later may be kept. Evidence and verdicts \
+        cannot be edited. To change what a judged claim means, retire it and add a new one."
     )]
     async fn update_claim(&self, Parameters(params): Parameters<UpdateClaimParams>) -> ToolResult {
         respond(
@@ -219,6 +228,7 @@ impl ClaimsServer {
     }
 
     #[tool(
+        annotations(read_only_hint = true),
         description = "Trace a claim through the requirements hierarchy: ancestors via \
         derived_from (up), active descendants (down), or both, optionally limited to \
         max_depth links."
@@ -234,13 +244,14 @@ impl ClaimsServer {
     }
 
     #[tool(
+        annotations(read_only_hint = true),
         description = "Audit report over active claims: totals by verdict, kind, level, and \
         integrity level; gaps (no_evidence, unverified, refuted, not_enough_info, stale, \
         rigor, decomposition, dangling_links); and a traceability matrix unless \
         include_matrix is false."
     )]
     async fn audit_report(&self, Parameters(params): Parameters<AuditReportParams>) -> ToolResult {
-        let include_matrix = params.include_matrix.unwrap_or(true);
+        let include_matrix = params.include_matrix;
         respond(
             self.store
                 .read(move |catalog| Ok(report::audit_report(catalog, include_matrix)))
@@ -316,6 +327,27 @@ mod tests {
     }
 
     #[test]
+    fn read_only_tools_are_annotated() {
+        let (_directory, server) = server();
+        let mut read_only: Vec<String> = server
+            .tool_router
+            .list_all()
+            .into_iter()
+            .filter(|tool| {
+                tool.annotations
+                    .as_ref()
+                    .is_some_and(|annotations| annotations.read_only_hint == Some(true))
+            })
+            .map(|tool| tool.name.into_owned())
+            .collect();
+        read_only.sort();
+        assert_eq!(
+            read_only,
+            vec!["audit_report", "get_claim", "list_claims", "trace"]
+        );
+    }
+
+    #[test]
     fn registers_all_ten_tools() {
         let (_directory, server) = server();
         let mut names: Vec<String> = server
@@ -387,7 +419,7 @@ mod tests {
 
         let report = server
             .audit_report(Parameters(AuditReportParams {
-                include_matrix: None,
+                include_matrix: true,
             }))
             .await
             .expect("audit_report");
