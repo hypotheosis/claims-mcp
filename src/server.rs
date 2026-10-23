@@ -298,9 +298,10 @@ impl ClaimsServer {
     name = "claims-mcp",
     instructions = "Ledger of claims for requirements traceability, IEEE 1012 V&V, and \
         FEVER-style auditing. Register atomic claims, attach evidence you gathered yourself, \
-        then record verdicts backed by that evidence. Use audit_report to find gaps, next_steps for a ranked to-do list. Never edit \
-        the catalog file directly: every record is sealed, and the server refuses all writes \
-        after a hand edit until the file is restored from git."
+        then record verdicts backed by that evidence. Use audit_report to find gaps, and \
+        next_steps for a ranked to-do list. Never edit the catalog file directly: every record \
+        is sealed, and the server refuses all writes after a hand edit until the file is \
+        restored from git."
 )]
 impl ServerHandler for ClaimsServer {}
 
