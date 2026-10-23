@@ -192,6 +192,10 @@ should) to make a missing `typst` fail the tests instead.
 See [the design spec](docs/superpowers/specs/2026-10-23-claims-mcp-design.md), section 3,
 for the full schema. Ids look like `CLM-0007` and `EVD-0014` and are never reused.
 
+## Security
+
+Report vulnerabilities privately; see [`SECURITY.md`](SECURITY.md).
+
 ## Development
 
 ```bash
@@ -230,7 +234,3 @@ archives listed under [Install](#1-install-the-server), and publishes a GitHub r
 the archives, their `.sha256` files, and the audit report. A pull request that changes
 `release.yml` runs the builds as a dry run without publishing. Release tags (`v*`) cannot be moved or deleted once
 pushed, so a bad release is fixed with a new version.
-
-## Security
-
-Report vulnerabilities privately; see [`SECURITY.md`](SECURITY.md).
