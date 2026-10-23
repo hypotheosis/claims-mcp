@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 38,
+  "next_claim_seq": 66,
   "next_claim_seq_seal": {
-    "by": "adopt",
-    "mac": "17da0b369393860ec1b8cc3bc6612ad6bc3332c56e8b8eb720dcf80247bb1dc9"
+    "by": "server",
+    "mac": "edff89add80492d0de6f8244858809a43256f097df2bfd30b469c2e57ad905d1"
   },
-  "next_evidence_seq": 47,
+  "next_evidence_seq": 122,
   "next_evidence_seq_seal": {
-    "by": "adopt",
-    "mac": "42e0f7afdb4e0ba4f33228705fd13e18d6c15c6243e1525eaa1e53d1c6775c8e"
+    "by": "server",
+    "mac": "597e7130e1737665ab28562717f929c9731488fa56ba4a9e67d7421866e5c3d3"
   },
   "claims": [
     {
@@ -41,6 +41,18 @@
             "by": "adopt",
             "mac": "3e288c9c9694105463ac9ee9e3d6b366361ff24412133c4b4e491574bbe72a04"
           }
+        },
+        {
+          "id": "EVD-0120",
+          "kind": "analysis",
+          "locator": "children: CLM-0002, CLM-0003, CLM-0004, CLM-0010, CLM-0012, CLM-0014, CLM-0015, CLM-0016, CLM-0017, CLM-0019, CLM-0037",
+          "summary": "Replaces EVD-0039, which still listed the retired CLM-0005 and predated its replacement CLM-0037. All 11 current active children are supported at HEAD 908bf0c, each with re-verification evidence from this session. The JSON-catalog element of concept.md is now covered by CLM-0037 (sealed schema v2) instead of CLM-0005.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.063858449Z",
+          "seal": {
+            "by": "server",
+            "mac": "5b56697f3f8ead2dcc310eca151325c856af79df38995c9973cf9e3547b060a8"
+          }
         }
       ],
       "verdicts": [
@@ -56,13 +68,26 @@
             "by": "adopt",
             "mac": "aa623323fa3d40b0eb42ede51d19097462d07dc177b57f082aa90bc474518928"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-adjudicated against the current children. The earlier verdict cited EVD-0039, which named the retired CLM-0005. All 11 active children, including CLM-0037, are supported at HEAD (EVD-0120).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0120"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.152891879Z",
+          "seal": {
+            "by": "server",
+            "mac": "b3100d870c8255bfd37fa0f0c6d0f57b659e86422d00f308cd357b6b49e50337"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:52:08.053225450Z",
+      "updated_at": "2026-10-23T15:57:39.152891879Z",
       "seal": {
-        "by": "adopt",
-        "mac": "fca2ef9768f8d1d5ac6f25e6c37a56a9ce9c438296aba20fc48eddcd5e8ef648"
+        "by": "server",
+        "mac": "45b7e326c485a6c873a69cbe5f42ffad01828d9a3be3966a305d408103dac76a"
       }
     },
     {
@@ -109,6 +134,30 @@
             "by": "adopt",
             "mac": "13ff7fbcc05e66636880199514369bdc2e9b34b44f5d5e7691d76d26b8ff808d"
           }
+        },
+        {
+          "id": "EVD-0059",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: printf initialize, notifications/initialized, tools/list, tools/call get_claim CLM-9999 | RUST_LOG=debug claims-mcp --catalog <tmp>/x.json 2>err >out",
+          "summary": "All 3 stdout lines parse as JSON objects with \"jsonrpc\":\"2.0\"; the 30607 bytes of debug logging went to stderr only.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.865612103Z",
+          "seal": {
+            "by": "server",
+            "mac": "7d5427f1d7e911286504d3411a986efe3752ff77ac4583c55e851c32f0222e0b"
+          }
+        },
+        {
+          "id": "EVD-0060",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: src/main.rs:83-89 init_tracing",
+          "summary": "init_tracing configures the fmt subscriber with .with_writer(std::io::stderr); the doc comment says stdout carries the MCP protocol.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.879087089Z",
+          "seal": {
+            "by": "server",
+            "mac": "f04c365f8076290dfa646d8c7a8b36c2fda2317dff224afe65aa9941374d5c9e"
+          }
         }
       ],
       "verdicts": [
@@ -125,13 +174,27 @@
             "by": "adopt",
             "mac": "7e82a2e83690b8d12ee80758253e88e34dc555c56524a787a12900d254a5dce7"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: every stdout line was a JSON-RPC message even with debug logging on (EVD-0059), and the code routes tracing to stderr (EVD-0060).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0059",
+            "EVD-0060"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.867447771Z",
+          "seal": {
+            "by": "server",
+            "mac": "2a607f7cddded02f1a14dca4d0bf9ef36b7db7e6d2ddfd09876a94133a0eb280"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.665027683Z",
+      "updated_at": "2026-10-23T15:51:50.867447771Z",
       "seal": {
-        "by": "adopt",
-        "mac": "c523c5e2447e7b89b3f1e1c89897308c3a3c130babd91ba89f7960c22ac599b1"
+        "by": "server",
+        "mac": "b2781eb5fa09a421f18e0befb5e973dc7391927909052fe2e28b99c1187e7f74"
       }
     },
     {
@@ -179,6 +242,18 @@
             "by": "adopt",
             "mac": "6d5f3785ccf4e161009e7a4ec8ce9f18697d02f3f57a661bcb3bce24e2e2d76e"
           }
+        },
+        {
+          "id": "EVD-0061",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: Cargo.toml:22; src/server.rs:108 #[tool_router], :263 #[tool_handler(; grep -c '#\\[tool(' src/server.rs = 10",
+          "summary": "Cargo.toml depends on rmcp 3.7.0 (server, macros, transport-io); server.rs has #[tool_router] on the tools impl, 10 #[tool(...)] methods, and a #[tool_handler(...)] ServerHandler impl.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.886686663Z",
+          "seal": {
+            "by": "server",
+            "mac": "e46faad93b7427a94af910bfb1b87e051de498bf3a48dda7880752bae876a536"
+          }
         }
       ],
       "verdicts": [
@@ -195,13 +270,26 @@
             "by": "adopt",
             "mac": "13922ae0af2f770467081b0221ab49553179d5e50eff79c1e4e2401bd3f29383"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the rmcp dependency and the tool_router/tool_handler macros are present (EVD-0061).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0061"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.901151036Z",
+          "seal": {
+            "by": "server",
+            "mac": "101ac27aa74af3134bafbacd30cc693ad29fd249121010d6bf32da27c6c9c95b"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.681118477Z",
+      "updated_at": "2026-10-23T15:51:50.901151036Z",
       "seal": {
-        "by": "adopt",
-        "mac": "369438124f22b81339ff343986588057c8ea2f7151a563467d6af46d9f9dda1e"
+        "by": "server",
+        "mac": "5b899ab7fa7cf838e1ac2e62d816f29007a8ff5a344db5c7c7b4d6a55135011d"
       }
     },
     {
@@ -236,6 +324,18 @@
             "by": "adopt",
             "mac": "de4d9365d60d7524887d3bb0625b3ce2dbf99bfed8624b27dec9ea851141f223"
           }
+        },
+        {
+          "id": "EVD-0062",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: tools/list (id 1) from claims-mcp 0.2.0 over stdio",
+          "summary": "tools/list returned exactly 10 names: add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, record_verdict, retire_claim, trace, update_claim. No extra tools.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.893861636Z",
+          "seal": {
+            "by": "server",
+            "mac": "7520260a4780b8206107c5cc539a5223198277c707cb59113c743aaf3c52dcfd"
+          }
         }
       ],
       "verdicts": [
@@ -251,13 +351,26 @@
             "by": "adopt",
             "mac": "dcd2b4c26c975bbf39f339c63b47542072d68b9451df6cd5eaeb34d98dc34dd6"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the live tools/list returns exactly the 10 named tools (EVD-0062).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0062"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.911595901Z",
+          "seal": {
+            "by": "server",
+            "mac": "10fa6a4f9d835e660484d7814e321fc1c658edb29a8ca5543f3cea3d1aa52230"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.701270593Z",
+      "updated_at": "2026-10-23T15:51:50.911595901Z",
       "seal": {
-        "by": "adopt",
-        "mac": "7a3f2cb45d5569af7e58f3cc92a19e48dccf54bae4fef2151d045bdecdfed8f8"
+        "by": "server",
+        "mac": "b9b7987e6b70f684b355569043e3ea4981adb8dbe76e789f1161eef79d4c4817"
       }
     },
     {
@@ -352,6 +465,18 @@
             "by": "adopt",
             "mac": "ad09c86d0a81e632b29240f167c9c42b84a7dbe05c32c780b90f9093dd2247b3"
           }
+        },
+        {
+          "id": "EVD-0047",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact store::tests::failed_operation_leaves_file_untouched",
+          "summary": "Re-run at HEAD 908bf0c (0.2.0, sealed store): 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.242997744Z",
+          "seal": {
+            "by": "server",
+            "mac": "3077fe682695a68a7b736ddd82405f0d6146dc5f0da8f87cd55e520fc08ea1b9"
+          }
         }
       ],
       "verdicts": [
@@ -367,13 +492,26 @@
             "by": "adopt",
             "mac": "d461e1393f3a26daabf25b1c2631f858eb77c9ae09f1f7a92fbe6b73ab6c3670"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named test passes against the sealed store (EVD-0047).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0047"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.939269843Z",
+          "seal": {
+            "by": "server",
+            "mac": "7d93ff6e63418bec5928d7fe561eb710b6a329ba9a97371f668d07ae469a67a9"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T14:59:11.316661879Z",
+      "updated_at": "2026-10-23T15:51:50.939269843Z",
       "seal": {
         "by": "server",
-        "mac": "5c6cf9e6cca607a64e284260080def395b7797c6ecca203a2194aa54af9bf598"
+        "mac": "a39e24cdec372277aa12d865e4e680e384aedb219b18e882698359e807934b7c"
       }
     },
     {
@@ -409,6 +547,18 @@
             "by": "adopt",
             "mac": "ccae93a389afd14a69d3b7e638228321cf4403c5d0b2a763c413c24778b89966"
           }
+        },
+        {
+          "id": "EVD-0048",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact store::tests::concurrent_writers_never_lose_updates",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.255206759Z",
+          "seal": {
+            "by": "server",
+            "mac": "46455182d01d0b2cd873f596bdbc261e6c6604b95d5fe9552aaa06b06b49fc2f"
+          }
         }
       ],
       "verdicts": [
@@ -424,13 +574,26 @@
             "by": "adopt",
             "mac": "bec3e94c9b71f3e14b5efef5493cdc07598f2e23c92187b8f228253671452f6d"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named concurrency test passes (EVD-0048).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0048"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.956432161Z",
+          "seal": {
+            "by": "server",
+            "mac": "576de86cf0caeef09cd2295a8e5aed0d9696dd8e3a1797b2341e89d9dbd1b84d"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T14:59:11.319797710Z",
+      "updated_at": "2026-10-23T15:51:50.956432161Z",
       "seal": {
         "by": "server",
-        "mac": "986673f20821b94c0557534d73ba059219d4863c991f5d09a9ae618a0bb0d494"
+        "mac": "41317805024f84e9b6d783f670fa76c2ed334196bc46a82f2f3927d707e1254c"
       }
     },
     {
@@ -467,6 +630,18 @@
             "by": "adopt",
             "mac": "140265e0c0edffc29f7ad601cff1c296ce26f88aa735fbefacc7d6ffba90962f"
           }
+        },
+        {
+          "id": "EVD-0049",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact store::tests::inconsistent_catalog_is_rejected_on_load",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.262475122Z",
+          "seal": {
+            "by": "server",
+            "mac": "8ce53604f5eace6e23e233adcc1ca7d4033a828069b24e0e2bb82db79a90fea6"
+          }
         }
       ],
       "verdicts": [
@@ -482,13 +657,26 @@
             "by": "adopt",
             "mac": "000f9e2f0016107b997a5cd9708bf4d4402e2907f600cb438fe51e21565b124e"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named test passes (EVD-0049).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0049"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.976715760Z",
+          "seal": {
+            "by": "server",
+            "mac": "31f9efcacb449568062847cfd22bec8e61aee788ee9ca211dd74ed58f3d80ffa"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T14:59:11.322645771Z",
+      "updated_at": "2026-10-23T15:51:50.976715760Z",
       "seal": {
         "by": "server",
-        "mac": "6cfc1e0dcd7d2336456915e19ceb664a36d9fa77bf6e03c891f691900c218386"
+        "mac": "67906d310cf251260d7a5b5937c14524e0db4fb91547c53c379b94be00b8aaee"
       }
     },
     {
@@ -524,6 +712,18 @@
             "by": "adopt",
             "mac": "892a2096571c26a652deb2c78b5939ad025a4060979994bdeb43a4527ba8fbed"
           }
+        },
+        {
+          "id": "EVD-0050",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact store::tests::output_is_deterministic_and_ends_with_newline",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.269306055Z",
+          "seal": {
+            "by": "server",
+            "mac": "95e27e584213a61ce3e7d6f52723ea3d27e48d6ea0a64c4a30346c58dd1d0696"
+          }
         }
       ],
       "verdicts": [
@@ -539,13 +739,26 @@
             "by": "adopt",
             "mac": "b3780b8e61ebbfc56ab9b5a02a9daca187272b1c914595cb33fd3f857d2852b8"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named determinism test passes (EVD-0050).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0050"
+          ],
+          "recorded_at": "2026-10-23T15:51:50.995604868Z",
+          "seal": {
+            "by": "server",
+            "mac": "e02f2b57d73ba30f6629555bb4eccf2f8360a5007fe66d5c572e4818d59505cf"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T14:59:11.325546482Z",
+      "updated_at": "2026-10-23T15:51:50.995604868Z",
       "seal": {
         "by": "server",
-        "mac": "d980f8358301c94c362e634605c6d09e172de1ddf6920ed25c6589f1fa66894a"
+        "mac": "fad2cd98758c1b05707c61eef45dc7cb8a5f99a003241017d87cd429a4824c91"
       }
     },
     {
@@ -580,6 +793,30 @@
             "by": "adopt",
             "mac": "1db67922a0aba8be364e68a7b148e329da9c2cc95a92f0ce19e6c4d4263f4b42"
           }
+        },
+        {
+          "id": "EVD-0051",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact report::tests::trace_walks_both_directions_with_depth",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.276778299Z",
+          "seal": {
+            "by": "server",
+            "mac": "5ccfb1e4e343be912c282e46316e079498e99b6c89e0a6baa802518f34f84386"
+          }
+        },
+        {
+          "id": "EVD-0113",
+          "kind": "analysis",
+          "locator": "children: CLM-0011",
+          "summary": "The only active child, CLM-0011 (cycle and self-link rejection), was re-supported at 908bf0c. Together with the parent's own trace test (EVD-0051), both the traversal and the link-integrity halves hold.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:23.989667606Z",
+          "seal": {
+            "by": "server",
+            "mac": "b741b0cd3dbc150ee5cd21846b39920a979605c194445b512264deb9c1683a46"
+          }
         }
       ],
       "verdicts": [
@@ -595,13 +832,27 @@
             "by": "adopt",
             "mac": "ede9e31ed2cff128d140619717db403061915ec00a5bb704b22e0d7497b233b4"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "The trace test passes at HEAD (EVD-0051), and the only child is supported (EVD-0113).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0051",
+            "EVD-0113"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.014086148Z",
+          "seal": {
+            "by": "server",
+            "mac": "0703d042b666e215af68bfe9c5256b61b167e457fc6e9b67b4628f26d245b909"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:59.522149644Z",
+      "updated_at": "2026-10-23T15:57:39.014086148Z",
       "seal": {
-        "by": "adopt",
-        "mac": "376b133669f70d61ed5346d5be91d2ac50c00b41d59c1276a299a83026f297da"
+        "by": "server",
+        "mac": "d7d16b94d866123bff56ecd8dd62893597bc0447d2ee81dd50d337f28e1a3d90"
       }
     },
     {
@@ -636,6 +887,18 @@
             "by": "adopt",
             "mac": "4067daf57de0570b95dcf2f02ae9f0ffeba79993a1ae79caa0401bee99cebd42"
           }
+        },
+        {
+          "id": "EVD-0052",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::update_claim_rejects_cycles_and_self_links",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.283364442Z",
+          "seal": {
+            "by": "server",
+            "mac": "15184b21926b35fdfa4684777ab95fe08ea9d4f378b3d63224da6163819dc63b"
+          }
         }
       ],
       "verdicts": [
@@ -651,13 +914,26 @@
             "by": "adopt",
             "mac": "fdd71f307afdb3ffbd9e8b9760a355767b7028ea90aecba8378b6a895aff0398"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named cycle and self-link test passes (EVD-0052).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0052"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.014795947Z",
+          "seal": {
+            "by": "server",
+            "mac": "c05ea95f3681599c5b25b1c0404b3992fa5ece0c67fc24806dee3008c12ed746"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.744443255Z",
+      "updated_at": "2026-10-23T15:51:51.014795947Z",
       "seal": {
-        "by": "adopt",
-        "mac": "056a2f19631cd3bd21d0259cdeb1b20c780f50a9f1fe2b05c9a7d52442bbf378"
+        "by": "server",
+        "mac": "53c35eb2a4eeb79458c93bca0c05c11c8070cdcdcafe89fd32ec292e97bd634e"
       }
     },
     {
@@ -693,6 +969,30 @@
             "by": "adopt",
             "mac": "baf1fdcf0c6600925614822d79336d0c0c89e29a4add18d2023b64439530cdf9"
           }
+        },
+        {
+          "id": "EVD-0053",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::verdict_history_is_append_only; ... --exact model::tests::enums_use_snake_case_names",
+          "summary": "Both re-run individually at HEAD 908bf0c: each 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.291522685Z",
+          "seal": {
+            "by": "server",
+            "mac": "71c7e0cf54b09352c15773031c5c6c276e1fe1e400392b31eb30b5b25eea3660"
+          }
+        },
+        {
+          "id": "EVD-0114",
+          "kind": "analysis",
+          "locator": "children: CLM-0013",
+          "summary": "The only active child, CLM-0013 (supported needs own supports evidence), was re-supported at 908bf0c. The parent's own tests (EVD-0053) cover the labels and append-only history.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.003405992Z",
+          "seal": {
+            "by": "server",
+            "mac": "c1d745a2694a5ad5dc2075b5006bdee02dda5e5d7c6b89ff17f8189a24640f1f"
+          }
         }
       ],
       "verdicts": [
@@ -708,13 +1008,27 @@
             "by": "adopt",
             "mac": "2da880ff64769ff3a40b78edb269338f63c4dbb93c67ecd7aa92f86e83fc2701"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "The label and history tests pass at HEAD (EVD-0053), and the only child is supported (EVD-0114).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0053",
+            "EVD-0114"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.123868017Z",
+          "seal": {
+            "by": "server",
+            "mac": "fb8f70e7bd5c39ab43dc2c7e295e09d8c69cfd4ab23d7e97d64295ee7d994444"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:59.535858108Z",
+      "updated_at": "2026-10-23T15:57:39.123868017Z",
       "seal": {
-        "by": "adopt",
-        "mac": "aeef95c9803105a8bb98c81192dd7a2ca29e89a29d0782db65f1b9df51edc1fc"
+        "by": "server",
+        "mac": "dbb1e747a9ff129d3e32df0a5609863e4a3aa78df350dfe317d006ef59f32dd2"
       }
     },
     {
@@ -749,6 +1063,18 @@
             "by": "adopt",
             "mac": "1ff1501c46dd7cb19764e5959413909c84b1fcb21c6069ee8cdb11f4fa6e146a"
           }
+        },
+        {
+          "id": "EVD-0054",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::supported_verdict_requires_supporting_evidence; ... --exact catalog::tests::verdict_rejects_evidence_from_another_claim",
+          "summary": "Both re-run individually at HEAD 908bf0c: each 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.298751608Z",
+          "seal": {
+            "by": "server",
+            "mac": "a07ccf72d87fb1a475d3ec401325ca926027359eed397693dbffbf2932d1d1f0"
+          }
         }
       ],
       "verdicts": [
@@ -764,13 +1090,26 @@
             "by": "adopt",
             "mac": "cd46ff106af45054e1261dd77bd551f0ecefef8e941f3ac80793057e2518688c"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: both named tests pass (EVD-0054). This session's own server also enforced the rule on every verdict recorded here.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0054"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.032749575Z",
+          "seal": {
+            "by": "server",
+            "mac": "c956a5c9deb0ca6d2b54ee8391c9c17e23353a286d91cd4ba538f431ba0a4924"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.750714197Z",
+      "updated_at": "2026-10-23T15:51:51.032749575Z",
       "seal": {
-        "by": "adopt",
-        "mac": "58b426b5c2e0bdaf26638e734b919959e5eefbfd54a296245aff033c02949b03"
+        "by": "server",
+        "mac": "0474627affe5e53e95efd1b087641bd340ac2f7fad42294d5586a08359e7111f"
       }
     },
     {
@@ -805,6 +1144,18 @@
             "by": "adopt",
             "mac": "64deedde140231858f680e102c6b95ae3ff89f33144d7ae6a592e61813464250"
           }
+        },
+        {
+          "id": "EVD-0055",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact model::tests::integrity_level_rejects_out_of_range",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed. The live add_claim schema served by the server also shows integrity_level minimum 1 / maximum 4 and verification_method enum inspection, analysis, demonstration, test, formal_proof.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.305811182Z",
+          "seal": {
+            "by": "server",
+            "mac": "c36343a52e5ef3692d2d655cd3c89c461ea231baeb693ec55a3147f3a2bf3e18"
+          }
         }
       ],
       "verdicts": [
@@ -820,13 +1171,26 @@
             "by": "adopt",
             "mac": "bc134c7c1be8f9c72737106e97005cfbf583a505a53e9db315a4c864fd33f4ea"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the range test passes, and the served schema restricts level and method as stated (EVD-0055).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0055"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.050901203Z",
+          "seal": {
+            "by": "server",
+            "mac": "3abae722af30dba332519db163bf1d8913da8433ba0e836dec847aec383cf3a9"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.756906468Z",
+      "updated_at": "2026-10-23T15:51:51.050901203Z",
       "seal": {
-        "by": "adopt",
-        "mac": "4a7944f5c1b38f6310f45585b357dd3c5ea9347016ec8c466d40117e7855edf6"
+        "by": "server",
+        "mac": "3fd70bb4e3edb91a777b5d22fb616f333fa85c56e0d44faa578f9ace8c2b79b2"
       }
     },
     {
@@ -861,6 +1225,18 @@
             "by": "adopt",
             "mac": "4bb0a073dfc2166824526c040d6d540e04a322c5629af9437d9855ba16cc8c88"
           }
+        },
+        {
+          "id": "EVD-0063",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: mcp__claims__audit_report on this repo's claims.json (include_matrix default and false)",
+          "summary": "The gaps object contains exactly the eight keys no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links. With the default include_matrix the response contains a matrix with one row per active claim. It also now carries an integrity section.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.901875779Z",
+          "seal": {
+            "by": "server",
+            "mac": "8c1ac2dd52e3b555dacad4078dd35584dc9a663b94ccf0d0f943d6e402852e27"
+          }
         }
       ],
       "verdicts": [
@@ -876,13 +1252,26 @@
             "by": "adopt",
             "mac": "98ff31f847d894a28ac2168410da2d0438b152819cd909629869ee0de382f9c0"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the live audit_report has all eight gap keys and a matrix (EVD-0063).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0063"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.068635941Z",
+          "seal": {
+            "by": "server",
+            "mac": "3ffb3cf8580799b5f15fad5912e78bf90cf00c75419bd4fdcf5564b90f8fe6cb"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.763501210Z",
+      "updated_at": "2026-10-23T15:51:51.068635941Z",
       "seal": {
-        "by": "adopt",
-        "mac": "f3042094185610e74df13b8fa4915c02364d0f69936797a0c88a2cb339b27f78"
+        "by": "server",
+        "mac": "72a0518621cac417204e958f5a3d849a9de1c2ca99ac69da19d6be9120d7291a"
       }
     },
     {
@@ -917,6 +1306,18 @@
             "by": "adopt",
             "mac": "593f3dd942a6f84f6a4d7163037794fccf55e0786b6ca8638050e0e7aee3b51b"
           }
+        },
+        {
+          "id": "EVD-0064",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: head -4 skills/claims-audit/SKILL.md; grep for each backticked tool name",
+          "summary": "Frontmatter has --- delimiters with name: claims-audit and a description. All 10 tool names appear backticked in the file.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.909149363Z",
+          "seal": {
+            "by": "server",
+            "mac": "ff8d80e3a683f38252fc6f70f3c472012a290ad74f3b4eebf8ed5a03e86be854"
+          }
         }
       ],
       "verdicts": [
@@ -932,13 +1333,26 @@
             "by": "adopt",
             "mac": "b298451539a2236ab1ec39cd39d77a27ccc62d59a6cf06c0d77b33c677542d00"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the frontmatter is valid and all 10 tools are referenced (EVD-0064).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0064"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.086228019Z",
+          "seal": {
+            "by": "server",
+            "mac": "6f083983ed624df71ac13af85babfec9880ba21d1c013e6015477b53af182f38"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.769726412Z",
+      "updated_at": "2026-10-23T15:51:51.086228019Z",
       "seal": {
-        "by": "adopt",
-        "mac": "6614491468687668a294d50d5e5e7bad7a0683e1f76115294587e7af68138299"
+        "by": "server",
+        "mac": "afc64f7a9465c770a57a982a1c1fac27a2c1f7f5101c38002a6838c801e74a12"
       }
     },
     {
@@ -974,6 +1388,42 @@
             "by": "adopt",
             "mac": "39b63bafd282a6acae941c8ddab7497349bd1f021d052d740764c31b39b848c7"
           }
+        },
+        {
+          "id": "EVD-0065",
+          "kind": "demonstration",
+          "locator": ".mcp.json (working tree on 908bf0c, uncommitted change to command: claims-mcp); /mcp reconnect in this session",
+          "summary": ".mcp.json registers server \"claims\" as `claims-mcp --catalog claims.json` (changed this session from `cargo run --release` so it no longer times out on connect). After reconnecting, this session's mcp__claims__* tools read and write ./claims.json.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.916432576Z",
+          "seal": {
+            "by": "server",
+            "mac": "a5b3f2e99f203dd0cb81775f7583f7ace2b28cc797d6670c073bc0ac757ce9d6"
+          }
+        },
+        {
+          "id": "EVD-0066",
+          "kind": "log",
+          "locator": "Session start: Claude Code MCP connect for 'claims' with the committed .mcp.json (cargo run --release)",
+          "summary": "With the committed 908bf0c .mcp.json the server failed to connect (\"connection timed out after 30000ms\") because cargo compiled first. The registration was correct but did not start in time. Fixed in the working tree by running claims-mcp from PATH.",
+          "stance": "neutral",
+          "recorded_at": "2026-10-23T15:51:03.923500619Z",
+          "seal": {
+            "by": "server",
+            "mac": "0f057d454740493a5d9e9ddb51efd710c12d8ab929383b426ebc5c0d03f2daaf"
+          }
+        },
+        {
+          "id": "EVD-0121",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: git show HEAD:.mcp.json",
+          "summary": "The committed .mcp.json registers server \"claims\" as `cargo run --release --quiet -- --catalog claims.json`. That is the claims server with the catalog at claims.json. The PATH-based command in this session's working tree is a local-only change and will not be committed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T16:35:28.668878351Z",
+          "seal": {
+            "by": "server",
+            "mac": "160be76c5342ab028796d93f6cf7127f9456a8db6c4d161c031a36532eca41c8"
+          }
         }
       ],
       "verdicts": [
@@ -989,13 +1439,39 @@
             "by": "adopt",
             "mac": "83c02c7abe5183c0d79b4ce1a6ce7fd2c9aa5175510899187356f9884b6bcb05"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": ".mcp.json registers the claims server against claims.json (EVD-0065). The connect timeout with the committed cargo-run form (EVD-0066) was about startup time, not registration, so it is neutral. That issue is fixed in the working tree and must be committed for this verdict to hold at the next commit.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0065"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.102153396Z",
+          "seal": {
+            "by": "server",
+            "mac": "962a11ece6af101437e3c93fc99b029b00d04aa69d182aea232da59acf6d975a"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Supersedes the previous verdict, which relied on an uncommitted working-tree .mcp.json. The committed file registers the claims server against claims.json (EVD-0121). The cargo-run form can exceed Claude Code's 30 s connect timeout on a cold build (EVD-0066, neutral), but that affects startup time, not the registration this claim asserts.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0121"
+          ],
+          "recorded_at": "2026-10-23T16:35:37.140356612Z",
+          "seal": {
+            "by": "server",
+            "mac": "52ce1c5ee316728df121cbbc0293ea99b665cb67d5e963e1600c2cfb26f765c0"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.777059784Z",
+      "updated_at": "2026-10-23T16:35:37.140356612Z",
       "seal": {
-        "by": "adopt",
-        "mac": "b026f0a6cbd4e2a2e5e917ec441e6fc8ae52e9e81d53d8a32ddf367d6f515c78"
+        "by": "server",
+        "mac": "e898f44addece747b6993bafe7794702dfd4133b303df8ab707845031a272106"
       }
     },
     {
@@ -1030,6 +1506,18 @@
             "by": "adopt",
             "mac": "76c8aa72affa97c85f682c81551316c5935201cf96c9f59b2be2533f924b792a"
           }
+        },
+        {
+          "id": "EVD-0067",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: git check-ignore -v .claims.json.lock .claims.json.tmp; src/store.rs:46-47",
+          "summary": "Both names are ignored by .gitignore:2 and :3, and store.rs builds the sidecars as .{file_name}.lock and .{file_name}.tmp, so they match for claims.json.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.931281523Z",
+          "seal": {
+            "by": "server",
+            "mac": "13624d13b8939242950fa9fb634fd8b22f866625fc674c4d41eb60eb912c0332"
+          }
         }
       ],
       "verdicts": [
@@ -1045,13 +1533,26 @@
             "by": "adopt",
             "mac": "b6ebd13d42533e19e1f92be27c6b0d609c0e58863c3e3462493c97eaaae1c7d2"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: git ignores both sidecar names, and they match the names store.rs builds (EVD-0067).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0067"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.121399225Z",
+          "seal": {
+            "by": "server",
+            "mac": "4ea53a5f3e446723fffafc8a8ba49ee1a6b3b763e1bc5d36353d7f4241a98e2a"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T14:59:11.328653383Z",
+      "updated_at": "2026-10-23T15:51:51.121399225Z",
       "seal": {
         "by": "server",
-        "mac": "de85fb76a57e0b9b00408c22c69af248c8f0d47b1142e92482efd020c54133f8"
+        "mac": "9e05548ff0dac7ae1e9019101bb7911a47817fd9d4f57ac18840f9b8546e6e3b"
       }
     },
     {
@@ -1098,6 +1599,18 @@
             "by": "adopt",
             "mac": "f2d98f450c279222ea85ae4631e8499b0026b08777d194d4e3068f11c9610c33"
           }
+        },
+        {
+          "id": "EVD-0116",
+          "kind": "analysis",
+          "locator": "children: CLM-0021, CLM-0022, CLM-0023, CLM-0025, CLM-0026, CLM-0027, CLM-0028, CLM-0029, CLM-0030, CLM-0031, CLM-0032, CLM-0033, CLM-0035, CLM-0036",
+          "summary": "All 14 active children were re-verified against HEAD 908bf0c (0.2.0) with fresh evidence and are supported. Spec coverage is the same as EVD-0044. The new seal.rs module was included in the no-unwrap, no-process, and module-boundary checks.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.028069113Z",
+          "seal": {
+            "by": "server",
+            "mac": "9fe0b0320df457febae1e0b1929c616c35bc97a0669d9b417eab86baf1650a79"
+          }
         }
       ],
       "verdicts": [
@@ -1126,13 +1639,26 @@
             "by": "adopt",
             "mac": "3d877cdcd9f9583b7d173310a0f488c3e315b6b560b54e29a7c8168e9b0a1559"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "All 14 spec children were re-verified at HEAD 908bf0c and are supported (EVD-0116).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0116"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.142757165Z",
+          "seal": {
+            "by": "server",
+            "mac": "e916d9b8bee19c9cffe4ec68502c4b42b505f1054647e74589580332846e4285"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:26:53.454038289Z",
+      "updated_at": "2026-10-23T15:57:39.142757165Z",
       "seal": {
-        "by": "adopt",
-        "mac": "a9071f1bb1f9ded7b8860017a83cc074b5188a7b2b6a365cd8cfc072276cf0e8"
+        "by": "server",
+        "mac": "8ff687852d97c24e85710215fea8b41b95ed3c7ab9dfb926152e4e6b2497f550"
       }
     },
     {
@@ -1263,6 +1789,30 @@
             "by": "adopt",
             "mac": "1769d273e2ee68c7247ebd563aedbf997b029e9f5ca34572d427b8c836f301dd"
           }
+        },
+        {
+          "id": "EVD-0056",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::retired_claims_reject_changes_and_ids_are_not_reused",
+          "summary": "Re-run at HEAD 908bf0c: 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.313504645Z",
+          "seal": {
+            "by": "server",
+            "mac": "f46ef74f5421df7f2f755bb8f2720b4a62133465fec3ceee197e9c3aeee1e86f"
+          }
+        },
+        {
+          "id": "EVD-0112",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0 over stdio in a temp catalog: add_claim, add_evidence, retire_claim CLM-0001, then record_verdict (id 4), add_evidence (id 5), update_claim (id 6)",
+          "summary": "All three post-retirement calls returned isError true with \"claim CLM-0001 is retired\". This covers record_verdict, which the unit test does not exercise (it asserts only add_evidence and update_claim).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:16.000331825Z",
+          "seal": {
+            "by": "server",
+            "mac": "597588d78cc779e1e72d63990eabbf26d5bdffdcf3d4ba83c4ac1ece8cf3ca46"
+          }
         }
       ],
       "verdicts": [
@@ -1279,13 +1829,40 @@
             "by": "adopt",
             "mac": "97a3b21c333c1b26536faeade12cc833dc571f9b6e4540ad703d69b8558dd0a5"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the named test passes (EVD-0056).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0056"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.129846368Z",
+          "seal": {
+            "by": "server",
+            "mac": "6ffba8ddfb9f85abccb92a7dc2c204c95b8888dd77672fb9df055a080d157c06"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Correction to the previous verdict, which cited only the unit test. That test covers add_evidence and update_claim but not record_verdict (EVD-0021). The 0.2.0 binary rejects all three operations on a retired claim (EVD-0112), and the unit test still passes for the other two (EVD-0056).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0112",
+            "EVD-0056"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.692040946Z",
+          "seal": {
+            "by": "server",
+            "mac": "18c4d4838e4e1f2b4b4b09dc74ce9f247c9ab1acd1a8da5a8c564c479ba952e8"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.796527609Z",
+      "updated_at": "2026-10-23T15:56:58.692040946Z",
       "seal": {
-        "by": "adopt",
-        "mac": "76caa88f7d556fca5ef318088d58dd474118d05071e6a9e9e769d606c21530cd"
+        "by": "server",
+        "mac": "b9927dacbaeacc8db3aeff642b928dd45cd10ff4292893d7e5f4cbf115cf64f7"
       }
     },
     {
@@ -1320,6 +1897,18 @@
             "by": "adopt",
             "mac": "84bf4847503ffa04c5d742043d6cd68375c898e28e3da495ecf0e6ed3d53f919"
           }
+        },
+        {
+          "id": "EVD-0057",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::add_claim_rejects_empty_statement_and_batch_refs; ... --exact catalog::tests::add_claim_assigns_sequential_ids_and_cleans_input",
+          "summary": "Both re-run individually at HEAD 908bf0c: each 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.321322339Z",
+          "seal": {
+            "by": "server",
+            "mac": "1fea98d48c114bd2c5ec8e49021fb895ab2512f18d232eab3789300e3fa7ac9a"
+          }
         }
       ],
       "verdicts": [
@@ -1335,13 +1924,26 @@
             "by": "adopt",
             "mac": "d3010085c5240227dffae36ccaffb521db0a975a406aec33d3d3437984223f82"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: both named tests pass (EVD-0057).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0057"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.176390029Z",
+          "seal": {
+            "by": "server",
+            "mac": "6e8d48d8050dc174a275bb0668c39817889b560cc0924d16335739ac24d1ef2d"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.803363391Z",
+      "updated_at": "2026-10-23T15:51:51.176390029Z",
       "seal": {
-        "by": "adopt",
-        "mac": "f8460c002a8dcbfb3eb8571d0884b5de7fa07a661899430464fa00fed1cde16e"
+        "by": "server",
+        "mac": "61310aa671dc4403f22e436b78022f6e4d1f4ec4253dd38e735a6a5b4efe7f87"
       }
     },
     {
@@ -1376,6 +1978,18 @@
             "by": "adopt",
             "mac": "537a2dcf2d10557c8ed0da4d74c24d3b24d46f76e174fe8731cd82273d5e940a"
           }
+        },
+        {
+          "id": "EVD-0058",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact catalog::tests::add_claims_is_all_or_nothing; ... --exact catalog::tests::add_claims_resolves_batch_refs",
+          "summary": "Both re-run individually at HEAD 908bf0c: each 1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:50:21.327979952Z",
+          "seal": {
+            "by": "server",
+            "mac": "dd2bad43029951483dda2ae86dbff66721049dcd80f5c507a0c65c77359c0646"
+          }
         }
       ],
       "verdicts": [
@@ -1391,13 +2005,26 @@
             "by": "adopt",
             "mac": "4800581da2b15614f64c7107e401d4932f4e63ca75ccf7ba1cf416af55a4de95"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: both named tests pass (EVD-0058).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0058"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.195888188Z",
+          "seal": {
+            "by": "server",
+            "mac": "b4bb7a344e471c729be39aa123611f0f3e441566d6764947d12890efa544eaa6"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.809089563Z",
+      "updated_at": "2026-10-23T15:51:51.195888188Z",
       "seal": {
-        "by": "adopt",
-        "mac": "7f7455215b5793eab35868451d10b07144389b3da7fb8664cba5a9ad7d443132"
+        "by": "server",
+        "mac": "4fef51c03fd2135cf0baecd905de9b2b1091be05bed4c8b2d89c99b488b816ad"
       }
     },
     {
@@ -1529,6 +2156,18 @@
             "by": "adopt",
             "mac": "5786a6cbeb951d9b53e0e3aed97726ea962018bba7885c11187fd52c4e5f816c"
           }
+        },
+        {
+          "id": "EVD-0068",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: claims-mcp --catalog <tmp>/v99.json (schema_version 99) + tools/call add_claim; sha256sum before/after",
+          "summary": "add_claim returned isError true: \"catalog .../v99.json has schema_version 99; this server supports 2\". The file's sha256 was unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.939156096Z",
+          "seal": {
+            "by": "server",
+            "mac": "2a22997ea1d71cd2ae446252f0d8acaeddb24765a8368df18c4fd66af9426730"
+          }
         }
       ],
       "verdicts": [
@@ -1545,13 +2184,26 @@
             "by": "adopt",
             "mac": "a8b4e4508f894215c8f3e16bf3ac19afa952b0b9dc663e9aa35b1dd3375e7ebc"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c against the release binary: an unsupported schema_version is rejected and the file stays byte-identical (EVD-0068).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0068"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.225317641Z",
+          "seal": {
+            "by": "server",
+            "mac": "a56c070001e46a4a1de045901627536fc0e26f2c7c9e513aa753c03a7d32fb8e"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.820795666Z",
+      "updated_at": "2026-10-23T15:51:51.225317641Z",
       "seal": {
-        "by": "adopt",
-        "mac": "7486f32e6cac218e4f029bcf5e1952bf05021db8b5be724902da01eddaac3600"
+        "by": "server",
+        "mac": "eeff4502b908439121382e5292488bd8c85437036e7873f688ee7b9c6dbff1ce"
       }
     },
     {
@@ -1587,6 +2239,18 @@
             "by": "adopt",
             "mac": "e5a2d7d37b204a523b4ad31821b9493c8aa0672c170b0772953827b3796e5fad"
           }
+        },
+        {
+          "id": "EVD-0069",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: tools/call get_claim CLM-9999 (id 2); add_claim on v99.json; list_claims on bad.json",
+          "summary": "Each domain error came back as a JSON-RPC result with isError true and the error text in content[0].text (\"claim CLM-9999 not found\", the schema_version message, the parse message). None of these responses had a JSON-RPC \"error\" member.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.946721689Z",
+          "seal": {
+            "by": "server",
+            "mac": "ec06f14645f30155e05215c582b087aa8845b8d3a22aacc4c8823831d956b283"
+          }
         }
       ],
       "verdicts": [
@@ -1602,13 +2266,26 @@
             "by": "adopt",
             "mac": "7002c2fbfa909b4801853b59ad753dc837e766e466e6d06dfd91e9c66050f3a6"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: three distinct domain errors came back as isError tool results, not protocol errors (EVD-0069).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0069"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.237001546Z",
+          "seal": {
+            "by": "server",
+            "mac": "108b2e94a5d73b101e331da729e9a8f0a6ef5b9d6225faf0b6da95c67ea736eb"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.826746828Z",
+      "updated_at": "2026-10-23T15:51:51.237001546Z",
       "seal": {
-        "by": "adopt",
-        "mac": "f4c23038844830186d10688f286c3c835402aae5dd51f0f5a69346fe67256947"
+        "by": "server",
+        "mac": "a07ae87859afcc1408f43678baa7891d7cd6c9bb758351b7bdde72f504c6ca51"
       }
     },
     {
@@ -1645,6 +2322,18 @@
             "by": "adopt",
             "mac": "ddfda8887518f8482237aea7db0519b8305465818dd8b6dfa96e93d1f2b3f61a"
           }
+        },
+        {
+          "id": "EVD-0070",
+          "kind": "demonstration",
+          "locator": "HEAD 908bf0c: echo '{ nope' > <tmp>/bad.json; claims-mcp --catalog <tmp>/bad.json + tools/call list_claims",
+          "summary": "Tool error text: \"catalog <absolute tmp path>/bad.json is not a valid claims catalog: key must be a string at line 1 column 3\". It names the path and gives serde's line and column.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.953869353Z",
+          "seal": {
+            "by": "server",
+            "mac": "2466994ae9fbe35359e5cad043d5410b94ed441f70b02e4aa3094bcf02a51022"
+          }
         }
       ],
       "verdicts": [
@@ -1660,13 +2349,26 @@
             "by": "adopt",
             "mac": "6e98d8f6e3a60fc75ef047b478cc361f9b31d51aad0048c193b432578f837044"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the parse error names the path and line/column (EVD-0070).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0070"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.262088798Z",
+          "seal": {
+            "by": "server",
+            "mac": "fd2f400beb155d2bec716bce94b694a542ecc9247a734af99dcaf7fc0450f099"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.832912429Z",
+      "updated_at": "2026-10-23T15:51:51.262088798Z",
       "seal": {
-        "by": "adopt",
-        "mac": "1b0ef5436fa708debe794cf552fe7569fc4f88ebb9b45f5c456d0a2a585ce432"
+        "by": "server",
+        "mac": "3a8a3d2e0f59a46bcf6137fbb60aa02673fe22010551dedf105421b43b24d069"
       }
     },
     {
@@ -1702,6 +2404,18 @@
             "by": "adopt",
             "mac": "ea7b61334e8f71f7b7a7082bc104b15450cd48aea398a452e65eb4d70b611a31"
           }
+        },
+        {
+          "id": "EVD-0071",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print}' $f; done | grep '\\.unwrap()'",
+          "summary": "No matches in the non-test portion of any of the 8 modules, including the new src/seal.rs.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.961270986Z",
+          "seal": {
+            "by": "server",
+            "mac": "f2a6d17841b604fc1d1a27f997b03e58af770cc3733ada2c3582b72911509b57"
+          }
         }
       ],
       "verdicts": [
@@ -1717,13 +2431,26 @@
             "by": "adopt",
             "mac": "0e98ec213a05663e1678ef3d2dafdf48f099eacb1b01229acc27ae1bba62d39f"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c across all 8 modules, including seal.rs: no unwrap outside tests (EVD-0071).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0071"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.280347936Z",
+          "seal": {
+            "by": "server",
+            "mac": "b0c31d937978b0e990e1dd6ab28c49dfcadeee686890cf7e2237faf866d08b23"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.838612701Z",
+      "updated_at": "2026-10-23T15:51:51.280347936Z",
       "seal": {
-        "by": "adopt",
-        "mac": "40423062151d15d609b72b9c8c12934030452b2622487aff6b4d8234d132eb5a"
+        "by": "server",
+        "mac": "da776528cbe3ccc5a4db5bee7dd71158a71e75122d46340372491e0071e818af"
       }
     },
     {
@@ -1760,6 +2487,18 @@
             "by": "adopt",
             "mac": "e82cd2fb898d8d3ea645d80f423fe1c9e51b28e6cfae42ed01e640fb70c4b5fc"
           }
+        },
+        {
+          "id": "EVD-0072",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: grep -E 'console-subscriber|ctrlc|lazy_static|^dotenv |dotenvy' Cargo.toml; ls .cargo; src/main.rs:67",
+          "summary": "Only dotenvy = \"0.15.7\" matches. There is no .cargo directory, so no tokio_unstable rustflag. main.rs:67 calls dotenvy::dotenv().",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.968491519Z",
+          "seal": {
+            "by": "server",
+            "mac": "1e4d410f334a160852512ad1ecb2f89c6f28141afbbab60281ab05e2e0060e01"
+          }
         }
       ],
       "verdicts": [
@@ -1775,13 +2514,26 @@
             "by": "adopt",
             "mac": "698d132d47fa8903a9ef69d3f4eac64851182aa67c802d71bb18b67f2f8c3158"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the template dependencies and rustflag are gone, and dotenvy is used (EVD-0072).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0072"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.298461804Z",
+          "seal": {
+            "by": "server",
+            "mac": "b458b02d9e444165a3d8e6e5e3b42fbc610063bbd2a32387500656632d0ea9dc"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.844820483Z",
+      "updated_at": "2026-10-23T15:51:51.298461804Z",
       "seal": {
-        "by": "adopt",
-        "mac": "9f6e698698ac87b44de2d0e1114716905fd733da27f3840a0b89159469d97bc0"
+        "by": "server",
+        "mac": "b83590f4c6856e6de4fcaff393a72a558893a59c176641ce19aae5a82e6e0b4b"
       }
     },
     {
@@ -1817,6 +2569,18 @@
             "by": "adopt",
             "mac": "6cfb61b732d2a520790ffb806b254275a19de1086134b5d076785b06889b3407"
           }
+        },
+        {
+          "id": "EVD-0073",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test",
+          "summary": "fmt --check exited 0; clippy produced no diagnostics; cargo test: 83 passed, 0 failed, 0 ignored.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.975151572Z",
+          "seal": {
+            "by": "server",
+            "mac": "68b616e1e1be64d910e4565217e10b9e0b0eb3d77f20bb269b7fd9e2bc0bb60b"
+          }
         }
       ],
       "verdicts": [
@@ -1832,13 +2596,26 @@
             "by": "adopt",
             "mac": "8bf1294b8ed7f7bbcb590b2236703b5736d75fe86c262ee6e9849bc2d6370fc5"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: all three gates pass, with 83 tests (EVD-0073).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0073"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.307142558Z",
+          "seal": {
+            "by": "server",
+            "mac": "958b17b3519b4736f956ce636eaaaeb7da9370ed3aaba44272d15f41f507c90b"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.850735794Z",
+      "updated_at": "2026-10-23T15:51:51.307142558Z",
       "seal": {
-        "by": "adopt",
-        "mac": "d08f6d7fe5312ca8427b4f78d98d160cd707e6100e254097a35749a3e387a325"
+        "by": "server",
+        "mac": "9cb72eac45918144bd471f898b8f1fe7188c02fb76bbfb7a3ddeaeada5762d5d"
       }
     },
     {
@@ -1886,6 +2663,18 @@
             "by": "adopt",
             "mac": "89a18d8b3e169f651d1f8b252f6d7d94e0a48537b18d1d3548ecb6d81b6e7573"
           }
+        },
+        {
+          "id": "EVD-0074",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: RUSTDOCFLAGS='-W missing_docs' cargo doc --no-deps --document-private-items; cargo clippy -- -W missing_docs",
+          "summary": "Neither run produced any \"missing documentation\" warning (0 each).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.981964045Z",
+          "seal": {
+            "by": "server",
+            "mac": "dab7e2801fc7f5121626f5444977df62cc8c235545ef5f9143ce45bdad7c847c"
+          }
         }
       ],
       "verdicts": [
@@ -1902,13 +2691,26 @@
             "by": "adopt",
             "mac": "c0e258855f2a0daca60731c72e027219f8b3b001b61b1f5f594477611a0a3111"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the missing_docs lint reports nothing (EVD-0074).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0074"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.324043165Z",
+          "seal": {
+            "by": "server",
+            "mac": "105a044fd2872067fc2bce561b62b64a9d6aa18e077cb7a136f3afaa97587ffe"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.856577686Z",
+      "updated_at": "2026-10-23T15:51:51.324043165Z",
       "seal": {
-        "by": "adopt",
-        "mac": "29a4f59ca5b99d477dac26056584861503f559a2325a019d362594b50b02abea"
+        "by": "server",
+        "mac": "113bed1ee19acdc4a7e242900e01b3e2d0b04dbc9bf70f5278f9aee8be55b280"
       }
     },
     {
@@ -1944,6 +2746,18 @@
             "by": "adopt",
             "mac": "39bfaaf2b649c1e6d216264f964102dcee0f954aa02b2af9c826daa7bb1d6e9b"
           }
+        },
+        {
+          "id": "EVD-0075",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: README.md:23 Install the server (cargo build --release l.71), :125 Run (CLAIMS_CATALOG table l.135), :210 Tools, :105 Install the skill (cp -r skills/claims-audit ~/.claude/skills/ l.112)",
+          "summary": "The sections moved since 0.1.0, but README still documents building, configuration (--catalog / CLAIMS_CATALOG), the tool reference, and the exact cp -r skill install command.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.988927568Z",
+          "seal": {
+            "by": "server",
+            "mac": "79ff488d6b94870e599673f001b976ce13752e653d0cb63fc53c1d0b223174a5"
+          }
         }
       ],
       "verdicts": [
@@ -1959,13 +2773,26 @@
             "by": "adopt",
             "mac": "538be8ec8867cf69de4d814e58e6f8033735edad0f1a19ab3185dd83564e2ba3"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: all four documented topics are present at their new line numbers (EVD-0075).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0075"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.340323543Z",
+          "seal": {
+            "by": "server",
+            "mac": "5203b8e8e1d00ba6ab219119c32cdd1b85a3eaf65d66cac213d10db658e91961"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.862563648Z",
+      "updated_at": "2026-10-23T15:51:51.340323543Z",
       "seal": {
-        "by": "adopt",
-        "mac": "e2f24329b26c4ef178e029af53d17cac7a68b68e4cd544a135d8a48402dd74c4"
+        "by": "server",
+        "mac": "2fe166f2be64ae8cb63114a615fd868cd85a2678ae87e011a66e7ca7e555ab26"
       }
     },
     {
@@ -2001,6 +2828,18 @@
             "by": "adopt",
             "mac": "f0ad125e67039617cc8e2b66e71383519ac5e1a56ac9416c54e50205f9487367"
           }
+        },
+        {
+          "id": "EVD-0076",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: ls changelog/",
+          "summary": "14 timestamped entries named YYYY-MM-DDTHH-MM-SSZ.md, the latest being the 0.2.0 release entry 2026-10-23T15-15-27Z.md.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:03.995809221Z",
+          "seal": {
+            "by": "server",
+            "mac": "8ed3e1eea4b73a40514dcae9a4bb3c3f586de3f9e16d1b5b50e4e7d21a49ee45"
+          }
         }
       ],
       "verdicts": [
@@ -2016,13 +2855,26 @@
             "by": "adopt",
             "mac": "3ab6ba61a204c9886063ed44dc6376c62f5d522afd6f2e62fe39be361a2ce291"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: there are timestamped changelog entries (EVD-0076).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0076"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.367709215Z",
+          "seal": {
+            "by": "server",
+            "mac": "51f256318723c6806c9c15b750a747565909983ba71aaf341f780aaeb862b4f9"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.868489289Z",
+      "updated_at": "2026-10-23T15:51:51.367709215Z",
       "seal": {
-        "by": "adopt",
-        "mac": "2e79c67f1d5c6d723f95f847b6d31ddd1dc81ad2cdc7df25dd7bc0ce949e8467"
+        "by": "server",
+        "mac": "41e6576a3dad88aaa40e5dd126702f716b5adf9cf64e4520fde91d9b510734ae"
       }
     },
     {
@@ -2058,6 +2910,18 @@
             "by": "adopt",
             "mac": "fb3f5d1fd05bc97a045647644d6b5edb4b1a7686f47f02b728f8f0e917061689"
           }
+        },
+        {
+          "id": "EVD-0077",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: git log -1 -- docs/superpowers/plans/2026-10-23-claims-mcp.md; grep 'passed' and 'src/*.rs' in the plan",
+          "summary": "The plan has not changed since 7baf774. It still expects \"46 passed\" (cargo test now reports 83). It references src/parse.rs, which does not exist, never mentions seal.rs, and contains no occurrence of \"seal\".",
+          "stance": "refutes",
+          "recorded_at": "2026-10-23T15:51:04.003807235Z",
+          "seal": {
+            "by": "server",
+            "mac": "9f5616e51eb3b324c876b8a974c2272ddb02d1136be7a3573b256c447ec2e82b"
+          }
         }
       ],
       "verdicts": [
@@ -2073,13 +2937,26 @@
             "by": "adopt",
             "mac": "f8c49306ac383a909c756fcf852d6e23989253721438b6de41c6fc773b989071"
           }
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "Still refuted at 908bf0c and further behind than at the first audit: it expects 46 tests (actual 83), names a src/parse.rs that does not exist, and has no seal.rs or schema v2 (EVD-0077). Tracked by issue #1.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0077"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.375656968Z",
+          "seal": {
+            "by": "server",
+            "mac": "d8a6a07002c0427e389ff0df2005703961f88d3a957b5004a7751d41eaceb346"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:01:09.126348384Z",
+      "updated_at": "2026-10-23T15:51:51.375656968Z",
       "seal": {
-        "by": "adopt",
-        "mac": "ce0f1a0f7afab41074c271f4d56946b6bf19f4dc7498383e9feaa6d6f40eb661"
+        "by": "server",
+        "mac": "e8382ecca63ba8a0bd755e014b7ea8973e7783b90e6a4cbb69ca384e95b9cfd9"
       }
     },
     {
@@ -2115,6 +2992,18 @@
             "by": "adopt",
             "mac": "a88bdf86e187b7f46708e24ac9a544bdb4ebf5723ca15d0b31596496b4b87a89"
           }
+        },
+        {
+          "id": "EVD-0078",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print FILENAME\":\"FNR\": \"$0}' $f; done | grep 'process::\\|Command\\|tokio::process\\|spawn('",
+          "summary": "Only main.rs lines match: :13 use std::process::ExitCode, and :24/:41/:46/:73/:74 for the clap `Command` subcommand enum (verify, seal). Neither runs a process. There is no std::process::Command, tokio::process, or spawn( in non-test code.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:04.010887718Z",
+          "seal": {
+            "by": "server",
+            "mac": "364fb90ba9761eb2515516422933b8122708eff9a9abd0f1c8cbd88db8ea96fb"
+          }
         }
       ],
       "verdicts": [
@@ -2130,13 +3019,26 @@
             "by": "adopt",
             "mac": "694f0862d465ec7020f43fc7220d6d56287150a87d739580768222605e62ec4c"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c: the only matches are ExitCode and the clap Command enum. Neither runs a process (EVD-0078).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0078"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.394585487Z",
+          "seal": {
+            "by": "server",
+            "mac": "a78913d235e6e9cd6b98b70e886a332421af568b4e5ae6ded93ffac1b541913a"
+          }
         }
       ],
       "created_at": "2026-10-23T13:26:33.528029393Z",
-      "updated_at": "2026-10-23T13:26:45.599814100Z",
+      "updated_at": "2026-10-23T15:51:51.394585487Z",
       "seal": {
-        "by": "adopt",
-        "mac": "dbdb72ad91e056284409816817b13504d30c44d450943575bc81f1ac26dbb8ba"
+        "by": "server",
+        "mac": "23b5bb9637aa238b6b3de1fef30202cacf6d39159ae15b365db5a3c6c7756b5d"
       }
     },
     {
@@ -2172,6 +3074,18 @@
             "by": "adopt",
             "mac": "1ab87009a1a502d4aa4423c39cd8383e4cb5deab702fe89d15852465a3d7c8a5"
           }
+        },
+        {
+          "id": "EVD-0079",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: per-file non-test counts of 'std::fs|fs::|File::' and 'rmcp' over src/*.rs",
+          "summary": "fs matches: store.rs 7, all other modules 0 (including the new seal.rs). rmcp matches: server.rs 5, main.rs 2, all others 0.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:51:04.017741121Z",
+          "seal": {
+            "by": "server",
+            "mac": "714cb7416370012c1438f0752f532b9208a972f2e1e55a67f9734ed8d12c7b05"
+          }
         }
       ],
       "verdicts": [
@@ -2187,13 +3101,26 @@
             "by": "adopt",
             "mac": "97fb23ace03623b7d94e63383fe4cc948b84c9da8771ea37055b12ca3506cb8e"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-verified at 908bf0c, including the new seal.rs: fs access is only in store.rs, and rmcp is only in server.rs and main.rs (EVD-0079).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0079"
+          ],
+          "recorded_at": "2026-10-23T15:51:51.413671485Z",
+          "seal": {
+            "by": "server",
+            "mac": "a9ab145ffddf09cc9681c6e5c5d5ec0f727a170d58b9131dfc3bd44aeefe8ab3"
+          }
         }
       ],
       "created_at": "2026-10-23T13:26:33.528029393Z",
-      "updated_at": "2026-10-23T13:26:45.613469604Z",
+      "updated_at": "2026-10-23T15:51:51.413671485Z",
       "seal": {
-        "by": "adopt",
-        "mac": "fc464f7c6b5e354ee31f8ad99ab076b662e4dc6c1e62d85ab3bb9eb577059d1d"
+        "by": "server",
+        "mac": "143db261854656b7d3b7fc0f0b457944617d22b981235c567a6124a3e65665a1"
       }
     },
     {
@@ -2244,6 +3171,18 @@
             "by": "server",
             "mac": "96409dd0c673ac7282646a5e450953651d989461f98326f2b97f8c880ba47a21"
           }
+        },
+        {
+          "id": "EVD-0115",
+          "kind": "analysis",
+          "locator": "children: CLM-0006, CLM-0007, CLM-0008, CLM-0009, CLM-0018",
+          "summary": "All 5 active children were re-supported at 908bf0c: failed writes leave the file unchanged, concurrent writers lose nothing, stale counters are rejected, output is deterministic, and the sidecars are git-ignored. Together with EVD-0045/EVD-0046 (sealed schema v2 at the --catalog and CLAIMS_CATALOG paths, v1 refuses writes), this covers persistence. The 187-record repo catalog also verifies at HEAD.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.018847559Z",
+          "seal": {
+            "by": "server",
+            "mac": "6f4f7727ca3f6b76b357337f02d6df798bdffc9beb3609ede9614e55c4b5d0d0"
+          }
         }
       ],
       "verdicts": [
@@ -2260,13 +3199,1728 @@
             "by": "server",
             "mac": "b34a93714b42c5b71dfc0dd845360a28a0ead3d374e2a99e8a8780a06fc1c090"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Every child is re-supported at HEAD and the repo catalog verifies (EVD-0115). The sealed-persistence demonstration and tests (EVD-0045, EVD-0046) still stand.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0115",
+            "EVD-0045",
+            "EVD-0046"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.133255101Z",
+          "seal": {
+            "by": "server",
+            "mac": "2df82b879bc1c97b5bddfc5ca8b2829384d8168979e136af5f9220f81dcb0258"
+          }
         }
       ],
       "created_at": "2026-10-23T14:59:11.304195025Z",
-      "updated_at": "2026-10-23T14:59:11.313435818Z",
+      "updated_at": "2026-10-23T15:57:39.133255101Z",
       "seal": {
         "by": "server",
-        "mac": "55dfab5b08312dac18fd5908988a9ff886af83ebd43d931a7d7b5fa7de703ccc"
+        "mac": "aaaa25d08a86513e4bc9bd98d1a8372bd050b1ee705da7b26dc2bf0e9a631624"
+      }
+    },
+    {
+      "id": "CLM-0038",
+      "statement": "claims-mcp detects direct edits to the catalog with per-record HMAC seals and refuses writes until the file is restored, as specified in issue #9",
+      "kind": "security",
+      "level": "system",
+      "integrity_level": 4,
+      "verification_method": "analysis",
+      "source": "issue #9 (Detect direct edits to the claims catalog with HMAC seals)",
+      "derived_from": [],
+      "artifacts": [
+        "src/seal.rs",
+        "src/store.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity",
+        "0.2.0"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0119",
+          "kind": "analysis",
+          "locator": "children: CLM-0039 .. CLM-0053",
+          "summary": "14 of 15 children are supported: edit, reorder, and deletion detection; write refusal with recovery steps; no opt-out; reads still work; adopt refusal and labeling; reformat-safe; merge-safe; no schema-downgrade laundering; cross-build on Linux; verify in CI; threat-model docs. CLM-0051 (Linux seals verify on Windows/macOS) is not_enough_info, so the cross-platform half of acceptance criterion 3 is undecided.",
+          "stance": "neutral",
+          "recorded_at": "2026-10-23T15:57:24.055225195Z",
+          "seal": {
+            "by": "server",
+            "mac": "606de51a6257470adacacce5bbd4e77c0369b1bfac16f835fb8babdd57389ecd"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "not_enough_info",
+          "rationale": "14 of 15 children are supported, but CLM-0051 (seals reproducible across platforms) is undecided (EVD-0119). The parent cannot be supported until a known-answer seal test decides CLM-0051.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0119"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.182407562Z",
+          "seal": {
+            "by": "server",
+            "mac": "41b74fc6c619e30ff4b2f9eb599cf562d94b5c49dd1a7329f77e4a963f2d3bef"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:57:39.182407562Z",
+      "seal": {
+        "by": "server",
+        "mac": "83bb99e750ca63775b7e37fe48eddc33691e0a74713409e65753742af7b05cce"
+      }
+    },
+    {
+      "id": "CLM-0039",
+      "statement": "Changing the content of a sealed record (a verdict label or an evidence summary) makes `claims-mcp verify` exit 1 and name that record",
+      "kind": "security",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "issue #9 acceptance criterion 1",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0080",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::edited_fields_are_detected_and_named",
+          "summary": "1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.707511246Z",
+          "seal": {
+            "by": "server",
+            "mac": "baa3dc112669bac6078781ba8779b35a2a5d5613c485733e1c259293e00916c1"
+          }
+        },
+        {
+          "id": "EVD-0081",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0 (PATH): copy of claims.json with CLM-0034's latest verdict changed refuted->supported via python json edit; claims-mcp --catalog c.json verify",
+          "summary": "Printed \"integrity FAILED (187 records checked)\" and \"CLM-0034 verdict 2: seal does not match its content\", exit status 1.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.721627383Z",
+          "seal": {
+            "by": "server",
+            "mac": "0bd46758e83706b666e24bedd90a722090f5b7c490f69a8d775d22929d366865"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A real verdict flip on a copy of the catalog made verify exit 1 and name \"CLM-0034 verdict 2\" (EVD-0081). The unit test covers edited fields generally (EVD-0080).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0080",
+            "EVD-0081"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.707315863Z",
+          "seal": {
+            "by": "server",
+            "mac": "195bf716e7a40ddea8bfb78d4d65961501b66fe4228769fd47d7d1017b7e0ac4"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.707315863Z",
+      "seal": {
+        "by": "server",
+        "mac": "13c5ea35b6e7885eef92a9701dfe679333b0616d965ba4246ffb1c1b6dfed21e"
+      }
+    },
+    {
+      "id": "CLM-0040",
+      "statement": "`claims-mcp verify` detects reordered verdicts, records moved to another claim, and records added without a seal",
+      "kind": "security",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "issue #9 acceptance criterion 1",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0082",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::deleted_and_reordered_records_are_detected; ... --exact seal::tests::moved_unsealed_and_relabeled_records_are_detected",
+          "summary": "Both pass. The first swaps verdicts 0 and 1, among other cases. The second covers records moved between claims, records without a seal, and relabeled records.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.730009886Z",
+          "seal": {
+            "by": "server",
+            "mac": "262ed22f41f90dc1376dca49b257be5c619c93555a7e6da23b8ec2776d73fc12"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Two passing tests cover swapping verdicts, moving records between claims, and unsealed records (EVD-0082).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0082"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.718228808Z",
+          "seal": {
+            "by": "server",
+            "mac": "022de9d4d787dc35b4022ec36c187c249c82173925900563606c3beafa291231"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.718228808Z",
+      "seal": {
+        "by": "server",
+        "mac": "1ac4324bc6a076957151eb7b187632cc7509feaa7b2aa1ebfdc661636418c4c1"
+      }
+    },
+    {
+      "id": "CLM-0041",
+      "statement": "`claims-mcp verify` detects deletion of a claim, an evidence item, or a verdict, and a lowered next_claim_seq or next_evidence_seq",
+      "kind": "security",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "issue #9 acceptance criterion 2",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0083",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::deleted_and_reordered_records_are_detected; seal::tests::deleting_the_newest_claim_and_lowering_the_counter_is_detected; seal::tests::missing_claim_ids_lists_every_gap",
+          "summary": "All three pass. They cover truncating and removing verdicts, removing evidence, deleting the newest claim together with a lowered counter, and listing every missing claim id.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.738624120Z",
+          "seal": {
+            "by": "server",
+            "mac": "c3c626b70b821fd29bc1954aa811ebcdf00b52872c530d2875a08f3896a564f4"
+          }
+        },
+        {
+          "id": "EVD-0084",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0: copy of claims.json with evidence EVD-0077 removed from CLM-0034; claims-mcp --catalog d.json verify",
+          "summary": "Printed \"integrity FAILED (186 records checked)\" and \"CLM-0034: seal does not match its content\".",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.746885384Z",
+          "seal": {
+            "by": "server",
+            "mac": "6be75664e593e573a6b1ccfe7e4b1994067e43b54d6898ca231619edf37cb630"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Passing tests cover deleted claims, evidence, and verdicts, and a lowered counter (EVD-0083). A real evidence deletion was caught by the shipped binary (EVD-0084).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0083",
+            "EVD-0084"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.730011203Z",
+          "seal": {
+            "by": "server",
+            "mac": "b4773b7269d7bf37b66312ce9bef18b7ece870346648910788986f3886336e3e"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.730011203Z",
+      "seal": {
+        "by": "server",
+        "mac": "0fed6586e9b5bfd06a8f422f802ebd3eb4239065cd67d1d8fe14abcab9b8c691"
+      }
+    },
+    {
+      "id": "CLM-0042",
+      "statement": "While any integrity check fails, each of the six write tools (add_claim, add_claims, update_claim, retire_claim, add_evidence, record_verdict) returns an error naming the failing records and the restore-from-git recovery steps, and the catalog file is left unchanged",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 7",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/store.rs",
+        "src/error.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0085",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0 over stdio on the tampered copy c.json: tools/call ids 1-6 = add_claim, add_claims, update_claim, retire_claim, add_evidence, record_verdict; sha256sum before/after",
+          "summary": "All six returned isError true with \"catalog c.json was changed outside claims-mcp, so every write is refused until it is restored. Failed checks: CLM-0034 verdict 2 (seal does not match its content). Never edit the catalog file directly. To recover, restore it from git (`git checkout -- c.json`, ...), then redo the intended change through the claims tools.\" The sha256 was unchanged, and stderr had 6 ERROR lines.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.754968487Z",
+          "seal": {
+            "by": "server",
+            "mac": "5fa09d97477c558a87d38da5e757a9765bcad502ad15709ed5d824fe7e314484"
+          }
+        },
+        {
+          "id": "EVD-0086",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact store::tests::tampered_catalog_refuses_writes_but_allows_reads",
+          "summary": "1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.768589413Z",
+          "seal": {
+            "by": "server",
+            "mac": "a3c0cb93e67a61d8771325219c8f147bb8558649a332a297623527fd9357e464"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All six write tools were called on a tampered catalog. Each returned the error naming the failing record and the git restore steps, and the file hash did not change (EVD-0085). The store test agrees (EVD-0086).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0085",
+            "EVD-0086"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.741020438Z",
+          "seal": {
+            "by": "server",
+            "mac": "ef25a24442ea42b5736239e54895ddea505629c88dbcae932e7869a96638a485"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.741020438Z",
+      "seal": {
+        "by": "server",
+        "mac": "be685d9bd81fcba3f0dacedde75d58c908d950e29691322436972dd499ffd7de"
+      }
+    },
+    {
+      "id": "CLM-0043",
+      "statement": "No command-line flag, environment variable, or configuration setting disables or weakens the integrity check",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "analysis",
+      "source": "issue #9 acceptance criterion 7; Decided section",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/main.rs",
+        "src/store.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0087",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: src/main.rs:24-60 (clap Cli/Command); grep -rn 'std::env|env::var' src/ outside tests; claims-mcp --help",
+          "summary": "The only options are --catalog (env CLAIMS_CATALOG), `verify [--json]`, and `seal --adopt`. Outside tests, the only std::env::var read is REQUIRE_TYPST in report.rs:501, inside a test helper. No flag, env var, or config value reaches the store's integrity check.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.776607397Z",
+          "seal": {
+            "by": "server",
+            "mac": "0d8b53da0274b6c97c098f193494fa2b07aa809625e2dd8e3ff7361789ec9f0d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The complete CLI surface and every non-test environment read were enumerated, and none touches the integrity check (EVD-0087).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0087"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.752836663Z",
+          "seal": {
+            "by": "server",
+            "mac": "bdcd452a09ded39d0f519cbf5df12af4a93e19fdf786595b68b47aae7d45d1bc"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.752836663Z",
+      "seal": {
+        "by": "server",
+        "mac": "976dcc44d19668d4b490372f5bbc70872397d906475d0b9ca6ffd1eaefa3a1ea"
+      }
+    },
+    {
+      "id": "CLM-0044",
+      "statement": "On a catalog that fails integrity checks, get_claim, list_claims, trace, and audit_report still succeed, and audit_report's integrity section lists each failing record",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 8",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "src/report.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0088",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0 over stdio on the tampered copy c.json: tools/call ids 7-10 = get_claim CLM-0034, list_claims verdict=refuted, trace CLM-0011, audit_report",
+          "summary": "All four returned isError false. audit_report's integrity was {verified: false, records: 187, problems: [{record: \"CLM-0034 verdict 2\", problem: \"seal does not match its content\"}], adopted: [...]}.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.784714960Z",
+          "seal": {
+            "by": "server",
+            "mac": "86b136a009368f0e419e935fcfca4d1b13ace194a4e0dbca1455d1c31f1ae90e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "On the tampered catalog, all four read tools succeeded, and audit_report's integrity section named the failing record (EVD-0088).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0088"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.763969978Z",
+          "seal": {
+            "by": "server",
+            "mac": "b301a6e55c5522b02adf72839cd49c191656e9a427a0993d55889c60ea4e6b01"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.763969978Z",
+      "seal": {
+        "by": "server",
+        "mac": "4fad31c1d7dea00aa19f6b49c79c3fbc94fc81ca073b8662bc021ad933cee23f"
+      }
+    },
+    {
+      "id": "CLM-0045",
+      "statement": "`claims-mcp seal --adopt` refuses to run when any record has an invalid seal, exits non-zero, and leaves the catalog file unchanged",
+      "kind": "security",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "issue #9 section 4; acceptance criterion 5",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0089",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::adopt_refuses_edited_records_and_changes_nothing",
+          "summary": "1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.793160764Z",
+          "seal": {
+            "by": "server",
+            "mac": "d2e968e58444194f4ad7e0e1d8bd1ba476029b0f0903da5394bfd4e7edca9d2d"
+          }
+        },
+        {
+          "id": "EVD-0090",
+          "kind": "demonstration",
+          "locator": "claims-mcp 0.2.0: claims-mcp --catalog c.json seal --adopt on the tampered copy; sha256sum before/after",
+          "summary": "Logged \"ERROR ... seal --adopt failed: refusing to adopt: these records were changed after they were sealed, or are missing: CLM-0034 verdict 2 (...). Restore the catalog from git instead.\" Exit status 1, and the file sha256 was unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.803466748Z",
+          "seal": {
+            "by": "server",
+            "mac": "22b48d1ac864e763f8558fc5186293a5255a35d0a234df86f85cce9ff18b43c7"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The shipped binary refused adopt on a tampered catalog with exit 1 and an unchanged file (EVD-0090). The unit test agrees (EVD-0089).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0089",
+            "EVD-0090"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.774360793Z",
+          "seal": {
+            "by": "server",
+            "mac": "19832f1ed1bdcd5bb0fe56a7a18b8a837087fd4c84a34b78adab72780a17f0ef"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.774360793Z",
+      "seal": {
+        "by": "server",
+        "mac": "ce677d9d837eef8c81d80cc33f292dc9d8e7dbb9264901bfb36e3a53056148f8"
+      }
+    },
+    {
+      "id": "CLM-0046",
+      "statement": "Records sealed by `seal --adopt` are labeled as adopted (seal.by = adopt) and listed as adopted in both audit_report and `claims-mcp verify` output",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "issue #9 section 4; acceptance criterion 5",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs",
+        "src/report.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0091",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::adopt_labels_a_stripped_record_instead_of_trusting_it; ... --exact tests::report_lists_problems_and_adopted_records",
+          "summary": "Both pass. The first checks that a stripped-then-adopted record is labeled adopted. The second checks the verify output lists adopted records.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.813322953Z",
+          "seal": {
+            "by": "server",
+            "mac": "d9b618a985f142ba6d09d4c32942d081871aebc9a3a91b17e34cabd0fa25ff21"
+          }
+        },
+        {
+          "id": "EVD-0092",
+          "kind": "demonstration",
+          "locator": "claims-mcp verify on this repo's claims.json; mcp__claims__audit_report integrity.adopted; get_claim CLM-0001 seal",
+          "summary": "verify prints \"N records were sealed by `seal --adopt`, not by the server: ...\". audit_report's integrity.adopted lists the same records, and CLM-0001's seal shows {\"by\": \"adopt\"}.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.822422987Z",
+          "seal": {
+            "by": "server",
+            "mac": "348b788784c1ac55bf1f1674db1a71ef8cfb24edaa66c674e69913fec4e24a4a"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Tests (EVD-0091) and the repo's own adopted records (EVD-0092) show the adopted label in seals, verify output, and audit_report.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0091",
+            "EVD-0092"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.784280677Z",
+          "seal": {
+            "by": "server",
+            "mac": "3648001383b1498554b26d34709ef589c8366c56e7910925453db3a6bebd2546"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.784280677Z",
+      "seal": {
+        "by": "server",
+        "mac": "3909b6f87c59684faf9cea82e6a57f1f9c39df2172934e0d78ca89c427d906b0"
+      }
+    },
+    {
+      "id": "CLM-0047",
+      "statement": "Re-encoding claims.json with different whitespace or key order does not invalidate any seal",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "issue #9 acceptance criterion 10",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0093",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::reformatting_and_key_order_do_not_break_seals",
+          "summary": "1 passed, 0 failed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.831433611Z",
+          "seal": {
+            "by": "server",
+            "mac": "aee6c44de2202f70b96439b24108ebd9042fdf844c509d135434a692abe1a50b"
+          }
+        },
+        {
+          "id": "EVD-0094",
+          "kind": "demonstration",
+          "locator": "python json.dump(claims.json, sort_keys=True, separators=(',',':')) -> r.json; claims-mcp --catalog r.json verify",
+          "summary": "The compact, key-sorted re-encoding of the repo catalog printed \"integrity verified (187 records checked)\".",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.840694535Z",
+          "seal": {
+            "by": "server",
+            "mac": "a36d4a305f3c46955c1a5db70c13d608b3e6d143041389f908448232b06fab55"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A compact, key-sorted re-encoding of the real catalog verifies (EVD-0094), and the unit test passes (EVD-0093).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0093",
+            "EVD-0094"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.794448341Z",
+          "seal": {
+            "by": "server",
+            "mac": "ad838d574159a00feaa4100e65b53395901a916e013e7554b2c7ac15f284c1a1"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.794448341Z",
+      "seal": {
+        "by": "server",
+        "mac": "b26fbf62d6b167dd67cef82ab748de6ecb5415703194429ef0a1f971c39d67f1"
+      }
+    },
+    {
+      "id": "CLM-0048",
+      "statement": "A git merge of two branches that each added records through the server verifies without resealing, unless both branches changed the same claim or counter",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "issue #9 acceptance criterion 4",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0095",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::branches_touching_different_claims_merge_without_resealing; ... --exact seal::tests::branches_advancing_different_counters_merge_without_resealing",
+          "summary": "Both pass. The tests simulate the merge at the JSON level; no real git merge is run.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.849759849Z",
+          "seal": {
+            "by": "server",
+            "mac": "02752bdee57bedfead209cff82bfe84753b8adc1d9f9b2cef4d390ddf3f81c20"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both merge-shaped tests pass (EVD-0095). They model the merged JSON, not a real git merge, which is adequate for a seal property.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0095"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.806840067Z",
+          "seal": {
+            "by": "server",
+            "mac": "e75d48e2e0ace912ca633d8d33c642290c8d9b85e7428b4cfd8dbb7ec27d8ed6"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.806840067Z",
+      "seal": {
+        "by": "server",
+        "mac": "58c960565ffeadb01ef7cbc225fa1f0390708ae2cdb395573c05044f8d8bffbc"
+      }
+    },
+    {
+      "id": "CLM-0049",
+      "statement": "Lowering schema_version from 2 to 1 is reported as tampering, so it cannot be used to get an edited record re-sealed by `seal --adopt`",
+      "kind": "security",
+      "level": "component",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "issue #9 section 4 (no bypass via migration)",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs",
+        "src/store.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0096",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: cargo test --bin claims-mcp -- --exact seal::tests::lowering_schema_version_to_one_cannot_launder_an_edit; ... --exact store::tests::lowered_schema_version_is_tampering_not_an_unmigrated_catalog",
+          "summary": "Both pass.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.858558173Z",
+          "seal": {
+            "by": "server",
+            "mac": "0f27865ea20500bb69a043484604429b36af7ca6c4b5c5af97a8f6629e36cca5"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Two passing tests target exactly this laundering path (EVD-0096).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0096"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.825146025Z",
+          "seal": {
+            "by": "server",
+            "mac": "37550e97615ca72b0782d19556b0a36384388da31469e9a6ec4fd2b4a22104dc"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.825146025Z",
+      "seal": {
+        "by": "server",
+        "mac": "29d1aa43546ba8b540c3702b704356c897f5fa93f3fc9b0b136701190119137d"
+      }
+    },
+    {
+      "id": "CLM-0050",
+      "statement": "Seals written by a local development build verify under the CI-built v0.2.0 x86_64-unknown-linux-musl release binary",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 3 (reproducible across builds)",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0097",
+          "kind": "demonstration",
+          "locator": "gh release download v0.2.0 -p 'claims-mcp-0.2.0-x86_64-unknown-linux-musl.tar.gz*'; sha256sum -c; <extracted>/claims-mcp --catalog claims.json verify",
+          "summary": "The checksum was OK, and the binary is a static-pie ELF reporting claims-mcp 0.2.0. It printed \"claims.json: integrity verified (187 records checked)\" on the repo catalog, which a local dev build sealed during this session.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.867759967Z",
+          "seal": {
+            "by": "server",
+            "mac": "d30280df3bb1d81800f58681ba1e96b275f455faf426e2f150b384900e830cc8"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The CI-built musl release binary verified all 187 seals written by the local dev build (EVD-0097).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0097"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.834365859Z",
+          "seal": {
+            "by": "server",
+            "mac": "e46bdd6c83a492e0a5d27ef045e856e1ed3216b4ec2e016acece12ceac9fca5c"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.834365859Z",
+      "seal": {
+        "by": "server",
+        "mac": "18dae3df5acecbd21ba2e64fb5a6b05c1abc5812bb5363a62299e8b3c04d73cd"
+      }
+    },
+    {
+      "id": "CLM-0051",
+      "statement": "Seals written on Linux verify under the Windows and macOS builds of claims-mcp",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 3 (reproducible across platforms)",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/seal.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity",
+        "issue:12"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0098",
+          "kind": "analysis",
+          "locator": "gh run view 39977179469 (test (windows-latest), test (macos-latest): success); grep for a fixed MAC test vector in src/seal.rs",
+          "summary": "cargo test passes on Windows and macOS runners, but the seal tests seal and verify on the same machine. There is no fixed expected-MAC test vector, and no Windows or macOS binary was run against a Linux-sealed catalog. Cross-platform agreement is neither shown nor contradicted.",
+          "stance": "neutral",
+          "recorded_at": "2026-10-23T15:56:15.876763801Z",
+          "seal": {
+            "by": "server",
+            "mac": "d5e0e35ab42f2c7e24e03648db44d67da3116af97cc3dc020c1b6a6ea0400f59"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "not_enough_info",
+          "rationale": "The Windows and macOS test runs only seal and verify on the same platform, and there is no fixed MAC test vector (EVD-0098). Nothing shows Linux-written seals verifying on Windows or macOS. A known-answer test (a fixed record with its expected MAC), which CI already runs on all three OSes, would decide this.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0098"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.843242183Z",
+          "seal": {
+            "by": "server",
+            "mac": "8002b6b5730d5241e0ba04cf759bcec43e999d005131bbb1c0d8d776da09fc3a"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T16:35:11.464293173Z",
+      "seal": {
+        "by": "server",
+        "mac": "83efad057343c491cd537428d5d93355ed8559e9e5108dbeaebbe7400f90ad28"
+      }
+    },
+    {
+      "id": "CLM-0052",
+      "statement": "The CI workflow runs `claims-mcp verify` on every pull request and push to main, so a committed hand edit fails CI",
+      "kind": "constraint",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "issue #9 acceptance criterion 6",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        ".github/workflows/ci.yml"
+      ],
+      "tags": [
+        "issue:9",
+        "ci"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0099",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: .github/workflows/ci.yml:10-13 (on: pull_request, push branches [main]), :51-52 (verify catalog integrity seals: cargo run --locked --quiet -- verify)",
+          "summary": "The check job runs `claims-mcp verify` on the default claims.json for every PR and push to main. verify exits 1 on a failure, which fails the step.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.885671805Z",
+          "seal": {
+            "by": "server",
+            "mac": "d935d26eb51761f09fed8182f7d1f5fc846d86628006f103ea58849905c89d63"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "ci.yml runs verify in the check job on PRs and pushes to main (EVD-0099).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0099"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.853363777Z",
+          "seal": {
+            "by": "server",
+            "mac": "d2908787fb2d26b54b3eaf5d53e5cdc79462eaf17ff49c3883aa6b5a65ee45e3"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.853363777Z",
+      "seal": {
+        "by": "server",
+        "mac": "b5d3cafe1060f01c8989c5c8ca7353187a27a1735879c5404367616a66e08aa2"
+      }
+    },
+    {
+      "id": "CLM-0053",
+      "statement": "README.md and the design spec state that the seals are a deterrent, not cryptographic security, because the key is in public source, and README shows permissions.deny rules that block edits to claims.json",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #9 section 5; acceptance criterion 12",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "README.md",
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "issue:9",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0100",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: README.md:169 (\"This is a deterrent, not cryptographic security. The key is in this repository's source\"), README.md:199-207 (permissions.deny Edit/Write(**/claims.json), Bash(claims-mcp seal:*)); spec :99-108",
+          "summary": "The README states the deterrent threat model and gives the deny rules. The spec says the seals are an HMAC-SHA256 under a key built into the binary and \"deters casual hand edits; it is not cryptographic security, because the key is in the public source\".",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.895002139Z",
+          "seal": {
+            "by": "server",
+            "mac": "35f4cda53675122caf040bfbce4abee00cc195df1f1cddedc215c46fb81f817a"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both documents state the deterrent threat model, and the README gives the deny rules (EVD-0100).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0100"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.866140813Z",
+          "seal": {
+            "by": "server",
+            "mac": "ad7c6e9cd3cea94b026670a24c84a9efa65c2a1fda7c8cb7020151069e9f8a19"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.866140813Z",
+      "seal": {
+        "by": "server",
+        "mac": "817d6e23d397350e485f4dbfe836f56792e62fbfa3e7a6bcf553898c89d7509f"
+      }
+    },
+    {
+      "id": "CLM-0054",
+      "statement": "A PDF audit report can be generated from claims.json with the repository's Typst template, as specified in issue #2",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "issue #2 (Generate PDF audit reports from claims.json with Typst)",
+      "derived_from": [],
+      "artifacts": [
+        "report/claims-report.typ",
+        "justfile"
+      ],
+      "tags": [
+        "issue:2",
+        "report",
+        "0.2.0"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0117",
+          "kind": "analysis",
+          "locator": "children: CLM-0055, CLM-0056, CLM-0057, CLM-0058, CLM-0059",
+          "summary": "All 5 children are supported and cover issue #2 acceptance criteria 1-4 and 6-7: the template compiles clean, matches audit_report, handles empty and retired catalogs, has text verdict labels, and is documented. Criterion 5 (matrix readability at 34+ claims) is a visual property not separately claimed. The changelog criterion is covered by CLM-0033.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.037014897Z",
+          "seal": {
+            "by": "server",
+            "mac": "7b016d60e24e60071bd856bb28c5324cb9faf1f55aab0b984c46eb36ef7e63f5"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All 5 children are supported and cover issue #2's testable acceptance criteria (EVD-0117).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0117"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.161849873Z",
+          "seal": {
+            "by": "server",
+            "mac": "5f0916dc9a4be4d17b6da2172a900584aea2b3e4d97cb4474f067c1680160293"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:57:39.161849873Z",
+      "seal": {
+        "by": "server",
+        "mac": "f86d31ff9c904512541acd03aff2be1f67e025b5efee7754dc50e5da5ce7b0de"
+      }
+    },
+    {
+      "id": "CLM-0055",
+      "statement": "report/claims-report.typ compiles with Typst 0.14.2 against this repository's claims.json with no warnings",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "issue #2 acceptance criterion 1",
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "report/claims-report.typ"
+      ],
+      "tags": [
+        "issue:2",
+        "report"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0101",
+          "kind": "demonstration",
+          "locator": "typst 0.14.2: typst compile --root . report/claims-report.typ target/audit-check.pdf --input catalog=claims.json --input commit=$(git describe --always --dirty) --input notes=report/audit-notes.toml --input integrity=target/integrity.json",
+          "summary": "Exit 0 with no output on stderr (no warnings). It produced an 858462-byte PDF. A first attempt with the integrity input outside --root failed with \"file not found\", which is expected Typst root sandboxing, not a template defect.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.904171633Z",
+          "seal": {
+            "by": "server",
+            "mac": "737a65336220db89d1519812fe974be57a50fb8e9746cedd64962e55ff2efb6d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A clean compile with no stderr output under Typst 0.14.2 (EVD-0101).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0101"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.876575998Z",
+          "seal": {
+            "by": "server",
+            "mac": "5855551569e023bd5df7402d83c10ad9d5bd187c2dcf537b3dc0fe2a7aa998cf"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.876575998Z",
+      "seal": {
+        "by": "server",
+        "mac": "ddf8baffb479a8ea792c86ad91e1805b7735f08db2d458b059b50290c37fec5f"
+      }
+    },
+    {
+      "id": "CLM-0056",
+      "statement": "A test checks that the PDF's counts and gap lists equal audit_report's for the same catalog, and it passes for this repository's claims.json",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "issue #2 acceptance criterion 2",
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "src/report.rs",
+        "report/claims-report.typ"
+      ],
+      "tags": [
+        "issue:2",
+        "report"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0102",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: REQUIRE_TYPST=1 cargo test --bin claims-mcp -- --exact report::tests::typst_template_matches_repo_catalog",
+          "summary": "1 passed with typst on PATH. The test loads the repo's claims.json and calls assert_template_matches, which runs the template through typst with the catalog and integrity inputs and compares it against the Rust report.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.913772827Z",
+          "seal": {
+            "by": "server",
+            "mac": "2c444d8a2b9e5c78d77ea3d3103e3137174d4ff8a5fdaae25968ceb937a032be"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The comparison test runs typst on the repo catalog and passes under REQUIRE_TYPST=1 (EVD-0102).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0102"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.887417222Z",
+          "seal": {
+            "by": "server",
+            "mac": "afaef9af82a191f2d5cc330da129c79848699cefc1dd7d0e0a20869516234168"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.887417222Z",
+      "seal": {
+        "by": "server",
+        "mac": "1142a4370b35cf741eceec282ccc70cab5a05e43a6831c768606c6561359b70f"
+      }
+    },
+    {
+      "id": "CLM-0057",
+      "statement": "The template renders an empty catalog, and on a catalog with retired claims it excludes them from the totals",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "issue #2 acceptance criterion 3",
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "report/claims-report.typ"
+      ],
+      "tags": [
+        "issue:2",
+        "report"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0103",
+          "kind": "test",
+          "locator": "HEAD 908bf0c: REQUIRE_TYPST=1 cargo test --bin claims-mcp -- --exact report::tests::typst_template_handles_empty_catalog; ... --exact report::tests::typst_template_matches_every_gap_and_retired_claims",
+          "summary": "Both pass with typst installed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.922278291Z",
+          "seal": {
+            "by": "server",
+            "mac": "0a7915fc248e85e9b383c01b46c17e756040991785504deca7caab84637f9474"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The empty-catalog and retired-claims template tests pass with typst present (EVD-0103).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0103"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.898799917Z",
+          "seal": {
+            "by": "server",
+            "mac": "afeffbc32da12f8efc09128c78f7292a77560c2ec6a4417a401986aeb9d1a480"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.898799917Z",
+      "seal": {
+        "by": "server",
+        "mac": "51e34f08bd75be40da0de2ad7cef3c58351fa9c64a5bbe5a0fa7b19ec30897cd"
+      }
+    },
+    {
+      "id": "CLM-0058",
+      "statement": "Verdict markers in the PDF carry a text label as well as a fill color",
+      "kind": "non_functional",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #2 acceptance criterion 4",
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "report/claims-report.typ"
+      ],
+      "tags": [
+        "issue:2",
+        "report"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0104",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: report/claims-report.typ:174-176",
+          "summary": "Each verdict style has a text label as well as a fill: supported \"SUPPORTED\", refuted \"REFUTED\", not_enough_info \"NOT ENOUGH INFO\".",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.931016214Z",
+          "seal": {
+            "by": "server",
+            "mac": "db43a52d6b66311508569a7e492df8f0d0c9f27c16b9a1852f433bb5e0a14508"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The verdict styles define text labels alongside the fills (EVD-0104).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0104"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.909051312Z",
+          "seal": {
+            "by": "server",
+            "mac": "e7660abc63e496751127857752aa7c4271f9f48d11584c9f15d1617dc62e805f"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.909051312Z",
+      "seal": {
+        "by": "server",
+        "mac": "7aac52564b69be1d6b4a3358a01a0c71f4a11bffeede49e9ced54af51bdf3548"
+      }
+    },
+    {
+      "id": "CLM-0059",
+      "statement": "README.md has a 'Generate a PDF report' section and the claims-audit skill's Report step mentions the PDF as an optional output",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #2 acceptance criteria 6-7",
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "README.md",
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "issue:2",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0105",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: README.md:225 '## Generate a PDF report'; skills/claims-audit/SKILL.md step 5 'Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report'",
+          "summary": "Both are present.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.939923658Z",
+          "seal": {
+            "by": "server",
+            "mac": "00a0b259ec235ad7bd508377f9f95c85da612c4780b50ce5dc28c7e774391922"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both documentation items are present (EVD-0105).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0105"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.918234636Z",
+          "seal": {
+            "by": "server",
+            "mac": "0fadb5b32013c3aa581abe6094b12028b8aa3d7bd00162976ea11f9c4944df8f"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.918234636Z",
+      "seal": {
+        "by": "server",
+        "mac": "34b4360c3a865e27f8d804dac814f2c3b923315a162aec8565ebc493f159de49"
+      }
+    },
+    {
+      "id": "CLM-0060",
+      "statement": "The repository has a PR CI workflow and a tag-triggered multi-platform release pipeline, as specified in issue #4",
+      "kind": "constraint",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "issue #4 (CI: PR test workflow and tagged release pipeline)",
+      "derived_from": [],
+      "artifacts": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml"
+      ],
+      "tags": [
+        "issue:4",
+        "ci",
+        "0.2.0"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0118",
+          "kind": "analysis",
+          "locator": "children: CLM-0061, CLM-0062, CLM-0063, CLM-0064, CLM-0065",
+          "summary": "All 5 children are supported and cover issue #4 acceptance criteria 1-5: PR checks, the per-PR audit artifact, the multi-platform release with checksums and report, the tag/version gate, and README docs. The changelog criterion is covered by CLM-0033.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:57:24.045882471Z",
+          "seal": {
+            "by": "server",
+            "mac": "c45d4974c1a9183f6089bc65f423f488bf8f6009a1c52786d0593d6fa933a01c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All 5 children are supported and cover issue #4's acceptance criteria (EVD-0118).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0118"
+          ],
+          "recorded_at": "2026-10-23T15:57:39.171979108Z",
+          "seal": {
+            "by": "server",
+            "mac": "7e109d7b0a0f5d92a1b6c3d94c6c8d16ed14e51373c7b29c2342a46c63d31410"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:57:39.171979108Z",
+      "seal": {
+        "by": "server",
+        "mac": "7db62d2df9f0e5f4da6ecc52593410f5ce28e60be640cc32015e9f7daf5f2365"
+      }
+    },
+    {
+      "id": "CLM-0061",
+      "statement": "PR CI runs cargo fmt --check, clippy with -D warnings, a build with RUSTFLAGS=-D warnings, and cargo test with REQUIRE_TYPST=1",
+      "kind": "constraint",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "issue #4 acceptance criterion 1",
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        ".github/workflows/ci.yml"
+      ],
+      "tags": [
+        "issue:4",
+        "ci"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0106",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: .github/workflows/ci.yml:34-35 (env RUSTFLAGS: -D warnings, REQUIRE_TYPST: \"1\"), :46-49 (fmt --check, clippy --locked --all-targets -- -D warnings, build --locked, test --locked)",
+          "summary": "The check job runs all four commands with RUSTFLAGS=-D warnings and REQUIRE_TYPST=1 set for the job.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.949384733Z",
+          "seal": {
+            "by": "server",
+            "mac": "a5630eec69f67671d4c0c9186720964cc62a69ac31fbbd8e5eda9c5a1b5f3541"
+          }
+        },
+        {
+          "id": "EVD-0107",
+          "kind": "log",
+          "locator": "gh run view 39977179469 (CI on PR #11, chore-release-0.2.0)",
+          "summary": "Jobs \"fmt, clippy, build, test\", \"test (windows-latest)\", \"test (macos-latest)\", \"MSRV\", and \"audit report\" all concluded success.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.957690046Z",
+          "seal": {
+            "by": "server",
+            "mac": "554bcd8fc35bff9957ba3ae91276329bc35f2946620a4196081fc68ca725a4cf"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The workflow defines all four checks with the required env (EVD-0106), and a real PR run executed them successfully (EVD-0107).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0106",
+            "EVD-0107"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.928920210Z",
+          "seal": {
+            "by": "server",
+            "mac": "ab34d6feb6842b478b4ce4ec78d53e55edde40c5e57fddaad8aeb1c0fac08ec4"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.928920210Z",
+      "seal": {
+        "by": "server",
+        "mac": "d6ae24537ae4af7cb9e0d5b7e9b108c0e8050b61665e13ff44d0a73df5d6addd"
+      }
+    },
+    {
+      "id": "CLM-0062",
+      "statement": "Each PR CI run uploads an audit.pdf artifact rendered from the PR head commit and named with the PR number and head short SHA",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "issue #4 acceptance criterion 2",
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        ".github/workflows/ci.yml"
+      ],
+      "tags": [
+        "issue:4",
+        "ci"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0108",
+          "kind": "demonstration",
+          "locator": "gh api repos/{owner}/{repo}/actions/runs/39977179469/artifacts; gh pr view 11 headRefOid; .github/workflows/ci.yml:88-110",
+          "summary": "The run's artifact is \"audit-report-pr-11-af26b62\" (210021 bytes), and af26b62 is PR #11's head commit. The report job checks out github.event.pull_request.head.sha, runs `just report` (which stamps git describe of HEAD), and names the artifact from git rev-parse --short HEAD plus PR_NUMBER. The PDF text itself was not extracted (no pdftotext available).",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.966097690Z",
+          "seal": {
+            "by": "server",
+            "mac": "47045e4c52716fa0e28726798808a681c33051078fde9ae9ce0471834e8b6b5e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "PR #11's run uploaded audit-report-pr-11-af26b62, and af26b62 is the PR head. The workflow renders from the head checkout (EVD-0108).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0108"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.939488975Z",
+          "seal": {
+            "by": "server",
+            "mac": "6e093b24abf01fa5bbeb57cb60ffbd3baf123916bbdb890ae4ff2141884e8bcc"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.939488975Z",
+      "seal": {
+        "by": "server",
+        "mac": "65140a1291fa72f97c5210a285b2396d08bf81226c1cc67036b687d976093333"
+      }
+    },
+    {
+      "id": "CLM-0063",
+      "statement": "The v0.2.0 GitHub Release has archives for x86_64 and aarch64 Linux, x86_64 Windows, and x86_64 and aarch64 macOS, a .sha256 file for each archive, and audit.pdf; the x86_64 Linux binary runs",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "issue #4 acceptance criterion 3",
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        ".github/workflows/release.yml"
+      ],
+      "tags": [
+        "issue:4",
+        "release"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0109",
+          "kind": "demonstration",
+          "locator": "gh release view v0.2.0 --json assets; downloaded x86_64-unknown-linux-musl archive, sha256sum -c, ran --version",
+          "summary": "The assets are audit.pdf plus archives for aarch64-apple-darwin, aarch64-unknown-linux-musl, x86_64-apple-darwin, x86_64-pc-windows-msvc (.zip) and x86_64-unknown-linux-musl, each with a .sha256. The Linux x86_64 checksum is OK, the archive contains claims-mcp, LICENSE, NOTICE, README.md and skills/, and the binary prints \"claims-mcp 0.2.0\".",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.974660754Z",
+          "seal": {
+            "by": "server",
+            "mac": "af0034e93f5230043be21da2b1ebfc27832f7a60e24b2f56f9ef91a98f515a8f"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The release has all five target archives with checksums plus audit.pdf, and the Linux x86_64 binary checksum-verifies and runs (EVD-0109). The other platforms' binaries were not executed.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0109"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.949895070Z",
+          "seal": {
+            "by": "server",
+            "mac": "244cc362d2b6e881dc2d75cd746541f0795c8e013e7637934465d53252bd15b8"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.949895070Z",
+      "seal": {
+        "by": "server",
+        "mac": "e5f6fff316f674c206268cb0900aad84f616a01e04a2326fa4dffc7244841a36"
+      }
+    },
+    {
+      "id": "CLM-0064",
+      "statement": "The release workflow fails before any build or publish job when the tag does not equal v plus the Cargo.toml version",
+      "kind": "constraint",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "issue #4 acceptance criterion 4",
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        ".github/workflows/release.yml"
+      ],
+      "tags": [
+        "issue:4",
+        "release"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0110",
+          "kind": "analysis",
+          "locator": "HEAD 908bf0c: .github/workflows/release.yml:21-42 (version job: exit 1 if GITHUB_REF_NAME != v$version or not on main), :51 build needs: version, :97 release needs: [ci, build], :99-100 contents: write only on release",
+          "summary": "The version job exits 1 on a mismatch. build depends on version, and the publishing release job depends on build, so a failed version check skips both and nothing is published. This is an analysis of the job graph; no mismatched tag was pushed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.983108667Z",
+          "seal": {
+            "by": "server",
+            "mac": "aadcf2142c2e959d3ce2bca872e27fbbe0ca4776982c49af7d34124b2741c54c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The job dependency graph gates build and publish on the version check, which exits 1 on a mismatch (EVD-0110).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0110"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.959731024Z",
+          "seal": {
+            "by": "server",
+            "mac": "bb7df266e35efca80e8ec100639ae17acb486eeebb73c298505e6d16669a94e2"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.959731024Z",
+      "seal": {
+        "by": "server",
+        "mac": "e281a99db8ea6a4af38925ab10ab1bc58cf964c599dd3d5b7d1e81fb78581c10"
+      }
+    },
+    {
+      "id": "CLM-0065",
+      "statement": "README.md documents the CI checks and how to cut a release",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #4 acceptance criterion 5",
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        "README.md"
+      ],
+      "tags": [
+        "issue:4",
+        "docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0111",
+          "kind": "inspection",
+          "locator": "HEAD 908bf0c: README.md:278 '### Continuous integration', :291 '### Releasing'",
+          "summary": "The CI section lists the fmt/clippy/build/test checks, verify, the Windows/macOS/MSRV jobs, and the audit report artifact. Releasing gives the version-bump PR, git tag/push steps, and what release.yml checks and publishes.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T15:56:15.992012731Z",
+          "seal": {
+            "by": "server",
+            "mac": "bcc9995a88a746ee571d111b07b8f95a787ed5db8862ce0bb5836d361314db7b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The README has both sections with the required content (EVD-0111).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0111"
+          ],
+          "recorded_at": "2026-10-23T15:56:58.969066708Z",
+          "seal": {
+            "by": "server",
+            "mac": "9c27a26eee0a88ee689c029fcf71f0277edceabed1ef5974705b0d6f9d12f85b"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T15:54:48.877845729Z",
+      "updated_at": "2026-10-23T15:56:58.969066708Z",
+      "seal": {
+        "by": "server",
+        "mac": "ce9ec2bd01a2092d1b568b0116df019961775f3ad9199da688d67004bc2a154b"
       }
     }
   ]
