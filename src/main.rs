@@ -4,6 +4,7 @@ mod catalog;
 mod error;
 mod model;
 mod report;
+mod server;
 mod store;
 
 use tracing_subscriber::EnvFilter;
