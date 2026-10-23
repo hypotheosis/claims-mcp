@@ -27,8 +27,9 @@
     .join(", ", default: "")
 }
 
-// Runs of six or more comma-separated claim ids in free text become compressed ranges.
-#let id-run = regex("CLM-\d+(?:,\s*CLM-\d+){5,}")
+// Runs of six or more comma-separated claim ids in free text become compressed ranges. A run
+// ends at a word boundary, so an id glued to other text ("CLM-0007x") is left out of it.
+#let id-run = regex("CLM-\d+(?:,\s*CLM-\d+){5,}\b")
 #let compress-runs(value) = value.replace(
   id-run,
   found => compress-ids(found.text.split(regex(",\s*"))),
@@ -44,14 +45,20 @@
 }
 
 // Retired reasons with their claim ids replaced, so "replaced by CLM-0661, CLM-0662" and
-// "replaced by CLM-0663" count as one reason.
+// "replaced by CLM-0663" count as one reason. Ids may be separated by commas, "and", or both
+// (the Oxford comma ", and").
 #let reason-key(reason) = reason.replace(
-  regex("CLM-\d+(?:(?:,\s*|\s+and\s+)CLM-\d+)*"),
+  regex("CLM-\d+(?:(?:,\s*(?:and\s+)?|\s+and\s+)CLM-\d+)*"),
   "[claim ids]",
 )
 
-// Zero-width spaces after separators let long paths and locators wrap inside table cells.
-#let wrappable(value) = value.replace(regex("[/_.:,=-]"), found => found.text + sym.zws)
+// Zero-width spaces after separators let long paths and locators wrap inside table cells. A
+// hyphen after an uppercase letter is skipped, so ids like `CLM-0042` and `EVD-0007` never
+// split; the hyphen pattern matches the character before it too, which is kept in place.
+#let wrappable(value) = value.replace(
+  regex("[/_.:,=]|[^A-Z]-"),
+  found => found.text + sym.zws,
+)
 
 // Catalog free text: id runs compressed, `backtick` spans as inline code, and wrap points
 // throughout. Unbalanced backticks are printed as written.
