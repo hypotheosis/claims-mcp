@@ -1,6 +1,6 @@
-# Release pipeline: pushing a tag `vX.Y.Z` that matches `version` in Cargo.toml builds
-# claims-mcp for Linux, Windows, and macOS and publishes a GitHub Release with the archives,
-# their SHA-256 checksums, and the audit report for the tagged commit.
+# Release pipeline: pushing a tag `vX.Y.Z` on a commit in `main`, where X.Y.Z is `version` in
+# Cargo.toml, builds claims-mcp for Linux, Windows, and macOS and publishes a GitHub Release with
+# the archives, their SHA-256 checksums, and the audit report for the tagged commit.
 #
 # A pull request that edits this file runs the builds as a dry run; nothing is published.
 name: Release
@@ -19,18 +19,26 @@ env:
 
 jobs:
   version:
-    name: check tag matches Cargo.toml
+    name: check tag matches Cargo.toml and main
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
+      # Full history, so the tagged commit can be checked against `origin/main`.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - id: version
         run: |
           version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" != "v$version" ]]; then
+          [[ "$GITHUB_REF_TYPE" == tag ]] || exit 0
+          if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
             echo "::error::tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::tag $GITHUB_REF_NAME points at a commit that is not on main"
             exit 1
           fi
 

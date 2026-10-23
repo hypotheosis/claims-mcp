@@ -212,7 +212,7 @@ just test     # cargo test
    ```
 
 `.github/workflows/release.yml` checks that the tag equals `v` plus the `Cargo.toml` version
-(and fails without publishing otherwise), reruns CI on the tagged commit, builds the five
+and points at a commit on `main` (and fails without publishing otherwise), reruns CI on the tagged commit, builds the five
 archives listed under [Install](#1-install-the-server), and publishes a GitHub release with
 the archives, their `.sha256` files, and the audit report. A pull request that changes
 `release.yml` runs the builds as a dry run without publishing.
