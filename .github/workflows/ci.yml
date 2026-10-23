@@ -1,5 +1,7 @@
-# Pull request checks: the pre-commit checklist from .claude/CLAUDE.md, the test suite on every
-# release platform, and the rendered audit report as a downloadable artifact.
+# Pull request checks: the pre-commit checklist from .claude/CLAUDE.md, the test suite on Linux,
+# Windows, and macOS (x86_64 Linux, x86_64 Windows, arm64 macOS; the release's aarch64 Linux and
+# x86_64 macOS builds are compiled but not tested), and the rendered audit report as a
+# downloadable artifact.
 #
 # release.yml also calls this workflow, so a tag publishes only after these checks pass on the
 # tagged commit, and the release reuses the audit report rendered here.
