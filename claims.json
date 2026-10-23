@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "next_claim_seq": 35,
-  "next_evidence_seq": 40,
+  "next_claim_seq": 37,
+  "next_evidence_seq": 45,
   "claims": [
     {
       "id": "CLM-0001",
@@ -848,6 +848,14 @@
           "summary": "All 14 children are supported. Together they cover spec section 2 (no command execution), 3.4 rules 3/5/6, section 5 module boundaries, 5.1/6 schema and parse error handling, 5.2 template changes, 6 error mapping and no-unwrap, 9 deliverables and quality gates. Rules 1, 2, 4 and section 4/4.1 are covered under CLM-0001's children (CLM-0004, -0010/-0011, -0012/-0013, -0015).",
           "stance": "supports",
           "recorded_at": "2026-10-23T12:51:59.542965480Z"
+        },
+        {
+          "id": "EVD-0044",
+          "kind": "analysis",
+          "locator": "children: CLM-0021, CLM-0022, CLM-0023, CLM-0025, CLM-0026, CLM-0027, CLM-0028, CLM-0029, CLM-0030, CLM-0031, CLM-0032, CLM-0033, CLM-0035, CLM-0036",
+          "summary": "After the PR #3 re-audit, CLM-0020 and CLM-0024 are retired (refuted as written because they did not exclude test code) and replaced by CLM-0035 (no command execution in non-test code, spec 2) and CLM-0036 (non-test module boundaries, spec 5). All 14 active children are supported, and spec coverage matches EVD-0038 with the replacements in place.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T13:26:50.269404776Z"
         }
       ],
       "verdicts": [
@@ -859,10 +867,19 @@
             "EVD-0038"
           ],
           "recorded_at": "2026-10-23T12:52:04.854896553Z"
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-adjudicated after the PR #3 re-audit: every active child, including the replacements CLM-0035 and CLM-0036, is supported (EVD-0044).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0044"
+          ],
+          "recorded_at": "2026-10-23T13:26:53.454038289Z"
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:52:04.854896553Z"
+      "updated_at": "2026-10-23T13:26:53.454038289Z"
     },
     {
       "id": "CLM-0020",
@@ -883,7 +900,9 @@
         "security"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Refuted as written by PR #3's test-only std::process::Command use (EVD-0040): the statement covered all of src/ including #[cfg(test)] code. Superseded by CLM-0035, scoped to non-test code.",
+        "retired_at": "2026-10-23T13:26:45.620567306Z"
       },
       "evidence": [
         {
@@ -893,6 +912,14 @@
           "summary": "Only 2 matches: src/main.rs:42 std::process::exit(1) on startup failure, and src/store.rs:328 std::thread::spawn inside the #[cfg(test)] contention test. No Command, tokio::process, or process spawning anywhere in src/.",
           "stance": "supports",
           "recorded_at": "2026-10-23T12:50:55.051156405Z"
+        },
+        {
+          "id": "EVD-0040",
+          "kind": "analysis",
+          "locator": "grep -rn 'process::\\|Command\\|tokio::process\\|spawn(' src/ (PR #3 head); src/report.rs:325, :489, :511",
+          "summary": "src/report.rs:325 imports std::process::Command and :489/:511 call Command::new(\"typst\") inside the #[cfg(test)] Typst template tests added by PR #3. The statement covers all of src/ with no test-code exclusion, so it no longer holds as written. Non-test code is unaffected.",
+          "stance": "refutes",
+          "recorded_at": "2026-10-23T13:26:24.436300555Z"
         }
       ],
       "verdicts": [
@@ -904,10 +931,19 @@
             "EVD-0020"
           ],
           "recorded_at": "2026-10-23T12:51:48.790300588Z"
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "As written the claim covers all of src/, and PR #3's test-only Typst checks use std::process::Command (EVD-0040). The server's runtime behavior is unchanged; the statement's scope is wrong. Superseded by a claim scoped to non-test code.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0040"
+          ],
+          "recorded_at": "2026-10-23T13:26:29.585873453Z"
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.790300588Z"
+      "updated_at": "2026-10-23T13:26:45.620567306Z"
     },
     {
       "id": "CLM-0021",
@@ -1069,7 +1105,9 @@
         "architecture"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Refuted as written by PR #3's test-only std::fs use in report.rs (EVD-0041): the statement covered all of src/ including #[cfg(test)] code. Superseded by CLM-0036, scoped to non-test code.",
+        "retired_at": "2026-10-23T13:26:45.658242907Z"
       },
       "evidence": [
         {
@@ -1079,6 +1117,14 @@
           "summary": "Filesystem references: store.rs 14, every other file 0. rmcp references: server.rs 5, main.rs 2 (ServiceExt and stdio_pipes), every other file 0.",
           "stance": "supports",
           "recorded_at": "2026-10-23T12:50:55.107674825Z"
+        },
+        {
+          "id": "EVD-0041",
+          "kind": "analysis",
+          "locator": "per-file grep -c 'std::fs\\|fs::\\|File::' src/*.rs (PR #3 head); src/report.rs std::fs::write and std::fs::read in mod tests",
+          "summary": "Filesystem references: store.rs 14, report.rs 2, every other file 0. The report.rs hits are std::fs::write (temp catalog) and std::fs::read (claims.json) in the #[cfg(test)] Typst template tests added by PR #3. The statement has no test-code exclusion, so 'only store.rs touches the filesystem' no longer holds as written. Non-test code is unaffected.",
+          "stance": "refutes",
+          "recorded_at": "2026-10-23T13:26:24.481175449Z"
         }
       ],
       "verdicts": [
@@ -1090,10 +1136,19 @@
             "EVD-0025"
           ],
           "recorded_at": "2026-10-23T12:51:48.815012925Z"
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "As written the claim covers all of src/, and PR #3's test-only Typst checks call std::fs in report.rs (EVD-0041). The module boundaries of non-test code are unchanged; the statement's scope is wrong. Superseded by a claim scoped to non-test code.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0041"
+          ],
+          "recorded_at": "2026-10-23T13:26:29.598448617Z"
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.815012925Z"
+      "updated_at": "2026-10-23T13:26:45.658242907Z"
     },
     {
       "id": "CLM-0025",
@@ -1564,6 +1619,96 @@
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
       "updated_at": "2026-10-23T13:01:09.126348384Z"
+    },
+    {
+      "id": "CLM-0035",
+      "statement": "Outside #[cfg(test)] code, the server never executes commands or spawns processes (no std::process::Command or tokio::process use in non-test code under src/)",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "analysis",
+      "source": "spec 2 non-goals; spec 1 'pure ledger'; supersedes CLM-0020 (PR #3 review)",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "security"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0042",
+          "kind": "analysis",
+          "locator": "for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print FILENAME\":\"FNR\": \"$0}' $f; done | grep 'process::\\|Command\\|tokio::process\\|spawn('",
+          "summary": "Each src/*.rs file has exactly one #[cfg(test)], opening a trailing mod tests that runs to end of file with no top-level items after it, so the awk cut keeps exactly the non-test code. Only 2 matches remain: main.rs:20 doc comment 'Command-line options.' and main.rs:42 std::process::exit(1) on startup failure. No Command::new, tokio::process, or process spawning in non-test code.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T13:26:39.640152355Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Grep over exactly the non-test code finds no command execution or process spawning; the only hits are a doc comment and process::exit (EVD-0042).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0042"
+          ],
+          "recorded_at": "2026-10-23T13:26:45.599814100Z"
+        }
+      ],
+      "created_at": "2026-10-23T13:26:33.528029393Z",
+      "updated_at": "2026-10-23T13:26:45.599814100Z"
+    },
+    {
+      "id": "CLM-0036",
+      "statement": "Outside #[cfg(test)] code, only store.rs touches the filesystem and only server.rs (plus main.rs startup) uses rmcp",
+      "kind": "non_functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "spec 5; supersedes CLM-0024 (PR #3 review)",
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "src/"
+      ],
+      "tags": [
+        "spec",
+        "architecture"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0043",
+          "kind": "analysis",
+          "locator": "for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print}' $f | grep -c 'std::fs\\|fs::\\|File::'; ... | grep -c rmcp; done",
+          "summary": "Over non-test code only (each file cut at its single trailing #[cfg(test)] mod tests): filesystem references store.rs 7, every other file 0 (report.rs 0); rmcp references server.rs 5, main.rs 2, every other file 0.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T13:26:39.651851628Z"
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Per-file counts over non-test code show filesystem access only in store.rs and rmcp only in server.rs and main.rs (EVD-0043).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0043"
+          ],
+          "recorded_at": "2026-10-23T13:26:45.613469604Z"
+        }
+      ],
+      "created_at": "2026-10-23T13:26:33.528029393Z",
+      "updated_at": "2026-10-23T13:26:45.613469604Z"
     }
   ]
 }
