@@ -36,10 +36,22 @@ Pick one:
   | macOS Intel | `claims-mcp-<version>-x86_64-apple-darwin.tar.gz` |
   | macOS Apple Silicon | `claims-mcp-<version>-aarch64-apple-darwin.tar.gz` |
 
+  On Linux and macOS:
+
   ```bash
   sha256sum -c claims-mcp-<version>-<target>.tar.gz.sha256   # macOS: shasum -a 256 -c
   tar -xzf claims-mcp-<version>-<target>.tar.gz
+  mkdir -p ~/.local/bin
   install -m 755 claims-mcp-<version>-<target>/claims-mcp ~/.local/bin/
+  ```
+
+  On Windows (PowerShell), compare the hash with the one in the `.sha256` file, then extract
+  and put `claims-mcp.exe` in a directory on your `PATH`:
+
+  ```powershell
+  $archive = "claims-mcp-<version>-x86_64-pc-windows-msvc"
+  (Get-FileHash "$archive.zip" -Algorithm SHA256).Hash   # must match "$archive.zip.sha256"
+  Expand-Archive "$archive.zip" -DestinationPath .
   ```
 
   Each archive also contains this README and the `skills/` directory. The macOS binaries are
