@@ -2,16 +2,32 @@
 name = "claims-mcp"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.89"
 authors = ["Peter Grace <pete.grace@gmail.com>"]
+description = "Stdio MCP server maintaining a JSON claims catalog for traceability, V&V, and FEVER auditing"
 
 [dependencies]
-ctrlc = { version = "3.4.5", features = ["termination"] }
-lazy_static = "1.5.0"
-serde = { version = "1.0.216", features = ["derive"] }
+# Application-level error context in main.
+anyhow = "1.0.104"
+# RFC 3339 timestamps on claims, evidence, and verdicts.
+chrono = { version = "0.4.45", default-features = false, features = ["serde", "clock", "std"] }
+# Command-line parsing (--catalog / CLAIMS_CATALOG).
+clap = { version = "4.6.7", features = ["derive", "env"] }
+# Optional .env loading for CLAIMS_CATALOG / RUST_LOG.
+dotenvy = "0.15.7"
+# MCP server SDK: tool macros and stdio transport.
+rmcp = { version = "3.7.0", features = ["server", "macros", "transport-io"] }
+# JSON Schema generation for tool parameters (must match rmcp's schemars major version).
+schemars = "1.2.3"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+# Domain error type.
 thiserror = "2.0.6"
-tokio = { version = "1.42.0", features = ["rt-multi-thread", "macros", "time"] }
-tracing = "0.1.41"
-tracing-log = "0.2.0"
-tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
-console-subscriber = "0.4.1"
-dotenv = "0.15.0"
+# Async runtime; current-thread flavor plus the blocking pool for file I/O.
+tokio = { version = "1.54.1", features = ["rt", "macros"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
+
+[dev-dependencies]
+# Isolated temp directories for store and server tests.
+tempfile = "3.27.0"

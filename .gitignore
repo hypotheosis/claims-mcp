@@ -1,1 +1,3 @@
 /target
+.claims.json.lock
+.claims.json.tmp
