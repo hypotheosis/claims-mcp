@@ -4,7 +4,7 @@
 # full) as a downloadable artifact.
 #
 # release.yml also calls this workflow, so a tag publishes only after these checks pass on the
-# tagged commit, and the release reuses the audit report rendered here.
+# tagged commit, and the release reuses the audit reports rendered here.
 name: CI
 
 on:
