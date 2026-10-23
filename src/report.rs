@@ -979,6 +979,26 @@ mod tests {
         }
     }
 
+    /// `report/audit-notes.example.toml` is what other projects copy, so it must stay valid TOML
+    /// that the template renders without warnings in both detail modes.
+    #[test]
+    fn typst_template_accepts_example_notes() {
+        if !typst_available() {
+            return;
+        }
+        let (catalog, _) = areas_fixture();
+        let run = TemplateRun::new(&catalog);
+        let mut notes_input = OsString::from("notes=");
+        notes_input.push(report_file("audit-notes.example.toml"));
+        for detail in DETAILS {
+            run.typst_ok(
+                "compile",
+                detail,
+                &[run.pdf().as_os_str(), OsStr::new("--input"), &notes_input],
+            );
+        }
+    }
+
     #[test]
     fn typst_template_rejects_unknown_detail() {
         if !typst_available() {

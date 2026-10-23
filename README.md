@@ -271,7 +271,7 @@ end with a glossary that defines every term the report uses (verdicts, stances, 
 verification methods, seals), so readers need not know claims-mcp.
 
 ```bash
-just report                       # summary: claims.json -> audit.pdf
+just report                       # summary: claims.json -> audit.pdf (this repository's notes)
 just report full                  # full: claims.json -> audit-full.pdf
 # or, without just:
 claims-mcp --catalog claims.json verify --json > target/integrity.json
@@ -291,7 +291,7 @@ Paths are relative to `--root`. All inputs are optional:
 | `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
-| `notes` | TOML sidecar with `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator; see [`report/audit-notes.toml`](report/audit-notes.toml) |
+| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: start from [`report/audit-notes.example.toml`](report/audit-notes.example.toml), which explains every key ([`report/audit-notes.toml`](report/audit-notes.toml) is claims-mcp's own) |
 | `date` | Report date (default today) |
 | `artifact`, `version`, `repository`, `method`, `assessment` | Override the matching sidecar key |
 
