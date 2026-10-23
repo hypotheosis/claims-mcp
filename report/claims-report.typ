@@ -252,7 +252,13 @@
   let named = if open.len() == 0 { "" } else { ". Not supported: " + compress-ids(open) }
   prefix + str(kids.len()) + " active (" + breakdown + ")" + named
 }
-#let locator-text(claim, item) = if is-rollup(item) { rollup-locator(claim) } else { item.locator }
+// A roll-up's counts describe the children as they are now, which may differ from when the
+// evidence was recorded, so they are labelled as such.
+#let locator-text(claim, item) = if is-rollup(item) {
+  "Now: " + rollup-locator(claim)
+} else {
+  item.locator
+}
 
 #let rollup-locators = {
   let rendered = (:)
@@ -364,8 +370,13 @@
   },
 )
 
+// Full mode also shows a roll-up's locator exactly as recorded (long id runs compressed), so
+// the sealed text is visible next to the current counts.
 #let evidence-block(claim, item) = record-block(
   (strong(id-text(item.id)), item.kind, item.stance, wrappable(item.recorded_at)),
+  ..if full and is-rollup(item) {
+    (text(fill: luma(70))[Recorded: #rich(item.locator)],)
+  },
   text(fill: luma(70), rich(locator-text(claim, item))),
   rich(item.summary),
 )
@@ -809,9 +820,10 @@
       system), _proof_ (proof output), _log_ (captured log or command output), or _other_.]),
     ([Stance], [Whether the evidence _supports_ the claim (shows it holds), _refutes_ it (shows
       it does not), or is _neutral_ (relevant but decides nothing).]),
-    ([Roll-up], [Evidence on a parent claim that summarizes its children's verdicts. Its
-      locator reads "children of CLM-NNNN", followed by counts and the children not yet
-      supported.]),
+    ([Roll-up], [Evidence on a parent claim that summarizes its children's verdicts. The
+      report shows "Now: children of CLM-NNNN" with the children's current counts and those not
+      yet supported, which may have changed since the evidence was recorded; the full report
+      also shows the locator as recorded.]),
   )
   glossary-group(
     [Verdicts and findings],
