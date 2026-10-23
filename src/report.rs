@@ -1,4 +1,7 @@
-//! Read-only analyses over a catalog: the audit report and trace queries.
+//! Read-only analyses over a catalog: the audit report, trace queries, and the next-steps
+//! TL;DR.
+
+pub mod next_steps;
 
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 
