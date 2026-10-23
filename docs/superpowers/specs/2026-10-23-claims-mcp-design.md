@@ -38,9 +38,10 @@ using these tools.
 
 ```jsonc
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "next_claim_seq": 8,
   "next_evidence_seq": 15,
+  "seal": { "by": "server", "mac": "<64 hex digits>" },
   "claims": [
     {
       "id": "CLM-0007",
@@ -61,7 +62,8 @@ using these tools.
           "locator": "tests/config.rs:88 oversized_file_rejected",
           "summary": "test passes; returns ConfigError::TooLarge",
           "stance": "supports",
-          "recorded_at": "2026-10-23T14:02:11Z"
+          "recorded_at": "2026-10-23T14:02:11Z",
+          "seal": { "by": "server", "mac": "<64 hex digits>" }
         }
       ],
       "verdicts": [
@@ -70,11 +72,13 @@ using these tools.
           "rationale": "Direct test covers the boundary and passes.",
           "auditor": "claude-opus-5-5",
           "evidence_ids": ["EVD-0014"],
-          "recorded_at": "2026-10-23T14:03:40Z"
+          "recorded_at": "2026-10-23T14:03:40Z",
+          "seal": { "by": "server", "mac": "<64 hex digits>" }
         }
       ],
       "created_at": "2026-10-23T13:58:00Z",
-      "updated_at": "2026-10-23T14:03:40Z"
+      "updated_at": "2026-10-23T14:03:40Z",
+      "seal": { "by": "server", "mac": "<64 hex digits>" }
     }
   ]
 }
@@ -87,7 +91,19 @@ using these tools.
   are unique across the whole catalog.
 - **Optional fields** (`integrity_level`, `source`) are omitted when absent. Empty arrays are always
   emitted, so the shape is uniform.
-- `schema_version` must equal `1`. Any other value is an error and the file is not touched.
+- `schema_version` is `2`. A `1` (written before integrity seals, issue #9) is still read, but
+  the server refuses to write to it until `claims-mcp seal --adopt` migrates it. Any other value
+  is an error and the file is not touched.
+- **Integrity seals** (issue #9): the header and every claim, evidence item, and verdict carry
+  `seal: {by, mac}`, an HMAC-SHA256 under a key built into the binary. `by` is `server`, or
+  `adopt` for records sealed by `seal --adopt`. Each MAC covers the record and its place in the
+  catalog: evidence binds its claim id; a verdict binds its claim id, index, and the previous
+  verdict's MAC; a claim binds its own fields, its evidence ids, and its latest verdict's MAC;
+  the header binds `schema_version` and both counters. Any gap below `next_claim_seq` means a
+  deleted claim. The server verifies every seal on every call and refuses all writes while any
+  check fails; reads and `audit_report` still work. This deters casual hand edits; it is not
+  cryptographic security, because the key is in the public source. See `src/seal.rs` and the
+  README's "Integrity seals" section.
 
 ### 3.2 Enumerations (serialized snake_case)
 
@@ -209,8 +225,10 @@ tool call -> server handler -> store.mutate(|catalog| catalog.op(...))
     spawn_blocking:
         open/create  <dir>/.<file_name>.lock   ; File::lock() (exclusive, std >= 1.89)
         read <catalog> (missing file => Catalog::default())
-        serde_json::from_slice, check schema_version
+        serde_json::from_slice, check schema_version (1 or 2)
+        verify every seal (any failure => UnsealedCatalog / CatalogTampered, nothing written)
         run closure  (Err => nothing written)
+        re-seal, as the server, every record whose seal no longer matches
         serialize (pretty, trailing newline) -> <dir>/.<file_name>.tmp
         fsync tmp, rename tmp -> catalog
         lock released on drop
@@ -218,7 +236,8 @@ tool call -> server handler -> store.mutate(|catalog| catalog.op(...))
 ```
 
 `store.read` takes the same lock, loads the catalog, and never writes. The catalog is re-read on
-every call, so `git checkout`, hand edits, and concurrent server instances are always respected.
+every call, so `git checkout` and concurrent server instances are always respected. Hand edits
+are detected by the integrity seals and block writes until the file is restored.
 The cost is O(file size) per call, which is acceptable for expected catalog sizes (up to the low
 thousands of claims).
 

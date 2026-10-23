@@ -29,6 +29,15 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 
 ## Errors and constraints
 
+- **Never edit the catalog file (`claims.json`) directly**, not even to fix a typo. Every record
+  carries an integrity seal. If one fails, the server refuses every write until the file is
+  restored.
+- If a write fails with "was changed outside claims-mcp", **stop and tell the user**. Restore the
+  file from git (`git checkout -- claims.json`, or revert the commit that edited it), then redo
+  the intended change through the tools. Treat the failed checks as an audit finding. Never run
+  `claims-mcp seal --adopt` to clear the error: adoption is a maintainer's one-time migration,
+  and the records it seals are labeled as adopted in every report.
+
 - A failed call returns an error message and changes nothing. A failed `add_claims` writes
   nothing; the error names the entry as `claims[i]: ...` - fix that entry and resend the whole
   batch.
@@ -146,10 +155,11 @@ Call `audit_report` and summarize for the user:
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
 - Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report. Build it
   from a shell, not through this server (it never executes commands): `just report`, or
-  `typst compile --root . report/claims-report.typ audit.pdf --input catalog=claims.json
-  --input commit=<sha>`. Free text (the assessment and points for the evaluator) goes in a
-  TOML sidecar passed as `--input notes=<path>`. Tag a refuted claim `issue:N` to link its
-  tracking issue.
+  `claims-mcp verify --json > target/integrity.json`, then `typst compile --root .
+  report/claims-report.typ audit.pdf --input catalog=claims.json --input commit=<sha>
+  --input integrity=target/integrity.json`. Free text (the assessment and points for the
+  evaluator) goes in a TOML sidecar passed as `--input notes=<path>`. Tag a refuted claim
+  `issue:N` to link its tracking issue.
 
 ### 6. Re-audit after fixes
 

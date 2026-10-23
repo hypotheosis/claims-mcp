@@ -9,11 +9,16 @@ use serde::{Deserialize, Serialize};
 use crate::error::{ClaimsError, Result};
 use crate::model::{
     Claim, ClaimId, ClaimKind, ClaimLevel, ClaimRef, ClaimStatus, CurrentVerdict, Evidence,
-    EvidenceId, EvidenceKind, IntegrityLevel, Stance, Verdict, VerdictRecord, VerificationMethod,
+    EvidenceId, EvidenceKind, IntegrityLevel, Seal, Stance, Verdict, VerdictRecord,
+    VerificationMethod,
 };
 
-/// The only catalog `schema_version` this build reads and writes.
-pub const SCHEMA_VERSION: u32 = 1;
+/// The catalog `schema_version` this build writes: records carry integrity seals.
+pub const SCHEMA_VERSION: u32 = 2;
+
+/// The older, unsealed `schema_version`. It is still read, so `claims-mcp seal --adopt` can
+/// migrate it, but it never passes verification, so the server refuses to write to it.
+pub const UNSEALED_SCHEMA_VERSION: u32 = 1;
 
 /// Input for creating a claim (the `add_claim` tool parameters and `add_claims` entries).
 #[derive(Debug, Clone, PartialEq, Deserialize, JsonSchema)]
@@ -172,6 +177,9 @@ pub struct Catalog {
     schema_version: u32,
     next_claim_seq: u32,
     next_evidence_seq: u32,
+    /// Integrity seal over `schema_version` and the two counters (see `src/seal.rs`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    seal: Option<Seal>,
     claims: Vec<Claim>,
 }
 
@@ -181,6 +189,7 @@ impl Default for Catalog {
             schema_version: SCHEMA_VERSION,
             next_claim_seq: 1,
             next_evidence_seq: 1,
+            seal: None,
             claims: Vec::new(),
         }
     }
@@ -195,6 +204,43 @@ impl Catalog {
     /// Returns every claim, sorted by id.
     pub fn claims(&self) -> &[Claim] {
         &self.claims
+    }
+
+    /// Mutable access to every claim, for (re)sealing records in place. Ids and order must not
+    /// change.
+    pub(crate) fn claims_mut(&mut self) -> &mut [Claim] {
+        &mut self.claims
+    }
+
+    /// The next claim sequence number to be assigned.
+    pub fn next_claim_seq(&self) -> u32 {
+        self.next_claim_seq
+    }
+
+    /// The next evidence sequence number to be assigned.
+    pub fn next_evidence_seq(&self) -> u32 {
+        self.next_evidence_seq
+    }
+
+    /// The catalog header's integrity seal.
+    pub fn seal(&self) -> Option<&Seal> {
+        self.seal.as_ref()
+    }
+
+    /// Mutable access to the catalog header's integrity seal.
+    pub(crate) fn seal_mut(&mut self) -> &mut Option<Seal> {
+        &mut self.seal
+    }
+
+    /// Marks the catalog as the current (sealed) schema version, for `seal --adopt`.
+    pub(crate) fn upgrade_schema(&mut self) {
+        self.schema_version = SCHEMA_VERSION;
+    }
+
+    /// `true` for a catalog nothing was ever added to: no claims and both counters at 1. A
+    /// missing catalog file loads as one, and it needs no seal.
+    pub fn is_pristine(&self) -> bool {
+        self.claims.is_empty() && self.next_claim_seq == 1 && self.next_evidence_seq == 1
     }
 
     /// Checks invariants that a hand-edited or merged file could break: ids strictly
@@ -409,6 +455,7 @@ impl Catalog {
             verdicts: Vec::new(),
             created_at: now,
             updated_at: now,
+            seal: None,
         })
     }
 
@@ -527,6 +574,7 @@ impl Catalog {
             summary: required_text("summary", &new_evidence.summary)?,
             stance: new_evidence.stance,
             recorded_at: now,
+            seal: None,
         };
         self.next_evidence_seq = next_seq;
         let claim = &mut self.claims[index];
@@ -589,6 +637,7 @@ impl Catalog {
             auditor,
             evidence_ids,
             recorded_at: now,
+            seal: None,
         });
         claim.updated_at = now;
         Ok(claim.clone())

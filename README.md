@@ -136,8 +136,75 @@ claims-mcp --catalog path/to/claims.json   # or set CLAIMS_CATALOG
 | | `RUST_LOG` | `warn` | Log filter; logs go to stderr |
 
 The catalog is re-read on every call and written atomically (temp file, fsync, rename) under an
-exclusive lock on `.<name>.lock`. Git checkouts, hand edits, and several server instances
-sharing one file are all safe. Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
+exclusive lock on `.<name>.lock`. Git checkouts and several server instances sharing one file
+are safe. Hand edits are detected, and block writes; see [Integrity seals](#integrity-seals).
+Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
+
+| Subcommand | Purpose |
+|---|---|
+| *(none)* | Run the MCP server on stdio |
+| `verify [--json]` | Check every integrity seal; exit 1 if any check fails |
+| `seal --adopt` | Seal unsealed records once, to migrate a catalog (maintainers only) |
+
+## Integrity seals
+
+The catalog is meant to change only through the tools, which enforce its rules: verdicts must
+cite evidence, the history is append-only, claims are retired instead of deleted. To stop an
+agent from skipping the tools and editing `claims.json` directly, every claim, evidence item,
+and verdict, plus the catalog header, carries a `seal`: an HMAC-SHA256 over the record's content
+and its place in the catalog, under a key built into the binary.
+
+- **Every call verifies every seal.** If any check fails, the server **refuses every write**
+  until the file is restored. Reads and `audit_report` keep working, so the damage can be
+  inspected. There is no option to turn this off.
+- **What counts as tampering:** a changed field, an added record without a seal, a deleted
+  claim, evidence item, or verdict, reordered verdicts, evidence moved to another claim, and
+  lowered id counters.
+- **Recovering:** restore the file from git (`git checkout -- claims.json`, or revert the
+  commit that edited it), then redo the change through the tools.
+- **Not affected:** reformatting the file or reordering its keys (seals cover content, not
+  layout), and git merges of branches that changed *different* claims.
+
+This is a deterrent, not cryptographic security. The key is in this repository's source, so
+anyone who reads it can forge seals. What it stops is the casual edit: in your project, an agent
+would have to go find the key and write code to recompute seals.
+
+### Checking in CI
+
+`claims-mcp verify` exits 1 when any check fails and names each failing record, so a hand-edited
+catalog fails the PR. This repository's CI runs it. `--json` prints the result as JSON.
+
+```bash
+claims-mcp --catalog claims.json verify
+```
+
+### Migrating with `seal --adopt`
+
+Catalogs written before seals existed (`schema_version 1`) can still be read, but the server
+refuses to write to them until a maintainer runs:
+
+```bash
+claims-mcp --catalog claims.json seal --adopt   # then commit claims.json
+```
+
+It seals every unsealed record and labels it `adopt`. `verify` and `audit_report` list adopted
+records separately from ones the server recorded. Adoption **never** re-seals a record whose seal
+is present but wrong, so it cannot hide an edit to a sealed record. It also refuses when a claim
+is missing. The one exception is the catalog header (the id counters): when two branches both
+added claims or evidence, the header's seal conflicts on merge, and `seal --adopt` re-seals it
+once every other record verifies. If two branches changed the *same* claim, keep one side and
+redo the other side's change through the tools.
+
+Agents should never run `seal --adopt`: the server's own refusal message says so. To keep agents
+away from the file entirely, add deny rules to the project's `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": ["Edit(**/claims.json)", "Write(**/claims.json)", "Bash(claims-mcp seal:*)"]
+  }
+}
+```
 
 ## Tools
 
@@ -157,18 +224,20 @@ sharing one file are all safe. Add `.<name>.lock` and `.<name>.tmp` to `.gitigno
 ## Generate a PDF report
 
 [`report/claims-report.typ`](report/claims-report.typ) renders a catalog as a self-contained
-PDF audit report with [Typst](https://typst.app): result and assessment, findings, coverage by
-integrity level, all eight gap categories, the claim hierarchy, the traceability matrix, and an
-evidence appendix with the full verdict history. It runs outside the server, which never
-executes commands.
+PDF audit report with [Typst](https://typst.app): result and assessment, integrity seal status,
+findings, coverage by integrity level, all eight gap categories, the claim hierarchy, the
+traceability matrix, and an evidence appendix with the full verdict history. It runs outside the
+server, which never executes commands.
 
 ```bash
 just report                       # claims.json -> audit.pdf, stamped with the current commit
 # or, without just:
+claims-mcp --catalog claims.json verify --json > target/integrity.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
   --input commit=$(git rev-parse --short HEAD) \
-  --input notes=report/audit-notes.toml
+  --input notes=report/audit-notes.toml \
+  --input integrity=target/integrity.json
 ```
 
 Paths are relative to `--root`. All inputs are optional:
@@ -176,6 +245,7 @@ Paths are relative to `--root`. All inputs are optional:
 | Input | Meaning |
 |---|---|
 | `catalog` | Catalog to report on (default `claims.json`) |
+| `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
 | `notes` | TOML sidecar with `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator; see [`report/audit-notes.toml`](report/audit-notes.toml) |
 | `date` | Report date (default today) |
@@ -211,6 +281,7 @@ just test     # cargo test
 - `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, a build with
   `RUSTFLAGS=-D warnings`, and `cargo test` with Typst installed and `REQUIRE_TYPST=1`, so the
   Typst template checks cannot skip silently
+- `claims-mcp verify`, which fails if `claims.json` was edited outside the tools
 - `cargo test` on Windows and macOS, and `cargo check` on the minimum supported Rust version
   (`rust-version` in `Cargo.toml`)
 - `just report` on the PR head commit; the PDF is uploaded as the run's

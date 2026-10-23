@@ -5,8 +5,9 @@ use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use crate::catalog::{Catalog, SCHEMA_VERSION};
+use crate::catalog::{Catalog, SCHEMA_VERSION, UNSEALED_SCHEMA_VERSION};
 use crate::error::{ClaimsError, Result};
+use crate::seal;
 
 /// Paths derived once from the catalog path.
 #[derive(Debug)]
@@ -22,7 +23,9 @@ struct StorePaths {
 /// Every operation takes an exclusive lock on the sidecar `.<name>.lock` file, re-reads the
 /// catalog from disk, and, for mutations, writes `.<name>.tmp` and renames it over the
 /// catalog. The file is therefore always complete, and changes made outside the server
-/// (git checkout, hand edits, another instance) are always seen.
+/// (git checkout, another instance) are always seen. Hand edits are seen too, and detected:
+/// every record carries an integrity seal (`src/seal.rs`), and writes are refused while any
+/// seal fails to verify.
 #[derive(Debug, Clone)]
 pub struct CatalogStore {
     paths: Arc<StorePaths>,
@@ -73,12 +76,15 @@ impl CatalogStore {
         tokio::task::spawn_blocking(move || store.read_blocking(operation)).await?
     }
 
-    /// Runs `operation` against a fresh read of the catalog and saves the result atomically.
-    /// If `operation` fails, nothing is written.
+    /// Runs `operation` against a fresh read of the catalog and saves the result atomically,
+    /// re-sealing the records it changed. If `operation` fails, nothing is written.
     ///
     /// # Errors
     ///
-    /// Lock, read, parse, or write failures, or whatever `operation` returns.
+    /// [`ClaimsError::UnsealedCatalog`] for a schema v1 catalog and
+    /// [`ClaimsError::CatalogTampered`] if any seal fails (both checked before `operation`
+    /// runs), lock, read, parse, or write failures, or whatever `operation`
+    /// returns.
     pub async fn mutate<T, F>(&self, operation: F) -> Result<T>
     where
         T: Send + 'static,
@@ -86,6 +92,29 @@ impl CatalogStore {
     {
         let store = self.clone();
         tokio::task::spawn_blocking(move || store.mutate_blocking(operation)).await?
+    }
+
+    /// Seals every unsealed record as adopted and saves the catalog; see [`seal::adopt`].
+    /// Returns the names of the records it sealed.
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::AdoptRefused`] if a sealed record was changed or a claim is missing, and
+    /// lock, read, parse, or write failures.
+    pub async fn adopt(&self) -> Result<Vec<String>> {
+        let store = self.clone();
+        tokio::task::spawn_blocking(move || store.adopt_blocking()).await?
+    }
+
+    /// Synchronous body of [`CatalogStore::adopt`].
+    fn adopt_blocking(&self) -> Result<Vec<String>> {
+        let _lock = self.lock()?;
+        let mut catalog = self.load()?;
+        let adopted = seal::adopt(&mut catalog)?;
+        if !adopted.is_empty() {
+            self.save(&catalog)?;
+        }
+        Ok(adopted)
     }
 
     /// Synchronous body of [`CatalogStore::read`].
@@ -100,7 +129,22 @@ impl CatalogStore {
         // lock is released automatically when it is dropped (RAII, like a `with` block).
         let _lock = self.lock()?;
         let mut catalog = self.load()?;
+        let integrity = seal::verify(&catalog);
+        if !integrity.verified {
+            let path = self.paths.catalog.clone();
+            let error = if catalog.schema_version() == UNSEALED_SCHEMA_VERSION {
+                ClaimsError::UnsealedCatalog { path }
+            } else {
+                ClaimsError::CatalogTampered {
+                    path,
+                    problems: integrity.problems,
+                }
+            };
+            tracing::error!("{error}");
+            return Err(error);
+        }
         let output = operation(&mut catalog)?;
+        seal::reseal(&mut catalog);
         self.save(&catalog)?;
         Ok(output)
     }
@@ -132,7 +176,7 @@ impl CatalogStore {
                 path: path.clone(),
                 source,
             })?;
-        if catalog.schema_version() != SCHEMA_VERSION {
+        if ![SCHEMA_VERSION, UNSEALED_SCHEMA_VERSION].contains(&catalog.schema_version()) {
             return Err(ClaimsError::UnsupportedSchema {
                 path: path.clone(),
                 found: catalog.schema_version(),
@@ -265,12 +309,12 @@ mod tests {
     fn unsupported_schema_version_is_rejected() {
         let (_directory, store) = temp_store();
         let document =
-            r#"{"schema_version":2,"next_claim_seq":1,"next_evidence_seq":1,"claims":[]}"#;
+            r#"{"schema_version":3,"next_claim_seq":1,"next_evidence_seq":1,"claims":[]}"#;
         fs::write(store.path(), document).expect("write file");
         let result = store.read_blocking(|_| Ok(()));
         assert!(matches!(
             result,
-            Err(ClaimsError::UnsupportedSchema { found: 2, .. })
+            Err(ClaimsError::UnsupportedSchema { found: 3, .. })
         ));
     }
 
@@ -296,6 +340,69 @@ mod tests {
             store.read_blocking(|_| Ok(())),
             Err(ClaimsError::Validation(_))
         ));
+    }
+
+    /// Rewrites the first claim's statement directly in the file, as an agent might.
+    fn hand_edit_first_statement(store: &CatalogStore) {
+        let text = fs::read_to_string(store.path()).expect("read file");
+        fs::write(store.path(), text.replacen("\"first\"", "\"edited\"", 1)).expect("write");
+    }
+
+    #[test]
+    fn writes_are_sealed_and_verify() {
+        let (_directory, store) = temp_store();
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("first"), at(0)))
+            .expect("mutate");
+        let report = store
+            .read_blocking(|catalog| Ok(seal::verify(catalog)))
+            .expect("read");
+        assert!(report.verified, "{:?}", report.problems);
+        assert!(fs::read_to_string(store.path())
+            .expect("read file")
+            .contains("\"schema_version\": 2"));
+    }
+
+    #[test]
+    fn tampered_catalog_refuses_writes_but_allows_reads() {
+        let (_directory, store) = temp_store();
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("first"), at(0)))
+            .expect("mutate");
+        hand_edit_first_statement(&store);
+        let before = fs::read(store.path()).expect("read file");
+
+        let result = store.mutate_blocking(|catalog| catalog.add_claim(new_claim("b"), at(1)));
+        let Err(ClaimsError::CatalogTampered { problems, .. }) = result else {
+            panic!("expected CatalogTampered, got {result:?}");
+        };
+        assert_eq!(problems[0].record, "CLM-0001");
+        assert_eq!(fs::read(store.path()).expect("read file"), before);
+        let statement = store
+            .read_blocking(|catalog| Ok(catalog.claims()[0].statement.clone()))
+            .expect("reads still work");
+        assert_eq!(statement, "edited");
+    }
+
+    #[test]
+    fn adopt_migrates_a_v1_file_and_unblocks_writes() {
+        let (_directory, store) = temp_store();
+        let document = r#"{"schema_version":1,"next_claim_seq":2,"next_evidence_seq":1,"claims":[{
+            "id":"CLM-0001","statement":"s","kind":"functional","level":"unit",
+            "verification_method":"test","status":{"state":"active"},
+            "created_at":"2026-10-23T00:00:00Z","updated_at":"2026-10-23T00:00:00Z"}]}"#;
+        fs::write(store.path(), document).expect("write file");
+        assert!(matches!(
+            store.mutate_blocking(|_| Ok(())),
+            Err(ClaimsError::UnsealedCatalog { .. })
+        ));
+
+        let adopted = store.adopt_blocking().expect("adopt");
+        assert_eq!(adopted, ["CLM-0001", "catalog"]);
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("after"), at(1)))
+            .expect("writes work after adoption");
+        assert!(store.adopt_blocking().expect("adopt again").is_empty());
     }
 
     #[test]

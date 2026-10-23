@@ -3,6 +3,10 @@
 use std::path::PathBuf;
 
 use crate::model::{ClaimId, EvidenceId};
+use crate::seal::IntegrityProblem;
+
+/// At most this many failed checks are listed in an error message; the rest are counted.
+const LISTED_PROBLEMS: usize = 10;
 
 /// Every failure the catalog, store, or report code can produce.
 ///
@@ -73,6 +77,44 @@ pub enum ClaimsError {
         supported: u32,
     },
 
+    /// The catalog failed integrity verification, so the server refuses every write.
+    #[error(
+        "catalog {path} was changed outside claims-mcp, so every write is refused until it is \
+         restored. Failed checks: {}. Never edit the catalog file directly. To recover, restore \
+         it from git (`git checkout -- {path}`, or revert the commit that edited it), then \
+         redo the intended change through the claims tools. Reads and audit_report still work.",
+        list_problems(.problems)
+    )]
+    CatalogTampered {
+        /// Catalog file that failed verification.
+        path: PathBuf,
+        /// Every failed check.
+        problems: Vec<IntegrityProblem>,
+    },
+
+    /// The catalog uses the unsealed schema version 1, so the server refuses every write until
+    /// a maintainer migrates it.
+    #[error(
+        "catalog {path} uses schema_version 1, which has no integrity seals, so every write is \
+         refused. A maintainer (not an agent) must migrate it once with `claims-mcp --catalog \
+         {path} seal --adopt` and commit the result. Reads and audit_report still work."
+    )]
+    UnsealedCatalog {
+        /// Catalog file that needs migrating.
+        path: PathBuf,
+    },
+
+    /// `seal --adopt` found records whose seal is present but wrong, or deleted claims.
+    #[error(
+        "refusing to adopt: these records were changed after they were sealed, or are missing: \
+         {}. Restore the catalog from git instead.",
+        list_problems(.problems)
+    )]
+    AdoptRefused {
+        /// Every record that blocks adoption.
+        problems: Vec<IntegrityProblem>,
+    },
+
     /// Serializing the catalog or a tool response failed.
     #[error("failed to encode JSON: {0}")]
     Encode(#[from] serde_json::Error),
@@ -82,5 +124,38 @@ pub enum ClaimsError {
     Join(#[from] tokio::task::JoinError),
 }
 
+/// `EVD-0014 (seal does not match its content); ...`, truncated after [`LISTED_PROBLEMS`].
+fn list_problems(problems: &[IntegrityProblem]) -> String {
+    let mut listed: Vec<String> = problems
+        .iter()
+        .take(LISTED_PROBLEMS)
+        .map(|item| format!("{} ({})", item.record, item.problem))
+        .collect();
+    if problems.len() > LISTED_PROBLEMS {
+        listed.push(format!("and {} more", problems.len() - LISTED_PROBLEMS));
+    }
+    listed.join("; ")
+}
+
 /// Convenience alias used throughout the crate.
 pub type Result<T> = std::result::Result<T, ClaimsError>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn long_problem_lists_are_truncated_with_a_count() {
+        let problems: Vec<IntegrityProblem> = (1..=12)
+            .map(|seq| IntegrityProblem {
+                record: EvidenceId::new(seq).to_string(),
+                problem: "has no seal".to_owned(),
+            })
+            .collect();
+        let listed = list_problems(&problems);
+        assert!(listed.starts_with("EVD-0001 (has no seal); EVD-0002"));
+        assert!(listed.contains("EVD-0010 (has no seal)"));
+        assert!(!listed.contains("EVD-0011"));
+        assert!(listed.ends_with("and 2 more"));
+    }
+}
