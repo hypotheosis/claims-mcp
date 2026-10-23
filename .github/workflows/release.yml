@@ -1,0 +1,117 @@
+# Release pipeline: pushing a tag `vX.Y.Z` on a commit in `main`, where X.Y.Z is `version` in
+# Cargo.toml, builds claims-mcp for Linux, Windows, and macOS and publishes a GitHub Release with
+# the archives, their SHA-256 checksums, and the audit report for the tagged commit.
+#
+# A pull request that edits this file runs the builds as a dry run; nothing is published.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: [.github/workflows/release.yml]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  version:
+    name: check tag matches Cargo.toml and main
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      # Full history, so the tagged commit can be checked against `origin/main`.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: version
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          [[ "$GITHUB_REF_TYPE" == tag ]] || exit 0
+          if [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::tag $GITHUB_REF_NAME points at a commit that is not on main"
+            exit 1
+          fi
+
+  ci:
+    if: github.ref_type == 'tag'
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: build (${{ matrix.target }})
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # musl gives fully static Linux binaries that run on any distribution.
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest, musl: true }
+          - { target: aarch64-unknown-linux-musl, os: ubuntu-24.04-arm, musl: true }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+          - { target: x86_64-apple-darwin, os: macos-latest }
+          - { target: aarch64-apple-darwin, os: macos-latest }
+    runs-on: ${{ matrix.os }}
+    env:
+      ARCHIVE: claims-mcp-${{ needs.version.outputs.version }}-${{ matrix.target }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      - if: matrix.musl
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - run: cargo build --release --locked --target ${{ matrix.target }}
+      - name: package
+        run: |
+          mkdir "$ARCHIVE"
+          cp README.md "$ARCHIVE/"
+          cp -r skills "$ARCHIVE/"
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            cp "target/${{ matrix.target }}/release/claims-mcp.exe" "$ARCHIVE/"
+            7z a "$ARCHIVE.zip" "$ARCHIVE" > /dev/null
+          else
+            cp "target/${{ matrix.target }}/release/claims-mcp" "$ARCHIVE/"
+            tar -czf "$ARCHIVE.tar.gz" "$ARCHIVE"
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ env.ARCHIVE }}
+          path: ${{ env.ARCHIVE }}.*
+          if-no-files-found: error
+
+  publish:
+    if: github.ref_type == 'tag'
+    needs: [ci, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        # Every artifact of this run: the build archives and the report from `ci`.
+        with:
+          path: dist
+          merge-multiple: true
+      - name: checksums
+        working-directory: dist
+        run: |
+          for file in claims-mcp-*; do
+            sha256sum "$file" > "$file.sha256"
+          done
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag

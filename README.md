@@ -18,13 +18,113 @@ carries evidence and an append-only history of FEVER verdicts (`supported`, `ref
 The server only records; it never runs commands. Verification is done by the agent, guided by
 the bundled [`claims-audit`](skills/claims-audit/SKILL.md) skill.
 
-## Build
+## Install
+
+### 1. Install the server
+
+Pick one:
+
+- **Download a release.** Each [GitHub release](https://github.com/hypotheosis/claims-mcp/releases)
+  has an archive per platform, a `.sha256` checksum for each, and the audit report for that
+  version:
+
+  | Platform | Archive |
+  |---|---|
+  | Linux x86_64 (static) | `claims-mcp-<version>-x86_64-unknown-linux-musl.tar.gz` |
+  | Linux ARM64 (static) | `claims-mcp-<version>-aarch64-unknown-linux-musl.tar.gz` |
+  | Windows x86_64 | `claims-mcp-<version>-x86_64-pc-windows-msvc.zip` |
+  | macOS Intel | `claims-mcp-<version>-x86_64-apple-darwin.tar.gz` |
+  | macOS Apple Silicon | `claims-mcp-<version>-aarch64-apple-darwin.tar.gz` |
+
+  On Linux and macOS:
+
+  ```bash
+  sha256sum -c claims-mcp-<version>-<target>.tar.gz.sha256   # macOS: shasum -a 256 -c
+  tar -xzf claims-mcp-<version>-<target>.tar.gz
+  mkdir -p ~/.local/bin
+  install -m 755 claims-mcp-<version>-<target>/claims-mcp ~/.local/bin/
+  ```
+
+  On Windows (PowerShell), compare the hash with the one in the `.sha256` file, then extract
+  and put `claims-mcp.exe` in a directory on your `PATH`:
+
+  ```powershell
+  $archive = "claims-mcp-<version>-x86_64-pc-windows-msvc"
+  (Get-FileHash "$archive.zip" -Algorithm SHA256).Hash   # must match "$archive.zip.sha256"
+  Expand-Archive "$archive.zip" -DestinationPath .
+  ```
+
+  Each archive also contains this README and the `skills/` directory. The macOS binaries are
+  not signed or notarized; if Gatekeeper blocks one, clear the quarantine flag with
+  `xattr -d com.apple.quarantine ~/.local/bin/claims-mcp`.
+
+- **Install with cargo** (Rust 1.89 or newer):
+
+  ```bash
+  cargo install --locked --git https://github.com/hypotheosis/claims-mcp
+  ```
+
+  This puts `claims-mcp` in `~/.cargo/bin`.
+
+- **Build from a clone**:
+
+  ```bash
+  cargo build --release   # binary at target/release/claims-mcp
+  ```
+
+### 2. Register the server with Claude Code
+
+With `claims-mcp` on your `PATH`, register it from the root of the project whose catalog it
+should keep:
 
 ```bash
-cargo build --release
+claude mcp add --scope project claims -- claims-mcp --catalog claims.json
 ```
 
+`--scope project` writes `.mcp.json` so everyone working in the repository gets the server;
+use `--scope user` to make it available in all your projects, or leave the flag off to register
+it for this project only. A relative `--catalog` resolves against the directory Claude Code is
+started in. The resulting `.mcp.json` entry, if you prefer to write it by hand (use an absolute
+`command` path if the binary is not on `PATH`):
+
+```json
+{
+  "mcpServers": {
+    "claims": {
+      "command": "claims-mcp",
+      "args": ["--catalog", "claims.json"]
+    }
+  }
+}
+```
+
+This repository's own `.mcp.json` uses `cargo run --release` instead, so the first start
+compiles the server; run `cargo build --release` once beforehand to avoid a client startup
+timeout.
+
+### 3. Install the skill
+
+The [`claims-audit`](skills/claims-audit/SKILL.md) skill teaches Claude the audit workflow. Copy
+it from a clone or a release archive, either for yourself (all projects):
+
+```bash
+mkdir -p ~/.claude/skills
+cp -r skills/claims-audit ~/.claude/skills/
+```
+
+or into a project, committed so collaborators get it too:
+
+```bash
+mkdir -p .claude/skills
+cp -r skills/claims-audit .claude/skills/
+```
+
+On Windows the user directory is `%USERPROFILE%\.claude\skills`. Restart Claude Code, then ask
+it to "audit this change against the task", or invoke `/claims-audit`.
+
 ## Run
+
+The server speaks MCP over stdio, so Claude Code normally starts it. To run it directly:
 
 ```bash
 claims-mcp --catalog path/to/claims.json   # or set CLAIMS_CATALOG
@@ -38,32 +138,6 @@ claims-mcp --catalog path/to/claims.json   # or set CLAIMS_CATALOG
 The catalog is re-read on every call and written atomically (temp file, fsync, rename) under an
 exclusive lock on `.<name>.lock`. Git checkouts, hand edits, and several server instances
 sharing one file are all safe. Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
-
-## Register with Claude Code
-
-This repository's `.mcp.json` registers the server as `claims`, backed by `claims.json` in the
-repository root. It uses `cargo run --release`, so the first start compiles the server; run
-`cargo build --release` once beforehand to avoid a client startup timeout. For another project, add:
-
-```json
-{
-  "mcpServers": {
-    "claims": {
-      "command": "/absolute/path/to/claims-mcp/target/release/claims-mcp",
-      "args": ["--catalog", "claims.json"]
-    }
-  }
-}
-```
-
-## Install the skill
-
-```bash
-mkdir -p ~/.claude/skills
-cp -r skills/claims-audit ~/.claude/skills/
-```
-
-Then ask Claude to "audit this change against the task", or invoke `/claims-audit`.
 
 ## Tools
 
@@ -125,3 +199,33 @@ just fmt      # cargo fmt
 just clippy   # cargo clippy --all-targets -- -D warnings
 just test     # cargo test
 ```
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and push to `main`:
+
+- `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, a build with
+  `RUSTFLAGS=-D warnings`, and `cargo test` with Typst installed and `REQUIRE_TYPST=1`, so the
+  Typst template checks cannot skip silently
+- `cargo test` on Windows and macOS, and `cargo check` on the minimum supported Rust version
+  (`rust-version` in `Cargo.toml`)
+- `just report` on the PR head commit; the PDF is uploaded as the run's
+  `audit-report-pr-<number>-<commit>` artifact (open the run's summary page to download it)
+
+### Releasing
+
+1. Set `version` in `Cargo.toml` to the new version, update `report/audit-notes.toml` to match,
+   and merge.
+2. Tag the merge commit and push the tag:
+
+   ```bash
+   git tag v0.2.0
+   git push origin v0.2.0
+   ```
+
+`.github/workflows/release.yml` checks that the tag equals `v` plus the `Cargo.toml` version
+and points at a commit on `main` (and fails without publishing otherwise), reruns CI on the tagged commit, builds the five
+archives listed under [Install](#1-install-the-server), and publishes a GitHub release with
+the archives, their `.sha256` files, and the audit report. A pull request that changes
+`release.yml` runs the builds as a dry run without publishing.
+
