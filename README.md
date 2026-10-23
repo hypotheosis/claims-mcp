@@ -54,9 +54,9 @@ Pick one:
   Expand-Archive "$archive.zip" -DestinationPath .
   ```
 
-  Each archive also contains this README and the `skills/` directory. The macOS binaries are
-  not signed or notarized; if Gatekeeper blocks one, clear the quarantine flag with
-  `xattr -d com.apple.quarantine ~/.local/bin/claims-mcp`.
+  Each archive also contains this README, `LICENSE`, `NOTICE`, and the `skills/` directory. The
+  macOS binaries are not signed or notarized; if Gatekeeper blocks one, clear the quarantine flag
+  with `xattr -d com.apple.quarantine ~/.local/bin/claims-mcp`.
 
 - **Install with cargo** (Rust 1.89 or newer):
 
@@ -229,3 +229,9 @@ archives listed under [Install](#1-install-the-server), and publishes a GitHub r
 the archives, their `.sha256` files, and the audit report. A pull request that changes
 `release.yml` runs the builds as a dry run without publishing.
 
+## License
+
+Copyright 2026 Hypotheosis. Licensed under the [Apache License, Version 2.0](LICENSE); see
+[`NOTICE`](NOTICE). You may use, modify, and redistribute claims-mcp, including commercially,
+under the terms of that license. The license grants no rights to the Hypotheosis name or
+trademarks.
