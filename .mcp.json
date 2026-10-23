@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "claims": {
+      "command": "cargo",
+      "args": ["run", "--release", "--quiet", "--", "--catalog", "claims.json"]
+    }
+  }
+}
