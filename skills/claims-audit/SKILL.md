@@ -123,6 +123,12 @@ Call `record_verdict` with `auditor` set to your model id or name:
 The server enforces that `supported` cites supporting evidence and `refuted` cites refuting
 evidence. Your `rationale` must explain *why* the cited evidence decides the claim.
 
+A `refuted` or `not_enough_info` rationale must end with `Fix: <one concrete next step>`: what
+to change, or which test or evidence would decide the claim. `next_steps` and
+`claims-mcp tldr` show the text after the last `Fix:` as the claim's next step, so make it
+specific enough to act on without rereading the rationale ("Fix: add a test that sends a
+1024-bit RSA JWK and asserts it is rejected", not "Fix: add tests").
+
 Never infer support from the absence of failure ("no errors, so it works"). Absence of
 evidence is `not_enough_info`.
 

@@ -144,6 +144,7 @@ Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
 |---|---|
 | *(none)* | Run the MCP server on stdio |
 | `verify [--json]` | Check every integrity seal; exit 1 if any check fails |
+| `tldr [--limit N] [--json]` | Print the ranked next steps; see [TL;DR of next steps](#tldr-of-next-steps) |
 | `seal --adopt` | Seal unsealed records once, to migrate a catalog (maintainers only) |
 
 ## Integrity seals
@@ -221,6 +222,34 @@ away from the file entirely, add deny rules to the project's `.claude/settings.j
 | `record_verdict` | Append a FEVER verdict; it must cite evidence that backs it |
 | `trace` | Ancestors and descendants of a claim, optionally depth-limited |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
+| `next_steps` | Ranked TL;DR: open leaf claims in priority tiers, each with one next step |
+
+## TL;DR of next steps
+
+On a large catalog, `audit_report` is too long to act on. `next_steps` (MCP) and
+`claims-mcp tldr` (CLI) list only what to do next:
+
+```bash
+claims-mcp --catalog claims.json tldr             # Markdown, 10 items per tier
+claims-mcp --catalog claims.json tldr --limit 0   # every item
+claims-mcp --catalog claims.json tldr --json      # same data as the next_steps tool
+```
+
+Only active **leaf** claims (no active children) are listed: a parent's verdict rolls up from
+its children. Open leaves are ranked into tiers:
+
+| Tier | Contents |
+|---|---|
+| 0. STOP | Shown only when the integrity check fails: restore the catalog from git first |
+| 1. Wrong | Refuted claims |
+| 2. Unproven | Other open claims at integrity level 3-4 (not_enough_info, unverified, stale, no evidence) |
+| 3. Everything else | Counts per `area:` tag |
+
+Tiers 1 and 2 are sorted by integrity level, then id. Each item shows its `issue:` tags and its next
+step: the text after the last `Fix:` in the latest verdict rationale (the `claims-audit` skill
+requires one on every `refuted` and `not_enough_info` verdict), or else the rationale's first
+sentence before the marker. Items beyond `--limit` are counted per area. The command exits 0
+whenever the catalog can be read; use `verify` to gate CI.
 
 ## Generate a PDF report
 

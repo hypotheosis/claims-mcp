@@ -17,7 +17,9 @@ The TL;DR mode turns a catalog into a short, ranked list of exact next steps.
 
 One shared function, two entry points:
 
-- `report::next_steps(catalog: &Catalog, limit: usize) -> NextSteps` in `src/report.rs`.
+- `report::next_steps::next_steps(catalog: &Catalog, limit: usize) -> NextSteps` in
+  `src/report/next_steps.rs`, a submodule of `src/report.rs` that reuses its child index and
+  its `is_stale` / `is_high_integrity` helpers.
 - **MCP tool `next_steps`** with a `limit` parameter (optional, default 10). It returns
   `NextSteps` as JSON.
 - **CLI subcommand `claims-mcp [--catalog PATH] tldr [--limit N] [--json]`**. It prints Markdown
@@ -69,8 +71,10 @@ by area name.
 
 1. The latest verdict's rationale contains `Fix:`: the text after the **last** `Fix:`, trimmed.
    If that text is empty, fall through.
-2. The latest verdict has a rationale: its first sentence (up to and including the first `. `,
-   or the whole rationale), trimmed.
+2. The latest verdict has a rationale: the first sentence (up to and including the first `. `,
+   or the whole text), trimmed, of the text before the last `Fix:` (the whole rationale when
+   there is no marker). If that is empty (for example the rationale is just `Fix:`), the step
+   is `"Rationale names no next step; read the latest verdict."`.
 3. No verdict: a fixed phrase for the gap, `"No evidence attached; gather evidence, then record a
    verdict."` or `"Evidence attached but no verdict; record one."`.
 
