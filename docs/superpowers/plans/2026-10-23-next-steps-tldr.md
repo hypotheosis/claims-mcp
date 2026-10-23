@@ -12,6 +12,13 @@
 
 **Verified:** Every code block in this plan was applied to a scratch copy of the tree at `372976e`, then formatted (`cargo fmt --check` clean), linted (`cargo clippy --all-targets -- -D warnings` clean) and tested (100 tests passing). It was also run against `bdc.json`: 1049 active claims, 32 wrong, 266 unproven, 109 other.
 
+> **Historical record.** This plan describes the code as first implemented. Review follow-ups
+> changed it afterwards (`3dd7146`, `23e157d`, and the PR #15 review round): for example,
+> `next_step` was renamed `to_next_step`, `fallback_step`, `single_line` and `plural` were
+> added, the STOP banner and README tier-0 text were reworded, and the test count grew. Treat
+> the source files, the spec and the changelog, not the code blocks below, as the description
+> of the shipped code.
+
 **Working directory:** `/home/pgrace/repos/claims-mcp/.worktrees/claims-mcp-claims-tldr` (branch `claims-mcp/claims-tldr`). `bdc.json` there is untracked. **Never `git add` it**: always add files by explicit path.
 
 ---
