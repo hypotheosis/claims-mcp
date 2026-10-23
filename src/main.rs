@@ -3,6 +3,7 @@
 mod catalog;
 mod error;
 mod model;
+mod report;
 
 use tracing_subscriber::EnvFilter;
 
