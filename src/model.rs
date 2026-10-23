@@ -336,6 +336,27 @@ pub enum ClaimStatus {
     },
 }
 
+/// Who produced a [`Seal`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SealOrigin {
+    /// The server sealed the record when a tool created or changed it.
+    Server,
+    /// `claims-mcp seal --adopt` sealed a record that had no seal (catalog migration).
+    Adopt,
+}
+
+/// Integrity seal on a catalog record: an HMAC over the record's content and its position in
+/// the catalog (see `src/seal.rs`). The origin is covered by the MAC, so relabeling an adopted
+/// record as server-sealed invalidates it.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Seal {
+    /// Who sealed the record.
+    pub by: SealOrigin,
+    /// Lower-case hex HMAC-SHA256.
+    pub mac: String,
+}
+
 /// One piece of evidence attached to a claim.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Evidence {
@@ -351,6 +372,9 @@ pub struct Evidence {
     pub stance: Stance,
     /// When it was recorded.
     pub recorded_at: DateTime<Utc>,
+    /// Integrity seal; `None` only in unsealed (schema v1) catalogs or after tampering.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seal: Option<Seal>,
 }
 
 /// One entry in a claim's append-only verdict history.
@@ -366,6 +390,9 @@ pub struct VerdictRecord {
     pub evidence_ids: Vec<EvidenceId>,
     /// When it was recorded.
     pub recorded_at: DateTime<Utc>,
+    /// Integrity seal; also chains to the previous verdict's seal.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seal: Option<Seal>,
 }
 
 /// A single atomic, falsifiable assertion and everything recorded about it.
@@ -408,6 +435,9 @@ pub struct Claim {
     pub created_at: DateTime<Utc>,
     /// When the claim last changed in any way.
     pub updated_at: DateTime<Utc>,
+    /// Integrity seal over the claim's own fields, its evidence ids, and its latest verdict.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub seal: Option<Seal>,
 }
 
 impl Claim {

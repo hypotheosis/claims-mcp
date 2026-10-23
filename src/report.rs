@@ -10,6 +10,7 @@ use crate::error::Result;
 use crate::model::{
     Claim, ClaimId, ClaimKind, ClaimLevel, CurrentVerdict, IntegrityLevel, VerificationMethod,
 };
+use crate::seal::{self, IntegrityReport};
 
 /// Counts over active claims.
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]
@@ -75,6 +76,9 @@ pub struct AuditReport {
     pub totals: Totals,
     /// Gap categories.
     pub gaps: Gaps,
+    /// Integrity seal verification. When `verified` is false the catalog was changed outside
+    /// the server, and none of the verdicts above can be trusted.
+    pub integrity: IntegrityReport,
     /// Traceability matrix, when requested.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matrix: Option<Vec<MatrixRow>>,
@@ -172,6 +176,7 @@ pub fn audit_report(catalog: &Catalog, include_matrix: bool) -> AuditReport {
     AuditReport {
         totals,
         gaps,
+        integrity: seal::verify(catalog),
         matrix,
     }
 }
@@ -510,6 +515,16 @@ mod tests {
         // directly, so paths need no lossy conversion to `String`.
         let mut catalog_input = OsString::from("catalog=");
         catalog_input.push(&catalog_path);
+        // The template cannot compute HMACs, so it takes the integrity result as an input, as
+        // `just report` passes it from `claims-mcp verify --json`.
+        let integrity_path = dir.path().join("integrity.json");
+        std::fs::write(
+            &integrity_path,
+            serde_json::to_vec(&seal::verify(catalog)).expect("serialize integrity"),
+        )
+        .expect("write integrity");
+        let mut integrity_input = OsString::from("integrity=");
+        integrity_input.push(&integrity_path);
         // `--root /` lets the template read both the repo template and the temp catalog.
         let typst = |subcommand: &str, extra: &[&OsStr]| {
             let output = Command::new("typst")
@@ -521,6 +536,7 @@ mod tests {
                 .arg(&template)
                 .args(extra)
                 .args([OsStr::new("--input"), &catalog_input])
+                .args([OsStr::new("--input"), &integrity_input])
                 .output()
                 .expect("run typst");
             let stderr = String::from_utf8_lossy(&output.stderr);

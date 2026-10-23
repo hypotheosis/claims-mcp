@@ -1,7 +1,15 @@
 {
-  "schema_version": 1,
-  "next_claim_seq": 37,
-  "next_evidence_seq": 45,
+  "schema_version": 2,
+  "next_claim_seq": 38,
+  "next_claim_seq_seal": {
+    "by": "adopt",
+    "mac": "17da0b369393860ec1b8cc3bc6612ad6bc3332c56e8b8eb720dcf80247bb1dc9"
+  },
+  "next_evidence_seq": 47,
+  "next_evidence_seq_seal": {
+    "by": "adopt",
+    "mac": "42e0f7afdb4e0ba4f33228705fd13e18d6c15c6243e1525eaa1e53d1c6775c8e"
+  },
   "claims": [
     {
       "id": "CLM-0001",
@@ -28,7 +36,11 @@
           "locator": "children: CLM-0002, CLM-0003, CLM-0004, CLM-0005, CLM-0010, CLM-0012, CLM-0014, CLM-0015, CLM-0016, CLM-0017, CLM-0019",
           "summary": "All 11 children supported. Concept coverage: stdio MCP server (0002, 0004) on rmcp (0003); JSON catalog in the repo (0005 + durability 0006-0009, 0018); traceability (0010/0011); FEVER (0012/0013); IEEE 1012 levels/methods (0014); V&V gap reporting (0015); tailored skill (0016) wired via .mcp.json (0017); spec conformance (0019).",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:52:04.867883487Z"
+          "recorded_at": "2026-10-23T12:52:04.867883487Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "3e288c9c9694105463ac9ee9e3d6b366361ff24412133c4b4e491574bbe72a04"
+          }
         }
       ],
       "verdicts": [
@@ -39,11 +51,19 @@
           "evidence_ids": [
             "EVD-0039"
           ],
-          "recorded_at": "2026-10-23T12:52:08.053225450Z"
+          "recorded_at": "2026-10-23T12:52:08.053225450Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "aa623323fa3d40b0eb42ede51d19097462d07dc177b57f082aa90bc474518928"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:52:08.053225450Z"
+      "updated_at": "2026-10-23T12:52:08.053225450Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "fca2ef9768f8d1d5ac6f25e6c37a56a9ce9c438296aba20fc48eddcd5e8ef648"
+      }
     },
     {
       "id": "CLM-0002",
@@ -72,7 +92,11 @@
           "locator": "target/release/claims-mcp driven over stdio (initialize, tools/list, 8 tools/call) in a temp dir",
           "summary": "10 stdout lines, all JSON-RPC 2.0 messages (0 non-JSON-RPC lines); 0 bytes on stderr; process exited 0 when stdin closed.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:06.981356965Z"
+          "recorded_at": "2026-10-23T12:50:06.981356965Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "7e6c233bcc0a28eb7523ac871a979f824644b023ed629455bf02d7a7dee2893c"
+          }
         },
         {
           "id": "EVD-0002",
@@ -80,7 +104,11 @@
           "locator": "src/main.rs:45-52 init_tracing",
           "summary": "tracing_subscriber fmt is configured with .with_writer(std::io::stderr) and ANSI disabled; the server is served via rmcp::transport::stdio_pipes().",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:06.996408866Z"
+          "recorded_at": "2026-10-23T12:50:06.996408866Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "13ff7fbcc05e66636880199514369bdc2e9b34b44f5d5e7691d76d26b8ff808d"
+          }
         }
       ],
       "verdicts": [
@@ -92,11 +120,19 @@
             "EVD-0001",
             "EVD-0002"
           ],
-          "recorded_at": "2026-10-23T12:51:48.665027683Z"
+          "recorded_at": "2026-10-23T12:51:48.665027683Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "7e82a2e83690b8d12ee80758253e88e34dc555c56524a787a12900d254a5dce7"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.665027683Z"
+      "updated_at": "2026-10-23T12:51:48.665027683Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "c523c5e2447e7b89b3f1e1c89897308c3a3c130babd91ba89f7960c22ac599b1"
+      }
     },
     {
       "id": "CLM-0003",
@@ -126,7 +162,11 @@
           "locator": "Cargo.toml:19; cargo tree -e normal --depth 1",
           "summary": "Cargo.toml declares rmcp 3.7.0 with features server, macros, transport-io; cargo tree resolves rmcp v3.7.0 as a direct dependency.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.003580991Z"
+          "recorded_at": "2026-10-23T12:50:07.003580991Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "df4c9dd83adbca3c0c7ea25b03cbcea1ca963f10657bbd0c11dfd2a34a0ad207"
+          }
         },
         {
           "id": "EVD-0004",
@@ -134,7 +174,11 @@
           "locator": "src/server.rs:108 #[tool_router]; 10 x #[tool(...)]; #[tool_handler(...)] impl ServerHandler",
           "summary": "The ClaimsServer impl is annotated #[tool_router] with 10 #[tool] methods, and ServerHandler is implemented via rmcp's #[tool_handler] macro.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.010290505Z"
+          "recorded_at": "2026-10-23T12:50:07.010290505Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "6d5f3785ccf4e161009e7a4ec8ce9f18697d02f3f57a661bcb3bce24e2e2d76e"
+          }
         }
       ],
       "verdicts": [
@@ -146,11 +190,19 @@
             "EVD-0003",
             "EVD-0004"
           ],
-          "recorded_at": "2026-10-23T12:51:48.681118477Z"
+          "recorded_at": "2026-10-23T12:51:48.681118477Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "13922ae0af2f770467081b0221ab49553179d5e50eff79c1e4e2401bd3f29383"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.681118477Z"
+      "updated_at": "2026-10-23T12:51:48.681118477Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "369438124f22b81339ff343986588057c8ea2f7151a563467d6af46d9f9dda1e"
+      }
     },
     {
       "id": "CLM-0004",
@@ -179,7 +231,11 @@
           "locator": "tools/list response (id 2) from target/release/claims-mcp",
           "summary": "Returned exactly: add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, record_verdict, retire_claim, trace, update_claim (10 tools); read-only hints on audit_report, get_claim, list_claims, trace.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.016569300Z"
+          "recorded_at": "2026-10-23T12:50:07.016569300Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "de4d9365d60d7524887d3bb0625b3ce2dbf99bfed8624b27dec9ea851141f223"
+          }
         }
       ],
       "verdicts": [
@@ -190,11 +246,19 @@
           "evidence_ids": [
             "EVD-0005"
           ],
-          "recorded_at": "2026-10-23T12:51:48.701270593Z"
+          "recorded_at": "2026-10-23T12:51:48.701270593Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "dcd2b4c26c975bbf39f339c63b47542072d68b9451df6cd5eaeb34d98dc34dd6"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.701270593Z"
+      "updated_at": "2026-10-23T12:51:48.701270593Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "7a3f2cb45d5569af7e58f3cc92a19e48dccf54bae4fef2151d045bdecdfed8f8"
+      }
     },
     {
       "id": "CLM-0005",
@@ -215,7 +279,9 @@
         "storage"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Superseded by CLM-0037: issue #9 moved the catalog to schema_version 2 with integrity seals, so 'schema_version 1' is no longer true. Its children now derive from CLM-0037.",
+        "retired_at": "2026-10-23T14:59:11.331477534Z"
       },
       "evidence": [
         {
@@ -224,7 +290,11 @@
           "locator": "release binary run with no --catalog in a temp dir; then with CLAIMS_CATALOG=<tmp>/env.json",
           "summary": "Without --catalog, add_claim created ./claims.json starting with \"schema_version\": 1; with CLAIMS_CATALOG set, env.json was created containing CLM-0001.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.022643994Z"
+          "recorded_at": "2026-10-23T12:50:07.022643994Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "e18a03c0e28a78f0111d312235867193df0a4a5d172396c7950ac3594780a2be"
+          }
         }
       ],
       "verdicts": [
@@ -235,11 +305,19 @@
           "evidence_ids": [
             "EVD-0006"
           ],
-          "recorded_at": "2026-10-23T12:51:48.709919625Z"
+          "recorded_at": "2026-10-23T12:51:48.709919625Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "475d3c9c686e31097255de84c8c14ed47831458f1a98e6e35dd8a3fa07ab3ee1"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.709919625Z"
+      "updated_at": "2026-10-23T14:59:11.331477534Z",
+      "seal": {
+        "by": "server",
+        "mac": "ec7589c753870a2f6110f5ff657874cc7dcf2923704d294592b96f0c567763c8"
+      }
     },
     {
       "id": "CLM-0006",
@@ -250,7 +328,7 @@
       "verification_method": "test",
       "source": "spec 5.1",
       "derived_from": [
-        "CLM-0005"
+        "CLM-0037"
       ],
       "artifacts": [
         "src/store.rs"
@@ -269,7 +347,11 @@
           "locator": "cargo test -- --exact store::tests::failed_operation_leaves_file_untouched",
           "summary": "Passes: a mutate whose closure adds a claim and then returns Err leaves the catalog file bytes equal to the pre-call bytes.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.029448919Z"
+          "recorded_at": "2026-10-23T12:50:07.029448919Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "ad09c86d0a81e632b29240f167c9c42b84a7dbe05c32c780b90f9093dd2247b3"
+          }
         }
       ],
       "verdicts": [
@@ -280,11 +362,19 @@
           "evidence_ids": [
             "EVD-0007"
           ],
-          "recorded_at": "2026-10-23T12:51:48.718054108Z"
+          "recorded_at": "2026-10-23T12:51:48.718054108Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "d461e1393f3a26daabf25b1c2631f858eb77c9ae09f1f7a92fbe6b73ab6c3670"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.718054108Z"
+      "updated_at": "2026-10-23T14:59:11.316661879Z",
+      "seal": {
+        "by": "server",
+        "mac": "5c6cf9e6cca607a64e284260080def395b7797c6ecca203a2194aa54af9bf598"
+      }
     },
     {
       "id": "CLM-0007",
@@ -295,7 +385,7 @@
       "verification_method": "test",
       "source": "spec 5.1 (lock file, re-read per call)",
       "derived_from": [
-        "CLM-0005"
+        "CLM-0037"
       ],
       "artifacts": [
         "src/store.rs"
@@ -314,7 +404,11 @@
           "locator": "cargo test -- --exact store::tests::concurrent_writers_never_lose_updates",
           "summary": "Passes (and passed 3/3 runs earlier): 4 threads, each with its own CatalogStore on the same file, 10 add_claim mutations each; final read sees 40 claims and load-time validation found no duplicate ids.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.035593073Z"
+          "recorded_at": "2026-10-23T12:50:07.035593073Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "ccae93a389afd14a69d3b7e638228321cf4403c5d0b2a763c413c24778b89966"
+          }
         }
       ],
       "verdicts": [
@@ -325,11 +419,19 @@
           "evidence_ids": [
             "EVD-0008"
           ],
-          "recorded_at": "2026-10-23T12:51:48.725128340Z"
+          "recorded_at": "2026-10-23T12:51:48.725128340Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "bec3e94c9b71f3e14b5efef5493cdc07598f2e23c92187b8f228253671452f6d"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.725128340Z"
+      "updated_at": "2026-10-23T14:59:11.319797710Z",
+      "seal": {
+        "by": "server",
+        "mac": "986673f20821b94c0557534d73ba059219d4863c991f5d09a9ae618a0bb0d494"
+      }
     },
     {
       "id": "CLM-0008",
@@ -340,7 +442,7 @@
       "verification_method": "test",
       "source": "spec 3.1 (ids never reused); final review",
       "derived_from": [
-        "CLM-0005"
+        "CLM-0037"
       ],
       "artifacts": [
         "src/store.rs",
@@ -360,7 +462,11 @@
           "locator": "cargo test -- --exact store::tests::inconsistent_catalog_is_rejected_on_load",
           "summary": "Passes: a file with next_claim_seq 1 and claim CLM-0001 makes read return ClaimsError::Validation instead of the catalog.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.041710157Z"
+          "recorded_at": "2026-10-23T12:50:07.041710157Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "140265e0c0edffc29f7ad601cff1c296ce26f88aa735fbefacc7d6ffba90962f"
+          }
         }
       ],
       "verdicts": [
@@ -371,11 +477,19 @@
           "evidence_ids": [
             "EVD-0009"
           ],
-          "recorded_at": "2026-10-23T12:51:48.731571141Z"
+          "recorded_at": "2026-10-23T12:51:48.731571141Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "000f9e2f0016107b997a5cd9708bf4d4402e2907f600cb438fe51e21565b124e"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.731571141Z"
+      "updated_at": "2026-10-23T14:59:11.322645771Z",
+      "seal": {
+        "by": "server",
+        "mac": "6cfc1e0dcd7d2336456915e19ceb664a36d9fa77bf6e03c891f691900c218386"
+      }
     },
     {
       "id": "CLM-0009",
@@ -386,7 +500,7 @@
       "verification_method": "test",
       "source": "concept.md: 'durable format'; spec 3.1 determinism",
       "derived_from": [
-        "CLM-0005"
+        "CLM-0037"
       ],
       "artifacts": [
         "src/store.rs"
@@ -405,7 +519,11 @@
           "locator": "cargo test -- --exact store::tests::output_is_deterministic_and_ends_with_newline",
           "summary": "Passes: two saves of the same catalog produce identical bytes and the last byte is a newline.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.048499272Z"
+          "recorded_at": "2026-10-23T12:50:07.048499272Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "892a2096571c26a652deb2c78b5939ad025a4060979994bdeb43a4527ba8fbed"
+          }
         }
       ],
       "verdicts": [
@@ -416,11 +534,19 @@
           "evidence_ids": [
             "EVD-0010"
           ],
-          "recorded_at": "2026-10-23T12:51:48.737863133Z"
+          "recorded_at": "2026-10-23T12:51:48.737863133Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "b3780b8e61ebbfc56ab9b5a02a9daca187272b1c914595cb33fd3f857d2852b8"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.737863133Z"
+      "updated_at": "2026-10-23T14:59:11.325546482Z",
+      "seal": {
+        "by": "server",
+        "mac": "d980f8358301c94c362e634605c6d09e172de1ddf6920ed25c6589f1fa66894a"
+      }
     },
     {
       "id": "CLM-0010",
@@ -449,7 +575,11 @@
           "locator": "cargo test -- --exact report::tests::trace_walks_both_directions_with_depth",
           "summary": "Passes: on root<-mid<-leaf, trace(mid, both) returns ancestor root and descendant leaf; trace(root, down, None) returns depths [1, 2]; max_depth 1 returns one descendant.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.054316606Z"
+          "recorded_at": "2026-10-23T12:50:07.054316606Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "1db67922a0aba8be364e68a7b148e329da9c2cc95a92f0ce19e6c4d4263f4b42"
+          }
         }
       ],
       "verdicts": [
@@ -460,11 +590,19 @@
           "evidence_ids": [
             "EVD-0011"
           ],
-          "recorded_at": "2026-10-23T12:51:59.522149644Z"
+          "recorded_at": "2026-10-23T12:51:59.522149644Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "ede9e31ed2cff128d140619717db403061915ec00a5bb704b22e0d7497b233b4"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:59.522149644Z"
+      "updated_at": "2026-10-23T12:51:59.522149644Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "376b133669f70d61ed5346d5be91d2ac50c00b41d59c1276a299a83026f297da"
+      }
     },
     {
       "id": "CLM-0011",
@@ -493,7 +631,11 @@
           "locator": "cargo test -- --exact catalog::tests::update_claim_rejects_cycles_and_self_links",
           "summary": "Passes: linking root to its own descendant and linking root to itself both return ClaimsError::Cycle.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.059717090Z"
+          "recorded_at": "2026-10-23T12:50:07.059717090Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "4067daf57de0570b95dcf2f02ae9f0ffeba79993a1ae79caa0401bee99cebd42"
+          }
         }
       ],
       "verdicts": [
@@ -504,11 +646,19 @@
           "evidence_ids": [
             "EVD-0012"
           ],
-          "recorded_at": "2026-10-23T12:51:48.744443255Z"
+          "recorded_at": "2026-10-23T12:51:48.744443255Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "fdd71f307afdb3ffbd9e8b9760a355767b7028ea90aecba8378b6a895aff0398"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.744443255Z"
+      "updated_at": "2026-10-23T12:51:48.744443255Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "056a2f19631cd3bd21d0259cdeb1b20c780f50a9f1fe2b05c9a7d52442bbf378"
+      }
     },
     {
       "id": "CLM-0012",
@@ -538,7 +688,11 @@
           "locator": "cargo test -- --exact catalog::tests::verdict_history_is_append_only model::tests::enums_use_snake_case_names",
           "summary": "Both pass: after refuted then not_enough_info, the claim holds 2 verdict records with the first still refuted; verdict labels serialize as snake_case (e.g. not_enough_info).",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.065633004Z"
+          "recorded_at": "2026-10-23T12:50:07.065633004Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "baf1fdcf0c6600925614822d79336d0c0c89e29a4add18d2023b64439530cdf9"
+          }
         }
       ],
       "verdicts": [
@@ -549,11 +703,19 @@
           "evidence_ids": [
             "EVD-0013"
           ],
-          "recorded_at": "2026-10-23T12:51:59.535858108Z"
+          "recorded_at": "2026-10-23T12:51:59.535858108Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "2da880ff64769ff3a40b78edb269338f63c4dbb93c67ecd7aa92f86e83fc2701"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:59.535858108Z"
+      "updated_at": "2026-10-23T12:51:59.535858108Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "aeef95c9803105a8bb98c81192dd7a2ca29e89a29d0782db65f1b9df51edc1fc"
+      }
     },
     {
       "id": "CLM-0013",
@@ -582,7 +744,11 @@
           "locator": "cargo test -- --exact catalog::tests::supported_verdict_requires_supporting_evidence catalog::tests::verdict_rejects_evidence_from_another_claim",
           "summary": "Both pass: 'supported' citing only neutral evidence returns Validation; citing evidence attached to a different claim returns ForeignEvidence; citing own supports evidence succeeds.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.071576448Z"
+          "recorded_at": "2026-10-23T12:50:07.071576448Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "1ff1501c46dd7cb19764e5959413909c84b1fcb21c6069ee8cdb11f4fa6e146a"
+          }
         }
       ],
       "verdicts": [
@@ -593,11 +759,19 @@
           "evidence_ids": [
             "EVD-0014"
           ],
-          "recorded_at": "2026-10-23T12:51:48.750714197Z"
+          "recorded_at": "2026-10-23T12:51:48.750714197Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "cd46ff106af45054e1261dd77bd551f0ecefef8e941f3ac80793057e2518688c"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.750714197Z"
+      "updated_at": "2026-10-23T12:51:48.750714197Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "58b426b5c2e0bdaf26638e734b919959e5eefbfd54a296245aff033c02949b03"
+      }
     },
     {
       "id": "CLM-0014",
@@ -626,7 +800,11 @@
           "locator": "cargo test -- --exact model::tests::integrity_level_rejects_out_of_range",
           "summary": "Passes: integrity levels 0 and 5 fail to deserialize, 4 succeeds. The tool schema (seen in this session) also lists verification_method values inspection, analysis, demonstration, test, formal_proof.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.077298482Z"
+          "recorded_at": "2026-10-23T12:50:07.077298482Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "64deedde140231858f680e102c6b95ae3ff89f33144d7ae6a592e61813464250"
+          }
         }
       ],
       "verdicts": [
@@ -637,11 +815,19 @@
           "evidence_ids": [
             "EVD-0015"
           ],
-          "recorded_at": "2026-10-23T12:51:48.756906468Z"
+          "recorded_at": "2026-10-23T12:51:48.756906468Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "bc134c7c1be8f9c72737106e97005cfbf583a505a53e9db315a4c864fd33f4ea"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.756906468Z"
+      "updated_at": "2026-10-23T12:51:48.756906468Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "4a7944f5c1b38f6310f45585b357dd3c5ea9347016ec8c466d40117e7855edf6"
+      }
     },
     {
       "id": "CLM-0015",
@@ -670,7 +856,11 @@
           "locator": "audit_report tool call (id 10) on release binary",
           "summary": "Response top-level keys: gaps, matrix, totals; gaps keys exactly: dangling_links, decomposition, no_evidence, not_enough_info, refuted, rigor, stale, unverified.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.082998686Z"
+          "recorded_at": "2026-10-23T12:50:07.082998686Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "4bb0a073dfc2166824526c040d6d540e04a322c5629af9437d9855ba16cc8c88"
+          }
         }
       ],
       "verdicts": [
@@ -681,11 +871,19 @@
           "evidence_ids": [
             "EVD-0016"
           ],
-          "recorded_at": "2026-10-23T12:51:48.763501210Z"
+          "recorded_at": "2026-10-23T12:51:48.763501210Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "98ff31f847d894a28ac2168410da2d0438b152819cd909629869ee0de382f9c0"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.763501210Z"
+      "updated_at": "2026-10-23T12:51:48.763501210Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "f3042094185610e74df13b8fa4915c02364d0f69936797a0c88a2cb339b27f78"
+      }
     },
     {
       "id": "CLM-0016",
@@ -714,7 +912,11 @@
           "locator": "python frontmatter parse + backticked tool-name scan of skills/claims-audit/SKILL.md",
           "summary": "Frontmatter parses with keys name (claims-audit) and description (551 chars); all 10 tool names appear in backticks; missing list is empty.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.088588550Z"
+          "recorded_at": "2026-10-23T12:50:07.088588550Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "593f3dd942a6f84f6a4d7163037794fccf55e0786b6ca8638050e0e7aee3b51b"
+          }
         }
       ],
       "verdicts": [
@@ -725,11 +927,19 @@
           "evidence_ids": [
             "EVD-0017"
           ],
-          "recorded_at": "2026-10-23T12:51:48.769726412Z"
+          "recorded_at": "2026-10-23T12:51:48.769726412Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "b298451539a2236ab1ec39cd39d77a27ccc62d59a6cf06c0d77b33c677542d00"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.769726412Z"
+      "updated_at": "2026-10-23T12:51:48.769726412Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "6614491468687668a294d50d5e5e7bad7a0683e1f76115294587e7af68138299"
+      }
     },
     {
       "id": "CLM-0017",
@@ -759,7 +969,11 @@
           "locator": ".mcp.json; this audit session's mcp__claims__* tools; ./claims.json",
           "summary": ".mcp.json defines server 'claims' running cargo run --release --quiet -- --catalog claims.json; this session loaded the mcp__claims__* tools from it and the claims registered here were written to ./claims.json in the repo root.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.093984194Z"
+          "recorded_at": "2026-10-23T12:50:07.093984194Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "39b63bafd282a6acae941c8ddab7497349bd1f021d052d740764c31b39b848c7"
+          }
         }
       ],
       "verdicts": [
@@ -770,11 +984,19 @@
           "evidence_ids": [
             "EVD-0018"
           ],
-          "recorded_at": "2026-10-23T12:51:48.777059784Z"
+          "recorded_at": "2026-10-23T12:51:48.777059784Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "83c02c7abe5183c0d79b4ce1a6ce7fd2c9aa5175510899187356f9884b6bcb05"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.777059784Z"
+      "updated_at": "2026-10-23T12:51:48.777059784Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "b026f0a6cbd4e2a2e5e917ec441e6fc8ae52e9e81d53d8a32ddf367d6f515c78"
+      }
     },
     {
       "id": "CLM-0018",
@@ -785,7 +1007,7 @@
       "verification_method": "inspection",
       "source": "spec 5.2",
       "derived_from": [
-        "CLM-0005"
+        "CLM-0037"
       ],
       "artifacts": [
         ".gitignore"
@@ -803,7 +1025,11 @@
           "locator": ".gitignore:2-3; git check-ignore -v .claims.json.lock .claims.json.tmp",
           "summary": "Both paths are matched by .gitignore lines 2 and 3; git status lists claims.json as untracked but not .claims.json.lock, which exists on disk.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:07.100669179Z"
+          "recorded_at": "2026-10-23T12:50:07.100669179Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "76c8aa72affa97c85f682c81551316c5935201cf96c9f59b2be2533f924b792a"
+          }
         }
       ],
       "verdicts": [
@@ -814,11 +1040,19 @@
           "evidence_ids": [
             "EVD-0019"
           ],
-          "recorded_at": "2026-10-23T12:51:48.784328066Z"
+          "recorded_at": "2026-10-23T12:51:48.784328066Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "b6ebd13d42533e19e1f92be27c6b0d609c0e58863c3e3462493c97eaaae1c7d2"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T12:51:48.784328066Z"
+      "updated_at": "2026-10-23T14:59:11.328653383Z",
+      "seal": {
+        "by": "server",
+        "mac": "de85fb76a57e0b9b00408c22c69af248c8f0d47b1142e92482efd020c54133f8"
+      }
     },
     {
       "id": "CLM-0019",
@@ -847,7 +1081,11 @@
           "locator": "children: CLM-0020, CLM-0021, CLM-0022, CLM-0023, CLM-0024, CLM-0025, CLM-0026, CLM-0027, CLM-0028, CLM-0029, CLM-0030, CLM-0031, CLM-0032, CLM-0033",
           "summary": "All 14 children are supported. Together they cover spec section 2 (no command execution), 3.4 rules 3/5/6, section 5 module boundaries, 5.1/6 schema and parse error handling, 5.2 template changes, 6 error mapping and no-unwrap, 9 deliverables and quality gates. Rules 1, 2, 4 and section 4/4.1 are covered under CLM-0001's children (CLM-0004, -0010/-0011, -0012/-0013, -0015).",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:51:59.542965480Z"
+          "recorded_at": "2026-10-23T12:51:59.542965480Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "4f7b22e0830f6feffcf0dbb409c929506056d753e6951f42d54affd7169b6d8d"
+          }
         },
         {
           "id": "EVD-0044",
@@ -855,7 +1093,11 @@
           "locator": "children: CLM-0021, CLM-0022, CLM-0023, CLM-0025, CLM-0026, CLM-0027, CLM-0028, CLM-0029, CLM-0030, CLM-0031, CLM-0032, CLM-0033, CLM-0035, CLM-0036",
           "summary": "After the PR #3 re-audit, CLM-0020 and CLM-0024 are retired (refuted as written because they did not exclude test code) and replaced by CLM-0035 (no command execution in non-test code, spec 2) and CLM-0036 (non-test module boundaries, spec 5). All 14 active children are supported, and spec coverage matches EVD-0038 with the replacements in place.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T13:26:50.269404776Z"
+          "recorded_at": "2026-10-23T13:26:50.269404776Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "f2d98f450c279222ea85ae4631e8499b0026b08777d194d4e3068f11c9610c33"
+          }
         }
       ],
       "verdicts": [
@@ -866,7 +1108,11 @@
           "evidence_ids": [
             "EVD-0038"
           ],
-          "recorded_at": "2026-10-23T12:52:04.854896553Z"
+          "recorded_at": "2026-10-23T12:52:04.854896553Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "95c347199a46b147a0c8a0bcbbaafcee8d4a8ecb9c5db6f2ff1b16d1dfb600b5"
+          }
         },
         {
           "verdict": "supported",
@@ -875,11 +1121,19 @@
           "evidence_ids": [
             "EVD-0044"
           ],
-          "recorded_at": "2026-10-23T13:26:53.454038289Z"
+          "recorded_at": "2026-10-23T13:26:53.454038289Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "3d877cdcd9f9583b7d173310a0f488c3e315b6b560b54e29a7c8168e9b0a1559"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:26:53.454038289Z"
+      "updated_at": "2026-10-23T13:26:53.454038289Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "a9071f1bb1f9ded7b8860017a83cc074b5188a7b2b6a365cd8cfc072276cf0e8"
+      }
     },
     {
       "id": "CLM-0020",
@@ -911,7 +1165,11 @@
           "locator": "grep -rn 'process::\\|Command\\|tokio::process\\|spawn(' src/",
           "summary": "Only 2 matches: src/main.rs:42 std::process::exit(1) on startup failure, and src/store.rs:328 std::thread::spawn inside the #[cfg(test)] contention test. No Command, tokio::process, or process spawning anywhere in src/.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.051156405Z"
+          "recorded_at": "2026-10-23T12:50:55.051156405Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "69a18eb74676c0ee7b54258ada31e4560501ebc765bc5cd93380beb19a56ed22"
+          }
         },
         {
           "id": "EVD-0040",
@@ -919,7 +1177,11 @@
           "locator": "grep -rn 'process::\\|Command\\|tokio::process\\|spawn(' src/ (PR #3 head); src/report.rs:325, :489, :511",
           "summary": "src/report.rs:325 imports std::process::Command and :489/:511 call Command::new(\"typst\") inside the #[cfg(test)] Typst template tests added by PR #3. The statement covers all of src/ with no test-code exclusion, so it no longer holds as written. Non-test code is unaffected.",
           "stance": "refutes",
-          "recorded_at": "2026-10-23T13:26:24.436300555Z"
+          "recorded_at": "2026-10-23T13:26:24.436300555Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "a35c2c263d5fea8186ece3ced3ae5ba5cb0b1051578c9339fb5201d7bd1d47a2"
+          }
         }
       ],
       "verdicts": [
@@ -930,7 +1192,11 @@
           "evidence_ids": [
             "EVD-0020"
           ],
-          "recorded_at": "2026-10-23T12:51:48.790300588Z"
+          "recorded_at": "2026-10-23T12:51:48.790300588Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "20119c4dba247bf0393983c141c9681a8ae1249c57b09f1083dca39d19ca5388"
+          }
         },
         {
           "verdict": "refuted",
@@ -939,11 +1205,19 @@
           "evidence_ids": [
             "EVD-0040"
           ],
-          "recorded_at": "2026-10-23T13:26:29.585873453Z"
+          "recorded_at": "2026-10-23T13:26:29.585873453Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "bcd38f76f91e84cd3e7ef8b7c8b93c4c5f7b72b1b99e55aa6f796f8bab2474e1"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:26:45.620567306Z"
+      "updated_at": "2026-10-23T13:26:45.620567306Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "21105840784cd98088ee98ceb7a844d9ecb2317287d370a8ac6a8d30c06c8dc2"
+      }
     },
     {
       "id": "CLM-0021",
@@ -972,7 +1246,11 @@
           "locator": "cargo test -- --exact catalog::tests::retired_claims_reject_changes_and_ids_are_not_reused",
           "summary": "Passes, but only asserts add_evidence and update_claim return Retired on a retired claim; record_verdict on a retired claim is not exercised by this test.",
           "stance": "neutral",
-          "recorded_at": "2026-10-23T12:50:55.065198265Z"
+          "recorded_at": "2026-10-23T12:50:55.065198265Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "51e2c164543d95e281e834b0863556211ecd5ef9d6a9e73d1cca0d899c9192ca"
+          }
         },
         {
           "id": "EVD-0022",
@@ -980,7 +1258,11 @@
           "locator": "release binary: retire_claim CLM-0001 then record_verdict (id 6), add_evidence (id 7), update_claim (id 8)",
           "summary": "All three calls on the retired claim returned isError=true with text 'claim CLM-0001 is retired'.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.079727775Z"
+          "recorded_at": "2026-10-23T12:50:55.079727775Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "1769d273e2ee68c7247ebd563aedbf997b029e9f5ca34572d427b8c836f301dd"
+          }
         }
       ],
       "verdicts": [
@@ -992,11 +1274,19 @@
             "EVD-0021",
             "EVD-0022"
           ],
-          "recorded_at": "2026-10-23T12:51:48.796527609Z"
+          "recorded_at": "2026-10-23T12:51:48.796527609Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "97a3b21c333c1b26536faeade12cc833dc571f9b6e4540ad703d69b8558dd0a5"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.796527609Z"
+      "updated_at": "2026-10-23T12:51:48.796527609Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "76caa88f7d556fca5ef318088d58dd474118d05071e6a9e9e769d606c21530cd"
+      }
     },
     {
       "id": "CLM-0022",
@@ -1025,7 +1315,11 @@
           "locator": "cargo test -- --exact catalog::tests::add_claim_rejects_empty_statement_and_batch_refs catalog::tests::add_claim_assigns_sequential_ids_and_cleans_input",
           "summary": "Both pass: a whitespace-only statement returns Validation; tags [\"a\",\" a \",\"\",\"b\"] are stored as [\"a\",\"b\"]. Artifacts go through the same clean_list helper (src/catalog.rs:405-406), though only tags are asserted.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.091225003Z"
+          "recorded_at": "2026-10-23T12:50:55.091225003Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "84bf4847503ffa04c5d742043d6cd68375c898e28e3da495ecf0e6ed3d53f919"
+          }
         }
       ],
       "verdicts": [
@@ -1036,11 +1330,19 @@
           "evidence_ids": [
             "EVD-0023"
           ],
-          "recorded_at": "2026-10-23T12:51:48.803363391Z"
+          "recorded_at": "2026-10-23T12:51:48.803363391Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "d3010085c5240227dffae36ccaffb521db0a975a406aec33d3d3437984223f82"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.803363391Z"
+      "updated_at": "2026-10-23T12:51:48.803363391Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "f8460c002a8dcbfb3eb8571d0884b5de7fa07a661899430464fa00fed1cde16e"
+      }
     },
     {
       "id": "CLM-0023",
@@ -1069,7 +1371,11 @@
           "locator": "cargo test -- --exact catalog::tests::add_claims_is_all_or_nothing catalog::tests::add_claims_resolves_batch_refs",
           "summary": "Both pass: a batch whose entry 1 references @1 (not earlier) fails with Validation and the catalog equals its prior state; @0 from entry 1 resolves to the batch's first new id.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.098746278Z"
+          "recorded_at": "2026-10-23T12:50:55.098746278Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "537a2dcf2d10557c8ed0da4d74c24d3b24d46f76e174fe8731cd82273d5e940a"
+          }
         }
       ],
       "verdicts": [
@@ -1080,11 +1386,19 @@
           "evidence_ids": [
             "EVD-0024"
           ],
-          "recorded_at": "2026-10-23T12:51:48.809089563Z"
+          "recorded_at": "2026-10-23T12:51:48.809089563Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "4800581da2b15614f64c7107e401d4932f4e63ca75ccf7ba1cf416af55a4de95"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.809089563Z"
+      "updated_at": "2026-10-23T12:51:48.809089563Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "7f7455215b5793eab35868451d10b07144389b3da7fb8664cba5a9ad7d443132"
+      }
     },
     {
       "id": "CLM-0024",
@@ -1116,7 +1430,11 @@
           "locator": "per-file grep counts of std::fs|fs::|File:: and rmcp in src/*.rs",
           "summary": "Filesystem references: store.rs 14, every other file 0. rmcp references: server.rs 5, main.rs 2 (ServiceExt and stdio_pipes), every other file 0.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.107674825Z"
+          "recorded_at": "2026-10-23T12:50:55.107674825Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "56e819d9d43d17bea1da22f60c25d7d142bd443490ba2a6822d6cef6a419b53e"
+          }
         },
         {
           "id": "EVD-0041",
@@ -1124,7 +1442,11 @@
           "locator": "per-file grep -c 'std::fs\\|fs::\\|File::' src/*.rs (PR #3 head); src/report.rs std::fs::write and std::fs::read in mod tests",
           "summary": "Filesystem references: store.rs 14, report.rs 2, every other file 0. The report.rs hits are std::fs::write (temp catalog) and std::fs::read (claims.json) in the #[cfg(test)] Typst template tests added by PR #3. The statement has no test-code exclusion, so 'only store.rs touches the filesystem' no longer holds as written. Non-test code is unaffected.",
           "stance": "refutes",
-          "recorded_at": "2026-10-23T13:26:24.481175449Z"
+          "recorded_at": "2026-10-23T13:26:24.481175449Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "9847815d361fc0fe885a6fe6016fb4dd5d974a02b3e3f9d3b3cd0858b2d827e5"
+          }
         }
       ],
       "verdicts": [
@@ -1135,7 +1457,11 @@
           "evidence_ids": [
             "EVD-0025"
           ],
-          "recorded_at": "2026-10-23T12:51:48.815012925Z"
+          "recorded_at": "2026-10-23T12:51:48.815012925Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "a555f4cf345cb021f975deb464359861e6efe2ba179d42d8c2d0c863b605645e"
+          }
         },
         {
           "verdict": "refuted",
@@ -1144,11 +1470,19 @@
           "evidence_ids": [
             "EVD-0041"
           ],
-          "recorded_at": "2026-10-23T13:26:29.598448617Z"
+          "recorded_at": "2026-10-23T13:26:29.598448617Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "532826c102fdda73809e0f9c9f4d0b2ebb402af5e4cf08f9d964c09e553fae3a"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:26:45.658242907Z"
+      "updated_at": "2026-10-23T13:26:45.658242907Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "e01b972cc1153ab4add3a6d007c35f151a0fc2199a2d7155f3cdec086f1f8fcb"
+      }
     },
     {
       "id": "CLM-0025",
@@ -1178,7 +1512,11 @@
           "locator": "release binary --catalog v2.json (schema_version 2) + add_claim; sha256sum before/after",
           "summary": "add_claim returned isError=true 'catalog v2.json has schema_version 2; this server supports 1'; the file's sha256 was unchanged afterwards.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.116190611Z"
+          "recorded_at": "2026-10-23T12:50:55.116190611Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "21209dd8c1a2965818a71ab0dc2592bf8e4bb94f6ad07c05415e5c8018b2ff49"
+          }
         },
         {
           "id": "EVD-0027",
@@ -1186,7 +1524,11 @@
           "locator": "cargo test -- --exact store::tests::unsupported_schema_version_is_rejected",
           "summary": "Passes: reading a schema_version 2 file returns UnsupportedSchema{found: 2}. The test exercises read only, not mutate.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.125040687Z"
+          "recorded_at": "2026-10-23T12:50:55.125040687Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "5786a6cbeb951d9b53e0e3aed97726ea962018bba7885c11187fd52c4e5f816c"
+          }
         }
       ],
       "verdicts": [
@@ -1198,11 +1540,19 @@
             "EVD-0026",
             "EVD-0027"
           ],
-          "recorded_at": "2026-10-23T12:51:48.820795666Z"
+          "recorded_at": "2026-10-23T12:51:48.820795666Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "a8b4e4508f894215c8f3e16bf3ac19afa952b0b9dc663e9aa35b1dd3375e7ebc"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.820795666Z"
+      "updated_at": "2026-10-23T12:51:48.820795666Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "7486f32e6cac218e4f029bcf5e1952bf05021db8b5be724902da01eddaac3600"
+      }
     },
     {
       "id": "CLM-0026",
@@ -1232,7 +1582,11 @@
           "locator": "release binary responses ids 6, 7, 8, 9",
           "summary": "Each domain failure (retired claim x3, 'claim CLM-0099 not found') came back as a normal result with isError=true and the Display text; no JSON-RPC error objects were returned.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.132086572Z"
+          "recorded_at": "2026-10-23T12:50:55.132086572Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "e5a2d7d37b204a523b4ad31821b9493c8aa0672c170b0772953827b3796e5fad"
+          }
         }
       ],
       "verdicts": [
@@ -1243,11 +1597,19 @@
           "evidence_ids": [
             "EVD-0028"
           ],
-          "recorded_at": "2026-10-23T12:51:48.826746828Z"
+          "recorded_at": "2026-10-23T12:51:48.826746828Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "7002c2fbfa909b4801853b59ad753dc837e766e466e6d06dfd91e9c66050f3a6"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.826746828Z"
+      "updated_at": "2026-10-23T12:51:48.826746828Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "f4c23038844830186d10688f286c3c835402aae5dd51f0f5a69346fe67256947"
+      }
     },
     {
       "id": "CLM-0027",
@@ -1278,7 +1640,11 @@
           "locator": "release binary --catalog bad.json (invalid JSON) + list_claims",
           "summary": "Returned isError=true: 'catalog bad.json is not a valid claims catalog: key must be a string at line 2 column 3' (path plus line/column).",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.138254446Z"
+          "recorded_at": "2026-10-23T12:50:55.138254446Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "ddfda8887518f8482237aea7db0519b8305465818dd8b6dfa96e93d1f2b3f61a"
+          }
         }
       ],
       "verdicts": [
@@ -1289,11 +1655,19 @@
           "evidence_ids": [
             "EVD-0029"
           ],
-          "recorded_at": "2026-10-23T12:51:48.832912429Z"
+          "recorded_at": "2026-10-23T12:51:48.832912429Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "6e98d8f6e3a60fc75ef047b478cc361f9b31d51aad0048c193b432578f837044"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.832912429Z"
+      "updated_at": "2026-10-23T12:51:48.832912429Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "1b0ef5436fa708debe794cf552fe7569fc4f88ebb9b45f5c456d0a2a585ce432"
+      }
     },
     {
       "id": "CLM-0028",
@@ -1323,7 +1697,11 @@
           "locator": "grep -rn '\\.unwrap()' src/",
           "summary": "No matches anywhere in src/, test code included.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.144425370Z"
+          "recorded_at": "2026-10-23T12:50:55.144425370Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "ea7b61334e8f71f7b7a7082bc104b15450cd48aea398a452e65eb4d70b611a31"
+          }
         }
       ],
       "verdicts": [
@@ -1334,11 +1712,19 @@
           "evidence_ids": [
             "EVD-0030"
           ],
-          "recorded_at": "2026-10-23T12:51:48.838612701Z"
+          "recorded_at": "2026-10-23T12:51:48.838612701Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "0e98ec213a05663e1678ef3d2dafdf48f099eacb1b01229acc27ae1bba62d39f"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.838612701Z"
+      "updated_at": "2026-10-23T12:51:48.838612701Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "40423062151d15d609b72b9c8c12934030452b2622487aff6b4d8234d132eb5a"
+      }
     },
     {
       "id": "CLM-0029",
@@ -1369,7 +1755,11 @@
           "locator": "Cargo.toml; ls .cargo; src/main.rs:37",
           "summary": "Cargo.toml has no console-subscriber, ctrlc, lazy_static, dotenv, or tracing-log entries; .cargo/ (which held the tokio_unstable rustflag) no longer exists; dotenvy 0.15.7 is declared and main.rs calls dotenvy::dotenv().",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.160176081Z"
+          "recorded_at": "2026-10-23T12:50:55.160176081Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "e82cd2fb898d8d3ea645d80f423fe1c9e51b28e6cfae42ed01e640fb70c4b5fc"
+          }
         }
       ],
       "verdicts": [
@@ -1380,11 +1770,19 @@
           "evidence_ids": [
             "EVD-0031"
           ],
-          "recorded_at": "2026-10-23T12:51:48.844820483Z"
+          "recorded_at": "2026-10-23T12:51:48.844820483Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "698d132d47fa8903a9ef69d3f4eac64851182aa67c802d71bb18b67f2f8c3158"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.844820483Z"
+      "updated_at": "2026-10-23T12:51:48.844820483Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "9f6e698698ac87b44de2d0e1114716905fd733da27f3840a0b89159469d97bc0"
+      }
     },
     {
       "id": "CLM-0030",
@@ -1414,7 +1812,11 @@
           "locator": "cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test",
           "summary": "fmt exited 0 with no diff; clippy finished with no warnings or errors; cargo test: 56 passed, 0 failed.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.167506837Z"
+          "recorded_at": "2026-10-23T12:50:55.167506837Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "6cfb61b732d2a520790ffb806b254275a19de1086134b5d076785b06889b3407"
+          }
         }
       ],
       "verdicts": [
@@ -1425,11 +1827,19 @@
           "evidence_ids": [
             "EVD-0032"
           ],
-          "recorded_at": "2026-10-23T12:51:48.850735794Z"
+          "recorded_at": "2026-10-23T12:51:48.850735794Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "8bf1294b8ed7f7bbcb590b2236703b5736d75fe86c262ee6e9849bc2d6370fc5"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.850735794Z"
+      "updated_at": "2026-10-23T12:51:48.850735794Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "d08f6d7fe5312ca8427b4f78d98d160cd707e6100e254097a35749a3e387a325"
+      }
     },
     {
       "id": "CLM-0031",
@@ -1459,7 +1869,11 @@
           "locator": "python scan of src/*.rs non-test pub items for a preceding /// line",
           "summary": "Flagged 5 items (model.rs:44 macro pub struct $name, ClaimKind, ClaimLevel, VerificationMethod, CurrentVerdict); manual reading shows all 5 have doc comments separated by multi-line #[derive(...)] attributes, and $name receives its docs via $(#[$meta])* from documented invocations. The scan's flags are false positives.",
           "stance": "neutral",
-          "recorded_at": "2026-10-23T12:50:55.173507521Z"
+          "recorded_at": "2026-10-23T12:50:55.173507521Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "fd6e80fba4aee8cac3541e2e9b791b656bc500f4b42cf351465b6af6fade5cb1"
+          }
         },
         {
           "id": "EVD-0034",
@@ -1467,7 +1881,11 @@
           "locator": "RUSTDOCFLAGS='-W missing_docs' cargo doc --no-deps --document-private-items",
           "summary": "0 'missing documentation' warnings.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.179050685Z"
+          "recorded_at": "2026-10-23T12:50:55.179050685Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "89a18d8b3e169f651d1f8b252f6d7d94e0a48537b18d1d3548ecb6d81b6e7573"
+          }
         }
       ],
       "verdicts": [
@@ -1479,11 +1897,19 @@
             "EVD-0033",
             "EVD-0034"
           ],
-          "recorded_at": "2026-10-23T12:51:48.856577686Z"
+          "recorded_at": "2026-10-23T12:51:48.856577686Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "c0e258855f2a0daca60731c72e027219f8b3b001b61b1f5f594477611a0a3111"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.856577686Z"
+      "updated_at": "2026-10-23T12:51:48.856577686Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "29a4f59ca5b99d477dac26056584861503f559a2325a019d362594b50b02abea"
+      }
     },
     {
       "id": "CLM-0032",
@@ -1513,7 +1939,11 @@
           "locator": "README.md sections Build (l.21), Run (l.27, CLAIMS_CATALOG table l.35), Tools (l.68), Install the skill (l.59-63)",
           "summary": "README has Build with cargo build --release, a configuration table (--catalog, CLAIMS_CATALOG, RUST_LOG), a 10-row tool table, and 'cp -r skills/claims-audit ~/.claude/skills/'.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.184866159Z"
+          "recorded_at": "2026-10-23T12:50:55.184866159Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "39bfaaf2b649c1e6d216264f964102dcee0f954aa02b2af9c826daa7bb1d6e9b"
+          }
         }
       ],
       "verdicts": [
@@ -1524,11 +1954,19 @@
           "evidence_ids": [
             "EVD-0035"
           ],
-          "recorded_at": "2026-10-23T12:51:48.862563648Z"
+          "recorded_at": "2026-10-23T12:51:48.862563648Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "538be8ec8867cf69de4d814e58e6f8033735edad0f1a19ab3185dd83564e2ba3"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.862563648Z"
+      "updated_at": "2026-10-23T12:51:48.862563648Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "e2f24329b26c4ef178e029af53d17cac7a68b68e4cd544a135d8a48402dd74c4"
+      }
     },
     {
       "id": "CLM-0033",
@@ -1558,7 +1996,11 @@
           "locator": "ls changelog/",
           "summary": "Two entries: 2026-10-23T12-39-45Z.md and 2026-10-23T12-44-33Z.md.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T12:50:55.190521693Z"
+          "recorded_at": "2026-10-23T12:50:55.190521693Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "f0ad125e67039617cc8e2b66e71383519ac5e1a56ac9416c54e50205f9487367"
+          }
         }
       ],
       "verdicts": [
@@ -1569,11 +2011,19 @@
           "evidence_ids": [
             "EVD-0036"
           ],
-          "recorded_at": "2026-10-23T12:51:48.868489289Z"
+          "recorded_at": "2026-10-23T12:51:48.868489289Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "3ab6ba61a204c9886063ed44dc6376c62f5d522afd6f2e62fe39be361a2ce291"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T12:51:48.868489289Z"
+      "updated_at": "2026-10-23T12:51:48.868489289Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "2e79c67f1d5c6d723f95f847b6d31ddd1dc81ad2cdc7df25dd7bc0ce949e8467"
+      }
     },
     {
       "id": "CLM-0034",
@@ -1603,7 +2053,11 @@
           "locator": "python: plan rust code blocks reassembled per module vs src/*.rs; plan 'N passed' strings vs cargo test",
           "summary": "Only main.rs matches the plan; error.rs, model.rs, catalog.rs, report.rs, store.rs, server.rs all differ (post-review fixes were never back-ported). The plan's only expected test count is 46; cargo test reports 56.",
           "stance": "refutes",
-          "recorded_at": "2026-10-23T12:50:55.196122367Z"
+          "recorded_at": "2026-10-23T12:50:55.196122367Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "fb3f5d1fd05bc97a045647644d6b5edb4b1a7686f47f02b728f8f0e917061689"
+          }
         }
       ],
       "verdicts": [
@@ -1614,11 +2068,19 @@
           "evidence_ids": [
             "EVD-0037"
           ],
-          "recorded_at": "2026-10-23T12:51:48.874207141Z"
+          "recorded_at": "2026-10-23T12:51:48.874207141Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "f8c49306ac383a909c756fcf852d6e23989253721438b6de41c6fc773b989071"
+          }
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T13:01:09.126348384Z"
+      "updated_at": "2026-10-23T13:01:09.126348384Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "ce0f1a0f7afab41074c271f4d56946b6bf19f4dc7498383e9feaa6d6f40eb661"
+      }
     },
     {
       "id": "CLM-0035",
@@ -1648,7 +2110,11 @@
           "locator": "for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print FILENAME\":\"FNR\": \"$0}' $f; done | grep 'process::\\|Command\\|tokio::process\\|spawn('",
           "summary": "Each src/*.rs file has exactly one #[cfg(test)], opening a trailing mod tests that runs to end of file with no top-level items after it, so the awk cut keeps exactly the non-test code. Only 2 matches remain: main.rs:20 doc comment 'Command-line options.' and main.rs:42 std::process::exit(1) on startup failure. No Command::new, tokio::process, or process spawning in non-test code.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T13:26:39.640152355Z"
+          "recorded_at": "2026-10-23T13:26:39.640152355Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "a88bdf86e187b7f46708e24ac9a544bdb4ebf5723ca15d0b31596496b4b87a89"
+          }
         }
       ],
       "verdicts": [
@@ -1659,11 +2125,19 @@
           "evidence_ids": [
             "EVD-0042"
           ],
-          "recorded_at": "2026-10-23T13:26:45.599814100Z"
+          "recorded_at": "2026-10-23T13:26:45.599814100Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "694f0862d465ec7020f43fc7220d6d56287150a87d739580768222605e62ec4c"
+          }
         }
       ],
       "created_at": "2026-10-23T13:26:33.528029393Z",
-      "updated_at": "2026-10-23T13:26:45.599814100Z"
+      "updated_at": "2026-10-23T13:26:45.599814100Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "dbdb72ad91e056284409816817b13504d30c44d450943575bc81f1ac26dbb8ba"
+      }
     },
     {
       "id": "CLM-0036",
@@ -1693,7 +2167,11 @@
           "locator": "for f in src/*.rs; do awk '/^#\\[cfg\\(test\\)\\]/{exit} {print}' $f | grep -c 'std::fs\\|fs::\\|File::'; ... | grep -c rmcp; done",
           "summary": "Over non-test code only (each file cut at its single trailing #[cfg(test)] mod tests): filesystem references store.rs 7, every other file 0 (report.rs 0); rmcp references server.rs 5, main.rs 2, every other file 0.",
           "stance": "supports",
-          "recorded_at": "2026-10-23T13:26:39.651851628Z"
+          "recorded_at": "2026-10-23T13:26:39.651851628Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "1ab87009a1a502d4aa4423c39cd8383e4cb5deab702fe89d15852465a3d7c8a5"
+          }
         }
       ],
       "verdicts": [
@@ -1704,11 +2182,92 @@
           "evidence_ids": [
             "EVD-0043"
           ],
-          "recorded_at": "2026-10-23T13:26:45.613469604Z"
+          "recorded_at": "2026-10-23T13:26:45.613469604Z",
+          "seal": {
+            "by": "adopt",
+            "mac": "97fb23ace03623b7d94e63383fe4cc948b84c9da8771ea37055b12ca3506cb8e"
+          }
         }
       ],
       "created_at": "2026-10-23T13:26:33.528029393Z",
-      "updated_at": "2026-10-23T13:26:45.613469604Z"
+      "updated_at": "2026-10-23T13:26:45.613469604Z",
+      "seal": {
+        "by": "adopt",
+        "mac": "fc464f7c6b5e354ee31f8ad99ab076b662e4dc6c1e62d85ab3bb9eb577059d1d"
+      }
+    },
+    {
+      "id": "CLM-0037",
+      "statement": "The catalog is persisted as a JSON document with schema_version 2, every record carrying an HMAC integrity seal, at the --catalog path (default claims.json, env CLAIMS_CATALOG); a schema_version 1 catalog is still read but refuses writes until migrated with `claims-mcp seal --adopt`",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "concept.md: 'stored as a json file in the repo'; spec 3.1, 5; issue #9",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/main.rs",
+        "src/store.rs",
+        "src/seal.rs"
+      ],
+      "tags": [
+        "storage",
+        "integrity",
+        "issue:9"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0045",
+          "kind": "demonstration",
+          "locator": "release binary over MCP stdio in a temp dir: add_claim with --catalog claims.json; then with no --catalog and CLAIMS_CATALOG=<tmp>/env.json; then add_claim on a copy rewritten to schema_version 1",
+          "summary": "claims.json and env.json were created starting with \"schema_version\": 2 and a catalog seal {by: server, mac: ...}, and `claims-mcp verify` reported each as verified (2 records). On the schema_version 1 copy, add_claim returned isError with 'uses schema_version 1 ... must migrate it once with `claims-mcp --catalog v1.json seal --adopt`'.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T14:59:11.307476186Z",
+          "seal": {
+            "by": "server",
+            "mac": "9dc1a2d2deaccae46a7b26f8c9386a8ad6ccebab5e7f859e209383a82408b092"
+          }
+        },
+        {
+          "id": "EVD-0046",
+          "kind": "test",
+          "locator": "cargo test store::tests::writes_are_sealed_and_verify store::tests::adopt_migrates_a_v1_file_and_unblocks_writes",
+          "summary": "Both pass: a write produces a schema_version 2 file whose seals verify; a schema_version 1 file refuses writes with UnsealedCatalog, seal --adopt seals CLM-0001 and the catalog header, and writes then succeed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T14:59:11.310413717Z",
+          "seal": {
+            "by": "server",
+            "mac": "96409dd0c673ac7282646a5e450953651d989461f98326f2b97f8c880ba47a21"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The release binary writes sealed schema_version 2 catalogs at both the --catalog and CLAIMS_CATALOG paths, and refuses writes to a schema_version 1 catalog with a migration instruction; the store tests confirm the same behavior.",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0045",
+            "EVD-0046"
+          ],
+          "recorded_at": "2026-10-23T14:59:11.313435818Z",
+          "seal": {
+            "by": "server",
+            "mac": "b34a93714b42c5b71dfc0dd845360a28a0ead3d374e2a99e8a8780a06fc1c090"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T14:59:11.304195025Z",
+      "updated_at": "2026-10-23T14:59:11.313435818Z",
+      "seal": {
+        "by": "server",
+        "mac": "55dfab5b08312dac18fd5908988a9ff886af83ebd43d931a7d7b5fa7de703ccc"
+      }
     }
   ]
 }

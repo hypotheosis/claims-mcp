@@ -247,8 +247,8 @@ impl ClaimsServer {
         annotations(read_only_hint = true),
         description = "Audit report over active claims: totals by verdict, kind, level, and \
         integrity level; gaps (no_evidence, unverified, refuted, not_enough_info, stale, \
-        rigor, decomposition, dangling_links); and a traceability matrix unless \
-        include_matrix is false."
+        rigor, decomposition, dangling_links); integrity seal verification (records changed \
+        outside the server); and a traceability matrix unless include_matrix is false."
     )]
     async fn audit_report(&self, Parameters(params): Parameters<AuditReportParams>) -> ToolResult {
         let include_matrix = params.include_matrix;
@@ -265,7 +265,9 @@ impl ClaimsServer {
     name = "claims-mcp",
     instructions = "Ledger of claims for requirements traceability, IEEE 1012 V&V, and \
         FEVER-style auditing. Register atomic claims, attach evidence you gathered yourself, \
-        then record verdicts backed by that evidence. Use audit_report to find gaps."
+        then record verdicts backed by that evidence. Use audit_report to find gaps. Never edit \
+        the catalog file directly: every record is sealed, and the server refuses all writes \
+        after a hand edit until the file is restored from git."
 )]
 impl ServerHandler for ClaimsServer {}
 
@@ -427,6 +429,48 @@ mod tests {
         assert_eq!(report["totals"]["by_verdict"]["supported"], 1);
         assert_eq!(report["gaps"]["unverified"][0], "CLM-0001");
         assert_eq!(report["matrix"].as_array().map(Vec::len), Some(2));
+        assert_eq!(report["integrity"]["verified"], true);
+    }
+
+    #[tokio::test]
+    async fn hand_edited_catalog_turns_writes_into_explained_tool_errors() {
+        let (directory, server) = server();
+        server
+            .add_claim(Parameters(claim_input("original", Vec::new())))
+            .await
+            .expect("add_claim");
+        let path = directory.path().join("claims.json");
+        let text = std::fs::read_to_string(&path).expect("read catalog");
+        std::fs::write(&path, text.replace("original", "edited")).expect("write catalog");
+
+        let refused = server
+            .retire_claim(Parameters(RetireClaimParams {
+                id: ClaimId::new(1),
+                reason: "cover it up".to_owned(),
+            }))
+            .await
+            .expect("tool errors are Ok results");
+        assert_eq!(refused.is_error, Some(true));
+        let message = text_of(&refused);
+        for expected in [
+            "changed outside claims-mcp",
+            "CLM-0001",
+            "git checkout",
+            "Never edit",
+        ] {
+            assert!(
+                message.contains(expected),
+                "{expected:?} missing from: {message}"
+            );
+        }
+
+        let report = server
+            .audit_report(Parameters(AuditReportParams {
+                include_matrix: false,
+            }))
+            .await
+            .expect("audit_report");
+        assert_eq!(json_of(&report)["integrity"]["verified"], false);
     }
 
     #[tokio::test]

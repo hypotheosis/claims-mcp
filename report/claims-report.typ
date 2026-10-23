@@ -2,10 +2,13 @@
 //
 //   typst compile --root . report/claims-report.typ audit.pdf \
 //     --input catalog=claims.json --input commit=$(git rev-parse --short HEAD) \
-//     --input notes=report/audit-notes.toml
+//     --input notes=report/audit-notes.toml --input integrity=target/integrity.json
 //
 // Inputs (all optional):
 //   catalog     catalog path, relative to --root (default claims.json)
+//   integrity   output of `claims-mcp verify --json` for that catalog, relative to --root.
+//               Typst cannot check HMAC seals itself; without this input the report says
+//               integrity was not checked.
 //   commit      catalog commit shown on the cover and in the reproduce section; a "-dirty"
 //               suffix (git describe --dirty) marks uncommitted changes
 //   notes       TOML sidecar: artifact, version, repository, method, assessment, [[points]]
@@ -14,8 +17,9 @@
 //               override the matching sidecar keys
 //
 // Gap rules follow spec section 4.1 exactly, as in src/report.rs. The computed totals, gaps,
-// and matrix are exposed as <audit-report> metadata so `typst query` can be compared with
-// `audit_report`; see the `typst_template` tests in src/report.rs.
+// and matrix, plus the integrity input, are exposed as <audit-report> metadata so
+// `typst query` can be compared with `audit_report`; see the `typst_template` tests in
+// src/report.rs.
 
 // ---------------------------------------------------------------------------------------------
 // Inputs
@@ -29,6 +33,9 @@
 #let catalog-path = inputs.at("catalog", default: "claims.json")
 #let catalog = json(rooted(catalog-path))
 #let notes = if "notes" in inputs { toml(rooted(inputs.notes)) } else { (:) }
+// `verified`, `records`, `problems` (record, problem), `adopted`; none when not checked.
+#let seal-check = if "integrity" in inputs { json(rooted(inputs.integrity)) } else { none }
+#let tampered = seal-check != none and not seal-check.verified
 #let setting(key, default) = inputs.at(key, default: notes.at(key, default: default))
 
 #let artifact = setting("artifact", "unnamed artifact")
@@ -156,7 +163,7 @@
   current_verdict: current-verdict(claim),
 ))
 
-#metadata((totals: totals, gaps: gaps, matrix: matrix)) <audit-report>
+#metadata((totals: totals, gaps: gaps, integrity: seal-check, matrix: matrix)) <audit-report>
 
 // ---------------------------------------------------------------------------------------------
 // Presentation helpers
@@ -220,6 +227,15 @@
 
 #let auditors = claims.map(claim => claim.verdicts.map(record => record.auditor)).flatten().dedup()
 
+#let integrity-status() = if seal-check == none {
+  [not checked]
+} else if seal-check.verified {
+  [verified (#seal-check.records records)]
+} else {
+  let count = seal-check.problems.len()
+  strong[FAILED (#count #if count == 1 [problem] else [problems])]
+}
+
 #let cover() = {
   set align(center)
   v(4cm)
@@ -235,12 +251,22 @@
     ([Auditors], if auditors.len() == 0 { [none recorded] } else { auditors.join(", ") }),
     ([Method], raw(method)),
     ([Claims], [#active.len() active, #retired.len() retired]),
+    ([Integrity], integrity-status()),
   ))
   pagebreak()
 }
 
 #let section-result() = {
   heading[Result]
+  if tampered {
+    block(width: 100%, fill: rgb("#f3d0d0"), stroke: 0.8pt + luma(60), inset: 8pt, radius: 3pt)[
+      *INTEGRITY CHECK FAILED.* The catalog was changed outside claims-mcp (see the Integrity
+      section). Its verdicts and evidence cannot be trusted, so this report is not a clean
+      result.
+    ]
+  } else if seal-check == none {
+    par(emph[Integrity seals were not checked. Render with `just report` to include them.])
+  }
   let evidence = active.map(claim => claim.evidence).flatten()
   let stances = count-by(evidence, item => item.stance)
   grid(
@@ -310,6 +336,30 @@
       )
     }
   })
+}
+
+#let section-integrity() = {
+  heading[Integrity]
+  [claims-mcp seals every claim, evidence item, and verdict when a tool records it. A record
+    whose seal fails was changed outside the server.]
+  if seal-check == none {
+    par(emph[Not checked: no `integrity` input was given.])
+    return
+  }
+  if seal-check.verified {
+    par[All #seal-check.records sealed records verified.]
+  } else {
+    data-table(
+      columns: (auto, 1fr),
+      header: ([Record], [Problem]),
+      ..seal-check.problems.map(item => (raw(item.record), item.problem)),
+    )
+  }
+  if seal-check.adopted.len() > 0 {
+    par[#seal-check.adopted.len() records were sealed by `claims-mcp seal --adopt` (migrated)
+      rather than recorded through the server:]
+    text(size: 7.5pt, seal-check.adopted.map(raw).join(", "))
+  }
 }
 
 #let section-findings() = {
@@ -505,16 +555,23 @@
     "git checkout " + commit + "\n"
   }
   let notes-flag = if "notes" in inputs { " \\\n  --input notes=" + inputs.notes } else { "" }
+  let integrity-flag = if "integrity" in inputs {
+    " \\\n  --input integrity=" + inputs.integrity
+  } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
   [Regenerate this PDF:]
   raw(
     block: true,
     lang: "sh",
     checkout
+      + (if "integrity" in inputs {
+        "claims-mcp --catalog " + catalog-path + " verify --json > " + inputs.integrity + "\n"
+      } else { "" })
       + "typst compile --root . report/claims-report.typ audit.pdf \\\n  --input catalog="
       + catalog-path
       + commit-flag
-      + notes-flag,
+      + notes-flag
+      + integrity-flag,
   )
   [Re-run the checks. `cargo test` runs the server's tests; `cargo test typst_template` also
     confirms that this template's totals, gaps, and matrix match `audit_report` (it needs the
@@ -548,6 +605,7 @@
   [This catalog contains no claims. There is nothing to report.]
 } else {
   section-result()
+  section-integrity()
   section-findings()
   section-points()
   section-coverage()
