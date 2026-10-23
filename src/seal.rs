@@ -1,7 +1,7 @@
 //! Integrity seals: detect catalog edits that did not go through the server.
 //!
-//! Every claim, evidence item, and verdict, plus the catalog header (schema version and id
-//! counters), carries an HMAC-SHA256 seal under a key built into this binary. The server
+//! Every claim, evidence item, and verdict, plus each of the two id counters, carries an
+//! HMAC-SHA256 seal under a key built into this binary. The server
 //! verifies every seal on every load and refuses all writes while any check fails.
 //!
 //! This is a deterrent, not cryptographic security: the key is in the public source, so anyone
@@ -15,11 +15,14 @@
 //! - evidence: the owning claim id and the evidence fields
 //! - verdict: the owning claim id, its index, and the previous verdict's MAC (a chain)
 //! - claim: the claim's own fields, its evidence ids, and its latest verdict's MAC
-//! - header: `schema_version`, `next_claim_seq`, `next_evidence_seq`
+//! - each counter: `schema_version` and the counter's value
 //!
 //! Because claims are never deleted (only retired) and ids are never reused, any gap below
-//! `next_claim_seq` means a claim was removed. Sealing record by record, rather than the whole
-//! file, keeps seals valid across git merges of branches that changed different claims.
+//! `next_claim_seq` means a claim was removed, and lowering the counter to hide the newest
+//! claim's deletion breaks the counter's seal. Sealing record by record, rather than the whole
+//! file, keeps seals valid across git merges of branches that changed different claims; the
+//! two counters are sealed separately for the same reason, so a branch that added a claim and
+//! one that added evidence merge without either seal changing.
 
 use hmac::{Hmac, KeyInit, Mac};
 use serde::Serialize;
@@ -43,7 +46,8 @@ const DOMAIN: &[u8] = b"claims-mcp seal v1\0";
 /// One failed integrity check.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct IntegrityProblem {
-    /// The record that failed: `catalog`, `CLM-0001`, `EVD-0014`, or `CLM-0001 verdict 2`.
+    /// The record that failed: `catalog`, `schema_version`, `next_claim_seq`,
+    /// `next_evidence_seq`, `CLM-0001`, `EVD-0014`, or `CLM-0001 verdict 2`.
     pub record: String,
     /// What is wrong with it.
     pub problem: String,
@@ -55,7 +59,7 @@ pub struct IntegrityProblem {
 pub struct IntegrityReport {
     /// `true` when every check passed; the server only writes when this holds.
     pub verified: bool,
-    /// Number of sealed records checked (header, claims, evidence, verdicts).
+    /// Number of sealed records checked (counters, claims, evidence, verdicts).
     pub records: usize,
     /// Every failed check, in catalog order.
     pub problems: Vec<IntegrityProblem>,
@@ -72,24 +76,34 @@ pub fn verify(catalog: &Catalog) -> IntegrityReport {
         adopted: Vec::new(),
     };
     if catalog.schema_version() == UNSEALED_SCHEMA_VERSION {
-        report.verified = false;
-        report.problems.push(IntegrityProblem {
-            record: "catalog".to_owned(),
-            problem: format!(
-                "schema_version {UNSEALED_SCHEMA_VERSION} catalog has no integrity seals; a \
-                 maintainer must run `claims-mcp seal --adopt` once to migrate it"
-            ),
-        });
+        // A genuine v1 file predates seals, so seals in it mean the version was lowered.
+        let (record, problem) = if has_any_seal(catalog) {
+            (
+                "schema_version",
+                format!(
+                    "is {UNSEALED_SCHEMA_VERSION}, but the catalog carries seals, so it was \
+                     lowered by hand"
+                ),
+            )
+        } else {
+            (
+                "catalog",
+                format!(
+                    "schema_version {UNSEALED_SCHEMA_VERSION} catalog has no integrity seals; \
+                     a maintainer must run `claims-mcp seal --adopt` once to migrate it"
+                ),
+            )
+        };
+        report.fail(record.to_owned(), problem);
         return report;
     }
 
     // An untouched empty catalog (missing file or never written) has nothing to vouch for.
     if !catalog.is_pristine() {
-        report.check(
-            "catalog".to_owned(),
-            catalog.seal(),
-            &header_message(catalog),
-        );
+        for (name, value, seal) in catalog.counter_seals() {
+            let message = counter_message(name, catalog.schema_version(), value);
+            report.check(name.to_owned(), seal, &message);
+        }
     }
     for id in missing_claim_ids(catalog) {
         report.fail(
@@ -142,45 +156,54 @@ pub fn reseal(catalog: &mut Catalog) {
         let message = claim_message(claim);
         refresh(&mut claim.seal, &message);
     }
-    let message = header_message(catalog);
-    refresh(catalog.seal_mut(), &message);
+    let schema_version = catalog.schema_version();
+    for (name, value, slot) in catalog.counter_seals_mut() {
+        refresh(slot, &counter_message(name, schema_version, value));
+    }
 }
 
-/// Seals every unsealed record as adopted, for migrating a schema v1 catalog or recovering
-/// from a merge conflict in the catalog header. Returns the names of the records it sealed.
+/// `true` if the catalog header or any record carries a seal.
+pub fn has_any_seal(catalog: &Catalog) -> bool {
+    catalog
+        .counter_seals()
+        .iter()
+        .any(|(_, _, seal)| seal.is_some())
+        || catalog.claims().iter().any(|claim| {
+            claim.seal.is_some()
+                || claim
+                    .evidence
+                    .iter()
+                    .any(|evidence| evidence.seal.is_some())
+                || claim.verdicts.iter().any(|verdict| verdict.seal.is_some())
+        })
+}
+
+/// Seals every unsealed record as adopted, for migrating a schema v1 catalog. Returns the
+/// names of the records it sealed.
 ///
 /// It never re-seals a record whose seal is present but wrong, so it cannot launder an edit to
-/// a sealed record. The one exception is the catalog header, which is re-sealed when every
-/// other record verifies: two branches that each added claims or evidence conflict there, and
-/// the id-gap check still catches deleted claims.
+/// a sealed record, and it refuses a "v1" catalog that carries seals, since that means the
+/// version was lowered by hand to make every seal look absent.
 ///
 /// # Errors
 ///
-/// [`ClaimsError::AdoptRefused`] listing every record with a wrong seal and every missing
-/// claim id. Nothing is changed in that case.
+/// [`ClaimsError::AdoptRefused`] listing every record with a wrong seal, every missing claim
+/// id, or a lowered schema version. Nothing is changed in that case.
 pub fn adopt(catalog: &mut Catalog) -> Result<Vec<String>> {
     if catalog.schema_version() == UNSEALED_SCHEMA_VERSION {
-        catalog.upgrade_schema();
-        // A v1 file has no seals, but drop any that were added by hand so nothing is trusted.
-        for claim in catalog.claims_mut() {
-            claim.seal = None;
-            claim
-                .evidence
-                .iter_mut()
-                .for_each(|evidence| evidence.seal = None);
-            claim
-                .verdicts
-                .iter_mut()
-                .for_each(|verdict| verdict.seal = None);
+        if has_any_seal(catalog) {
+            return Err(ClaimsError::AdoptRefused {
+                problems: verify(catalog).problems,
+            });
         }
-        *catalog.seal_mut() = None;
+        catalog.upgrade_schema();
     }
 
     let report = verify(catalog);
     let wrong: Vec<IntegrityProblem> = report
         .problems
         .into_iter()
-        .filter(|problem| problem.record != "catalog" && problem.problem != NO_SEAL)
+        .filter(|problem| problem.problem != NO_SEAL)
         .collect();
     if !wrong.is_empty() {
         return Err(ClaimsError::AdoptRefused { problems: wrong });
@@ -212,13 +235,17 @@ pub fn adopt(catalog: &mut Catalog) -> Result<Vec<String>> {
             adopted.push(claim_id.to_string());
         }
     }
-    let message = header_message(catalog);
-    if catalog
-        .seal()
-        .is_none_or(|existing| !matches(existing, &message))
-    {
-        *catalog.seal_mut() = Some(seal(SealOrigin::Adopt, &message));
-        adopted.push("catalog".to_owned());
+    if !catalog.is_pristine() {
+        let schema_version = catalog.schema_version();
+        for (name, value, slot) in catalog.counter_seals_mut() {
+            if slot.is_none() {
+                *slot = Some(seal(
+                    SealOrigin::Adopt,
+                    &counter_message(name, schema_version, value),
+                ));
+                adopted.push(name.to_owned());
+            }
+        }
     }
     Ok(adopted)
 }
@@ -291,13 +318,8 @@ fn mac(by: SealOrigin, message: &Value) -> String {
         .collect()
 }
 
-fn header_message(catalog: &Catalog) -> Value {
-    json!([
-        "catalog",
-        catalog.schema_version(),
-        catalog.next_claim_seq(),
-        catalog.next_evidence_seq(),
-    ])
+fn counter_message(name: &str, schema_version: u32, value: u32) -> Value {
+    json!([name, schema_version, value])
 }
 
 fn claim_message(claim: &Claim) -> Value {
@@ -419,6 +441,24 @@ mod tests {
         serde_json::from_value(document).expect("still a well-formed catalog")
     }
 
+    /// The catalog as a genuine schema v1 file: no seals anywhere.
+    fn unsealed_v1(catalog: &Catalog) -> Catalog {
+        fn strip(value: &mut Value) {
+            match value {
+                Value::Object(map) => {
+                    map.retain(|key, _| !key.ends_with("seal"));
+                    map.values_mut().for_each(strip);
+                }
+                Value::Array(items) => items.iter_mut().for_each(strip),
+                _ => {}
+            }
+        }
+        hand_edit(catalog, |document| {
+            strip(document);
+            document["schema_version"] = json!(1);
+        })
+    }
+
     fn failed_records(catalog: &Catalog) -> Vec<String> {
         let report = verify(catalog);
         assert_eq!(report.verified, report.problems.is_empty());
@@ -433,8 +473,8 @@ mod tests {
     fn sealed_catalog_verifies_every_record() {
         let report = verify(&sealed());
         assert!(report.verified, "{:?}", report.problems);
-        // Header, 2 claims, 2 evidence items, 2 verdicts.
-        assert_eq!(report.records, 7);
+        // 2 counters, 2 claims, 2 evidence items, 2 verdicts.
+        assert_eq!(report.records, 8);
         assert!(report.adopted.is_empty());
     }
 
@@ -445,8 +485,7 @@ mod tests {
 
     #[test]
     fn unsealed_v1_catalog_fails_with_one_problem() {
-        let catalog = hand_edit(&sealed(), |document| document["schema_version"] = json!(1));
-        let report = verify(&catalog);
+        let report = verify(&unsealed_v1(&sealed()));
         assert!(!report.verified);
         assert_eq!(report.problems.len(), 1);
         assert_eq!(report.problems[0].record, "catalog");
@@ -477,7 +516,7 @@ mod tests {
             ("CLM-0002", |d| {
                 d["claims"][1]["statement"] = json!("weakened")
             }),
-            ("catalog", |d| d["next_evidence_seq"] = json!(9)),
+            ("next_evidence_seq", |d| d["next_evidence_seq"] = json!(9)),
         ];
         for (record, edit) in cases {
             assert_eq!(failed_records(&hand_edit(&catalog, edit)), [record]);
@@ -550,6 +589,38 @@ mod tests {
 
         let relabeled = hand_edit(&catalog, |d| d["claims"][1]["seal"]["by"] = json!("adopt"));
         assert_eq!(failed_records(&relabeled), ["CLM-0002"]);
+
+        // Passing an adopted record off as server-recorded fails too.
+        let mut adopted = unsealed_v1(&catalog);
+        adopt(&mut adopted).expect("adopt");
+        let promoted = hand_edit(&adopted, |d| d["claims"][1]["seal"]["by"] = json!("server"));
+        assert_eq!(failed_records(&promoted), ["CLM-0002"]);
+    }
+
+    #[test]
+    fn deleting_the_newest_claim_and_lowering_the_counter_is_detected() {
+        // No id gap remains, so only the counter's seal can catch this.
+        let mut catalog = hand_edit(&sealed(), |d| {
+            drop(d["claims"].as_array_mut().expect("list").pop());
+            d["next_claim_seq"] = json!(2);
+        });
+        assert_eq!(failed_records(&catalog), ["next_claim_seq"]);
+        let error = adopt(&mut catalog).expect_err("must refuse");
+        assert!(matches!(error, ClaimsError::AdoptRefused { .. }));
+    }
+
+    #[test]
+    fn lowering_schema_version_to_one_cannot_launder_an_edit() {
+        let downgraded = hand_edit(&sealed(), |d| {
+            d["claims"][0]["verdicts"][1]["verdict"] = json!("supported");
+            d["schema_version"] = json!(1);
+        });
+        assert_eq!(failed_records(&downgraded), ["schema_version"]);
+
+        let mut catalog = downgraded.clone();
+        let error = adopt(&mut catalog).expect_err("must refuse");
+        assert!(matches!(error, ClaimsError::AdoptRefused { .. }));
+        assert_eq!(catalog, downgraded);
     }
 
     #[test]
@@ -579,18 +650,14 @@ mod tests {
 
     #[test]
     fn adopt_migrates_a_v1_catalog() {
-        let v1 = hand_edit(&sealed(), |d| {
-            d["schema_version"] = json!(1);
-            d["seal"].take();
-        });
-        let mut catalog = v1.clone();
+        let mut catalog = unsealed_v1(&sealed());
         let adopted = adopt(&mut catalog).expect("adopt");
 
         assert_eq!(catalog.schema_version(), crate::catalog::SCHEMA_VERSION);
-        assert_eq!(adopted.len(), 7);
+        assert_eq!(adopted.len(), 8);
         let report = verify(&catalog);
         assert!(report.verified);
-        assert_eq!(report.adopted.len(), 7);
+        assert_eq!(report.adopted.len(), 8);
         assert_eq!(
             adopt(&mut catalog).expect("adopt again"),
             Vec::<String>::new()
@@ -644,7 +711,7 @@ mod tests {
     }
 
     #[test]
-    fn adopt_reseals_only_the_header_after_a_counter_conflict() {
+    fn branches_advancing_different_counters_merge_without_resealing() {
         let base = sealed();
         let mut ours = base.clone();
         ours.add_claim(new_claim("third"), at(5)).expect("add");
@@ -655,14 +722,16 @@ mod tests {
             .expect("evidence");
         reseal(&mut theirs);
 
-        // Both sides changed the header's counters; the conflict is resolved by hand.
-        let mut merged = hand_edit(&ours, |d| {
-            d["claims"][1] = serde_json::to_value(&theirs.claims()[1]).expect("value");
-            d["next_evidence_seq"] = json!(theirs.next_evidence_seq());
+        // Ours advanced next_claim_seq, theirs next_evidence_seq; each counter carries its own
+        // seal, so the merge takes each side's counter and seal unchanged.
+        let theirs_document = serde_json::to_value(&theirs).expect("value");
+        let merged = hand_edit(&ours, |d| {
+            d["claims"][1] = theirs_document["claims"][1].clone();
+            for key in ["next_evidence_seq", "next_evidence_seq_seal"] {
+                d[key] = theirs_document[key].clone();
+            }
         });
-        assert_eq!(failed_records(&merged), ["catalog"]);
-        assert_eq!(adopt(&mut merged).expect("adopt"), ["catalog"]);
-        assert!(verify(&merged).verified);
+        assert!(verify(&merged).verified, "{:?}", verify(&merged).problems);
         assert_eq!(merged.claims()[1].evidence[0].id, EvidenceId::new(3));
     }
 

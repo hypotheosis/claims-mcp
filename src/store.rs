@@ -132,7 +132,9 @@ impl CatalogStore {
         let integrity = seal::verify(&catalog);
         if !integrity.verified {
             let path = self.paths.catalog.clone();
-            let error = if catalog.schema_version() == UNSEALED_SCHEMA_VERSION {
+            let never_sealed = catalog.schema_version() == UNSEALED_SCHEMA_VERSION
+                && !seal::has_any_seal(&catalog);
+            let error = if never_sealed {
                 ClaimsError::UnsealedCatalog { path }
             } else {
                 ClaimsError::CatalogTampered {
@@ -385,6 +387,27 @@ mod tests {
     }
 
     #[test]
+    fn lowered_schema_version_is_tampering_not_an_unmigrated_catalog() {
+        let (_directory, store) = temp_store();
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("first"), at(0)))
+            .expect("mutate");
+        let text = fs::read_to_string(store.path()).expect("read file");
+        let lowered = text.replacen("\"schema_version\": 2", "\"schema_version\": 1", 1);
+        fs::write(store.path(), lowered).expect("write file");
+
+        let result = store.mutate_blocking(|_| Ok(()));
+        let Err(ClaimsError::CatalogTampered { problems, .. }) = result else {
+            panic!("expected CatalogTampered, got {result:?}");
+        };
+        assert_eq!(problems[0].record, "schema_version");
+        assert!(matches!(
+            store.adopt_blocking(),
+            Err(ClaimsError::AdoptRefused { .. })
+        ));
+    }
+
+    #[test]
     fn adopt_migrates_a_v1_file_and_unblocks_writes() {
         let (_directory, store) = temp_store();
         let document = r#"{"schema_version":1,"next_claim_seq":2,"next_evidence_seq":1,"claims":[{
@@ -398,7 +421,7 @@ mod tests {
         ));
 
         let adopted = store.adopt_blocking().expect("adopt");
-        assert_eq!(adopted, ["CLM-0001", "catalog"]);
+        assert_eq!(adopted, ["CLM-0001", "next_claim_seq", "next_evidence_seq"]);
         store
             .mutate_blocking(|catalog| catalog.add_claim(new_claim("after"), at(1)))
             .expect("writes work after adoption");

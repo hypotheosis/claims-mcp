@@ -176,10 +176,15 @@ pub struct ClaimDetail {
 pub struct Catalog {
     schema_version: u32,
     next_claim_seq: u32,
-    next_evidence_seq: u32,
-    /// Integrity seal over `schema_version` and the two counters (see `src/seal.rs`).
+    /// Integrity seal over `schema_version` and `next_claim_seq` (see `src/seal.rs`). Each
+    /// counter has its own seal, next to it, so branches that advanced different counters
+    /// merge without touching each other's seal.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    seal: Option<Seal>,
+    next_claim_seq_seal: Option<Seal>,
+    next_evidence_seq: u32,
+    /// Integrity seal over `schema_version` and `next_evidence_seq`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    next_evidence_seq_seal: Option<Seal>,
     claims: Vec<Claim>,
 }
 
@@ -188,8 +193,9 @@ impl Default for Catalog {
         Self {
             schema_version: SCHEMA_VERSION,
             next_claim_seq: 1,
+            next_claim_seq_seal: None,
             next_evidence_seq: 1,
-            seal: None,
+            next_evidence_seq_seal: None,
             claims: Vec::new(),
         }
     }
@@ -217,19 +223,39 @@ impl Catalog {
         self.next_claim_seq
     }
 
-    /// The next evidence sequence number to be assigned.
-    pub fn next_evidence_seq(&self) -> u32 {
-        self.next_evidence_seq
+    /// Each id counter with its name, value, and integrity seal.
+    pub fn counter_seals(&self) -> [(&'static str, u32, Option<&Seal>); 2] {
+        [
+            (
+                "next_claim_seq",
+                self.next_claim_seq,
+                self.next_claim_seq_seal.as_ref(),
+            ),
+            (
+                "next_evidence_seq",
+                self.next_evidence_seq,
+                self.next_evidence_seq_seal.as_ref(),
+            ),
+        ]
     }
 
-    /// The catalog header's integrity seal.
-    pub fn seal(&self) -> Option<&Seal> {
-        self.seal.as_ref()
-    }
-
-    /// Mutable access to the catalog header's integrity seal.
-    pub(crate) fn seal_mut(&mut self) -> &mut Option<Seal> {
-        &mut self.seal
+    /// Like [`Catalog::counter_seals`], with mutable seals for (re)sealing in place.
+    ///
+    /// Rust note: borrowing two different fields mutably at once is allowed, because the
+    /// compiler can see they never overlap.
+    pub(crate) fn counter_seals_mut(&mut self) -> [(&'static str, u32, &mut Option<Seal>); 2] {
+        [
+            (
+                "next_claim_seq",
+                self.next_claim_seq,
+                &mut self.next_claim_seq_seal,
+            ),
+            (
+                "next_evidence_seq",
+                self.next_evidence_seq,
+                &mut self.next_evidence_seq_seal,
+            ),
+        ]
     }
 
     /// Marks the catalog as the current (sealed) schema version, for `seal --adopt`.
