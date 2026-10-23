@@ -74,7 +74,8 @@ by area name.
 
 ## 5. The next step for each item
 
-`next_step` is chosen in this order:
+`next_step` is chosen in this order. A `Fix:` counts as the marker only at the start of the
+rationale or after whitespace, so `HotFix:` inside a word is not one.
 
 1. The latest verdict's rationale contains `Fix:`: the text after the **last** `Fix:`, trimmed.
    If that text is empty, fall through.

@@ -262,23 +262,38 @@ fn next_step_text(claim: &Claim, stale: bool) -> String {
     }
 }
 
-/// The trimmed text after the last `Fix:`, or `None` when there is no marker or nothing
-/// follows it.
+/// Byte offset of the last `Fix:` that starts the text or follows whitespace, so words such as
+/// `HotFix:` are not taken for the marker.
+fn marker_offset(rationale: &str) -> Option<usize> {
+    // Rust note: `rmatch_indices` yields `(offset, match)` pairs from the end backwards, and
+    // `find` stops at the first one that passes. `is_none_or` is true for the start of the
+    // text (no previous char) or when the previous char is whitespace.
+    rationale
+        .rmatch_indices(FIX_MARKER)
+        .map(|(index, _)| index)
+        .find(|&index| {
+            rationale[..index]
+                .chars()
+                .next_back()
+                .is_none_or(char::is_whitespace)
+        })
+}
+
+/// The trimmed text after the last `Fix:` marker, or `None` when there is no marker or
+/// nothing follows it.
 fn fix_text(rationale: &str) -> Option<&str> {
     // Rust note: `?` on an `Option` returns `None` from this function when the value is `None`.
-    // `rfind` gives a byte offset and `Fix:` is ASCII, so adding its length is a char boundary.
-    let start = rationale.rfind(FIX_MARKER)? + FIX_MARKER.len();
+    // The offset is where the ASCII marker starts, so adding its length is a char boundary.
+    let start = marker_offset(rationale)? + FIX_MARKER.len();
     // Rust note: `Some(x).filter(pred)` keeps the value only when `pred` is true, else `None`.
     Some(rationale[start..].trim()).filter(|text| !text.is_empty())
 }
 
-/// First sentence of the text before the last `Fix:` (the whole rationale without a marker),
-/// or `NO_STEP_IN_RATIONALE` when that text is empty.
+/// First sentence of the text before the last `Fix:` marker (the whole rationale without
+/// one), or `NO_STEP_IN_RATIONALE` when that text is empty.
 fn fallback_step(rationale: &str) -> &str {
-    // `rfind` returns a byte offset at the start of the ASCII marker, a char boundary.
-    let before = rationale
-        .rfind(FIX_MARKER)
-        .map_or(rationale, |index| &rationale[..index]);
+    // The marker offset is at the start of the ASCII marker, a char boundary.
+    let before = marker_offset(rationale).map_or(rationale, |index| &rationale[..index]);
     Some(first_sentence(before))
         .filter(|sentence| !sentence.is_empty())
         .unwrap_or(NO_STEP_IN_RATIONALE)
@@ -383,6 +398,20 @@ mod tests {
         assert_eq!(fix_text("Bad. Fix: one. Fix:  two. "), Some("two."));
         assert_eq!(fix_text("Bad. Fix:   "), None);
         assert_eq!(fix_text("No marker here."), None);
+    }
+
+    #[test]
+    fn marker_must_start_the_text_or_follow_whitespace() {
+        assert_eq!(
+            fix_text("Bad. Fix: real. See HotFix: 12."),
+            Some("real. See HotFix: 12.")
+        );
+        assert_eq!(fix_text("Fix: at start"), Some("at start"));
+        assert_eq!(fix_text("Shipped in HotFix: 12."), None);
+        assert_eq!(
+            fallback_step("Shipped in HotFix: 12."),
+            "Shipped in HotFix: 12."
+        );
     }
 
     #[test]
