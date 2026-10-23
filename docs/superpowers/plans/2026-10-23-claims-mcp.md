@@ -1,5 +1,14 @@
 # claims-mcp Implementation Plan
 
+> **Historical document. Do not execute this plan.** It records the original pre-review
+> implementation plan as written at commit `7baf774` and has not been updated since. The code
+> in `src/` is authoritative. The plan's code blocks and expected test counts no longer match
+> the repository. Changes made after the plan include post-review fixes (load-time catalog
+> validation, checked id arithmetic, the `RetiredParent` error, batch error indexes, the
+> post-rename fsync, read-only tool annotations), integrity seals (`src/seal.rs`,
+> `schema_version` 2, issue #9), Typst PDF reports (issue #2), and CI/release workflows
+> (issue #4). The reasoning behind each change is in `changelog/`. See issue #1.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a stdio MCP server on `rmcp` 3.7 that maintains a JSON claims catalog for requirements traceability, IEEE 1012 V&V, and FEVER-style auditing, plus a `claims-audit` skill that drives it.
@@ -10,7 +19,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-23-claims-mcp-design.md`
 
-**Verified:** Every code block in this plan was compiled, linted (`clippy -D warnings`), formatted, and tested (46 tests passing) in a scratch prototype before the plan was written, and the binary was smoke-tested over stdio.
+**Verified (at the time of writing, against the pre-review prototype):** Every code block in this plan was compiled, linted (`clippy -D warnings`), formatted, and tested (46 tests passing) in a scratch prototype before the plan was written, and the binary was smoke-tested over stdio.
 
 ---
 
