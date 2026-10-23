@@ -592,6 +592,10 @@
 
 #let section-coverage() = {
   heading[Coverage by integrity level]
+  [Each claim's _integrity level_ (IL, from the IEEE 1012 verification standard) rates the
+    consequence if it is wrong: 4 safety, security, or data loss; 3 a core function fails; 2 a
+    function is degraded; 1 cosmetic or documentation. Higher levels call for more rigorous
+    verification.]
   let rows = ("4", "3", "2", "1", "unassigned").map(key => {
     let group = active.filter(claim => integrity-key(claim) == key)
     let verdicts = count-by(group, current-verdict)
@@ -616,11 +620,16 @@
   )
   [_Other_ counts claims that are unverified or not enough info.]
   heading(level: 2)[Rigor check]
-  if gaps.rigor.len() == 0 {
-    [No integrity level 3-4 claim is verified only by inspection.]
+  let critical = active.filter(claim => integrity(claim) in (3, 4)).len()
+  [Claims at integrity level 3 or 4 should be verified by test, analysis, demonstration, or
+    formal proof, not by _inspection_ alone (someone reading the code or documents). ]
+  if critical == 0 {
+    [No active claim has integrity level 3 or 4.]
+  } else if gaps.rigor.len() == 0 {
+    [All #critical level 3-4 claims meet this: none relies on inspection alone.]
   } else {
-    [*RIGOR GAP:* #gaps.rigor.len() integrity level 3-4 claims are verified only by
-      inspection: #compress-ids(gaps.rigor).]
+    [*RIGOR GAP:* #gaps.rigor.len() of the #critical level 3-4 claims rely on inspection
+      alone: #compress-ids(gaps.rigor).]
   }
 }
 
@@ -630,7 +639,7 @@
   refuted: [Current verdict is refuted.],
   not_enough_info: [Current verdict is not enough info.],
   stale: [Evidence was recorded after the latest verdict.],
-  rigor: [Integrity level 3-4 claim verified only by inspection.],
+  rigor: [Integrity level 3-4 claim that relies on inspection alone.],
   decomposition: [At least one active child is not supported.],
   dangling_links: [Claim derives from a retired claim.],
 )
