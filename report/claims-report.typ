@@ -7,7 +7,7 @@
 //
 //   typst compile --root . report/claims-report.typ audit.pdf \
 //     --input catalog=claims.json --input commit=$(git rev-parse --short HEAD) \
-//     --input notes=report/audit-notes.toml --input integrity=target/integrity.json
+//     --input notes=report/audit-notes.toml --input integrity=integrity.json
 //
 // Inputs (all optional):
 //   catalog     catalog path, relative to --root (default claims.json)
