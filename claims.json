@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 66,
+  "next_claim_seq": 67,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "edff89add80492d0de6f8244858809a43256f097df2bfd30b469c2e57ad905d1"
+    "mac": "735703cb3961f672d4d26cd1f5db974c73a1412a860ec75f370e55e8cab8b351"
   },
-  "next_evidence_seq": 123,
+  "next_evidence_seq": 124,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "3eab72c592c99aad2daf9362639cc56157c0d2d867e34878907131c8be654ec1"
+    "mac": "efa98c755d4e74ea431ecbbcd3fd82dde57591c87db760ee1b55fb7f8d14f578"
   },
   "claims": [
     {
@@ -2896,7 +2896,9 @@
         "issue:1"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #1 resolved by option 2: the plan is now marked as a historical pre-review record rather than a reproduction of src/. The statement no longer describes the plan's role, so it is replaced by a new claim rather than edited.",
+        "retired_at": "2026-10-23T17:26:13.744415673Z"
       },
       "evidence": [
         {
@@ -2953,10 +2955,10 @@
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T15:51:51.375656968Z",
+      "updated_at": "2026-10-23T17:26:13.744415673Z",
       "seal": {
         "by": "server",
-        "mac": "e8382ecca63ba8a0bd755e014b7ea8973e7783b90e6a4cbb69ca384e95b9cfd9"
+        "mac": "d935976694ddd8eec0928d4ac0903f394cd65580643c9a61cccece887f960aa1"
       }
     },
     {
@@ -4947,6 +4949,63 @@
       "seal": {
         "by": "server",
         "mac": "ce9ec2bd01a2092d1b568b0116df019961775f3ad9199da688d67004bc2a154b"
+      }
+    },
+    {
+      "id": "CLM-0066",
+      "statement": "The implementation plan docs/superpowers/plans/2026-10-23-claims-mcp.md is clearly marked as a historical pre-review record: a banner at the top says not to execute it, names src/ as authoritative, and points to changelog/ for the deltas",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #1 (replaces retired CLM-0034)",
+      "derived_from": [],
+      "artifacts": [
+        "docs/superpowers/plans/2026-10-23-claims-mcp.md"
+      ],
+      "tags": [
+        "plan",
+        "docs",
+        "process-artifact",
+        "issue:1"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0123",
+          "kind": "inspection",
+          "locator": "docs/superpowers/plans/2026-10-23-claims-mcp.md:3-10 (commit ef0c6bc)",
+          "summary": "A block-quote banner directly under the title starts \"Historical document. Do not execute this plan.\" It says the plan records the pre-review plan as of 7baf774, that the code in src/ is authoritative, that the code blocks and test counts no longer match, and lists the later changes (post-review fixes, seals #9, Typst reports #2, CI/release #4). It points to changelog/ for the reasoning. The \"Verified\" line is qualified as applying to the pre-review prototype.",
+          "stance": "supports",
+          "recorded_at": "2026-10-23T17:26:21.675590578Z",
+          "seal": {
+            "by": "server",
+            "mac": "f6b7df7a9f74b2756970e8b77ae9caf11eaf4f9453df5a829b1cca9028792f28"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The banner at lines 3-10 meets every part of the statement: it is at the top, says not to execute the plan, names src/ as authoritative, and points to changelog/ (EVD-0123).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0123"
+          ],
+          "recorded_at": "2026-10-23T17:26:24.634460800Z",
+          "seal": {
+            "by": "server",
+            "mac": "aa7a8c607afade6578b3cfc8635d588ec0e42cc16d3d5206bdb620005103a906"
+          }
+        }
+      ],
+      "created_at": "2026-10-23T17:26:13.757550771Z",
+      "updated_at": "2026-10-23T17:26:24.634460800Z",
+      "seal": {
+        "by": "server",
+        "mac": "36342891ad7fcaa2f17919f09b8415b77b28b647e11bcaa828c1212bca07a675"
       }
     }
   ]
