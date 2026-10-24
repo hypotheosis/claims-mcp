@@ -1,8 +1,12 @@
 # Notes for the PDF audit report (report/claims-report.typ) of one audited project.
 #
-# Copy this file into the audited project (for example as audit-notes.toml next to its claims
-# ledger), fill it in, and pass it with `--input notes=<path>`. Every key is optional; any key
-# except `points` can also be given as `--input key=value`, which wins over the file.
+# `claims-mcp report init` writes this example and the report template to report/ in the
+# audited project, and creates report/audit-notes.toml (unless that file exists) as a copy of
+# it with every setting commented out. The MCP server also serves it as the resource
+# claims://report/audit-notes.example.toml. In audit-notes.toml, uncomment each setting and
+# replace the example's values with the audited project's, then pass it with
+# `--input notes=<path>`. Every key is optional; any key except `points` can also be given as
+# `--input key=value`, which wins over the file.
 #
 # Write only judgment here. The report computes every count, verdict, and gap from the ledger,
 # so do not restate them: prose that repeats a number goes stale on the next audit, and the

@@ -146,6 +146,7 @@ Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
 | `verify [--json]` | Check every integrity seal; exit 1 if any check fails |
 | `tldr [--limit N] [--json]` | Print the ranked next steps; see [TL;DR of next steps](#tldr-of-next-steps) |
 | `seal --adopt` | Seal unsealed records once, to migrate a catalog (maintainers only) |
+| `report init [DIR]` | Write the PDF report template and a notes file to `DIR` (default `report`); see [Generate a PDF report](#generate-a-pdf-report) |
 
 ## Integrity seals
 
@@ -224,6 +225,10 @@ away from the file entirely, add deny rules to the project's `.claude/settings.j
 | `audit_report` | Totals, gap lists, and the traceability matrix |
 | `next_steps` | Ranked TL;DR: open claims in priority tiers, each with one next step |
 
+The server also offers read-only resources: the PDF report's files, under `claims://report/`.
+`claims://report/audit-notes.example.toml` is the commented example of the report's notes file,
+so an agent with only the MCP connection can write one.
+
 ## TL;DR of next steps
 
 On a large catalog, `audit_report` is too long to act on. `next_steps` (MCP) and
@@ -255,9 +260,9 @@ first sentence before the marker. Items beyond `--limit` are counted per area. T
 
 ## Generate a PDF report
 
-[`report/claims-report.typ`](report/claims-report.typ) renders a catalog as a self-contained
-PDF audit report with [Typst](https://typst.app). It runs outside the server, which never
-executes commands. It has two detail levels:
+A Typst template renders a catalog as a self-contained PDF audit report with
+[Typst](https://typst.app). It runs outside the server, which never executes commands. It has
+two detail levels:
 
 - **summary** (default): result and assessment, integrity seal status, findings grouped by
   area (refuted claims in full, the rest as one-line next steps), coverage by integrity level,
@@ -270,18 +275,31 @@ Both collapse long claim ID lists into ranges and roll-up evidence into child co
 end with a glossary that defines every term the report uses (verdicts, stances, integrity levels,
 verification methods, seals), so readers need not know claims-mcp.
 
+The template is built into the binary, so every install carries the version that matches it.
+In the audited project's root:
+
 ```bash
-just report                       # summary: claims.json -> audit.pdf (this repository's notes)
-just report full                  # full: claims.json -> audit-full.pdf
-# or, without just:
-claims-mcp --catalog claims.json verify --json > target/integrity.json
+claims-mcp report init            # writes report/claims-report.typ, report/text.typ,
+                                  # report/audit-notes.example.toml, and report/audit-notes.toml
+# uncomment and fill in report/audit-notes.toml as its comments say, then:
+claims-mcp --catalog claims.json verify --json > integrity.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
   --input detail=summary \
   --input commit=$(git rev-parse --short HEAD) \
   --input notes=report/audit-notes.toml \
-  --input integrity=target/integrity.json
+  --input integrity=integrity.json
 ```
+
+`report init` replaces the template files, so they always match the installed binary, but
+never replaces an existing `audit-notes.toml`; it prints what it wrote and what it kept. A new
+`audit-notes.toml` has every setting of the example commented out, so the example's invented
+project cannot end up in a report. Pass a
+directory (`claims-mcp report init docs/audit`) to write elsewhere, and adjust the paths above.
+Use `--input detail=full` and `audit-full.pdf` for the full record.
+
+In this repository, `just report` renders the summary (`audit.pdf`) and `just report full` the
+full record (`audit-full.pdf`) from `claims.json` with claims-mcp's own notes.
 
 Paths are relative to `--root`. All inputs are optional:
 
@@ -291,7 +309,7 @@ Paths are relative to `--root`. All inputs are optional:
 | `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
-| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: start from [`report/audit-notes.example.toml`](report/audit-notes.example.toml), which explains every key ([`report/audit-notes.toml`](report/audit-notes.toml) is claims-mcp's own) |
+| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: `report init` creates it with the commented example's settings commented out (also the resource `claims://report/audit-notes.example.toml`), which explains every key |
 | `date` | Report date (default today) |
 | `artifact`, `version`, `repository`, `method`, `assessment` | Override the matching sidecar key |
 

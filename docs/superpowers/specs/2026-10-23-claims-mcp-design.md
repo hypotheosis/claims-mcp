@@ -174,6 +174,12 @@ server does not fail the protocol request.
 | `trace` | `id`, `direction` (`up` / `down` / `both`, default `both`), optional `max_depth` (default unlimited) | breadth-first `ancestors` and `descendants` lists of `{id, statement, current_verdict, depth, retired}` nodes (each claim once, at its shortest depth) |
 | `audit_report` | optional `include_matrix` (default true) | the report described in 4.1 |
 
+The server also lists read-only resources, one per PDF report file compiled into the binary
+(`src/report/files.rs`, issue #18): `claims://report/claims-report.typ`,
+`claims://report/text.typ`, and `claims://report/audit-notes.example.toml`. Each is served as
+text, byte-identical to the file in `report/`. The server instructions name the notes example
+and the `claims-mcp report init` command, which writes the same files into a project.
+
 ### 4.1 `audit_report` contents (active claims only)
 
 - `totals`: counts by current verdict, kind, level, and integrity level (including `unassigned`).
@@ -219,7 +225,8 @@ Dependencies, in order:
 - `store` depends on `catalog`.
 - `catalog` and `report` depend on `model`.
 
-Only `store` touches the filesystem, and only `server` knows about MCP.
+Only `store` touches the filesystem, apart from the `report init` CLI command
+(`report::files::init`), and only `server` knows about MCP.
 
 ### 5.1 Store data flow
 
