@@ -138,17 +138,24 @@ fn starter_notes() -> String {
 /// Writes `contents` to `path` only if `path` does not exist.
 ///
 /// `create_new` checks and creates in one step, so a file that appears between a check and
-/// the write cannot be overwritten.
+/// the write cannot be overwritten. A write that fails partway (a full disk) removes the file it
+/// just created, so the next `init` retries instead of keeping a truncated file.
 fn create_new(path: &Path, contents: &str) -> std::io::Result<InitAction> {
     match fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .open(path)
     {
-        Ok(mut file) => {
-            file.write_all(contents.as_bytes())?;
-            Ok(InitAction::Wrote)
-        }
+        Ok(mut file) => match file.write_all(contents.as_bytes()) {
+            Ok(()) => Ok(InitAction::Wrote),
+            Err(error) => {
+                // Close the handle before removing, which Windows requires. A failed removal
+                // is not reported: the write error is the one that explains what went wrong.
+                drop(file);
+                let _ = fs::remove_file(path);
+                Err(error)
+            }
+        },
         Err(error) if error.kind() == ErrorKind::AlreadyExists => Ok(InitAction::Kept),
         Err(error) => Err(error),
     }
