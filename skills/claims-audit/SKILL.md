@@ -166,10 +166,10 @@ lead the report with tiers 0-2:
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
 - Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report:
   1. Run `claims-mcp report init` from the project root. It writes the report template to
-     `report/` and creates `report/audit-notes.toml` from the commented example (it never
-     replaces an existing notes file). Without a shell, read the MCP resource
-     `claims://report/audit-notes.example.toml` and write the notes file from it. Fill it in
-     as the example's comments say: set `artifact`, `version`, and `repository`; write an
+     `report/` and creates `report/audit-notes.toml`: the commented example with every setting
+     commented out (it never replaces an existing notes file). Without a shell, read the MCP
+     resource `claims://report/audit-notes.example.toml` and write the notes file from it.
+     Uncomment each setting and replace the example's values, as its comments say: set `artifact`, `version`, and `repository`; write an
      `assessment` that says what was audited, whether the project meets it, and which
      findings decide that, citing claim ids and issues;
      and add `[[points]]` for caveats the reader should weigh, such as whether the audit was

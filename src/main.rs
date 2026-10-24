@@ -85,7 +85,8 @@ enum Command {
 #[derive(Debug, Subcommand)]
 enum ReportCommand {
     /// Write the report template, its text helpers, and the commented notes example into DIR,
-    /// and create DIR/audit-notes.toml from the example unless it already exists.
+    /// and create DIR/audit-notes.toml (the example with every setting commented out) unless it
+    /// already exists.
     Init {
         /// Directory to write into, relative to the current directory.
         #[arg(default_value = files::DEFAULT_DIR)]

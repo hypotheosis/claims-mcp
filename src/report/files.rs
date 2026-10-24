@@ -89,8 +89,9 @@ pub enum InitAction {
 /// Writes the report files into `dir`, creating it if needed.
 ///
 /// The template, its helpers, and the notes example are always replaced, so they match this
-/// binary. The project's notes file (`NOTES_FILE`) is created from the example only when it does
-/// not exist yet: it holds the auditor's own prose and is never overwritten.
+/// binary. The project's notes file (`NOTES_FILE`) is created only when it does not exist yet:
+/// it holds the auditor's own prose and is never overwritten. It starts as `starter_notes`, so
+/// an unedited file renders no made-up claims.
 ///
 /// # Arguments
 ///
@@ -113,10 +114,25 @@ pub fn init(dir: &Path) -> anyhow::Result<Vec<(PathBuf, InitAction)>> {
         done.push((path, InitAction::Wrote));
     }
     let notes = dir.join(NOTES_FILE);
-    let action = create_new(&notes, NOTES_EXAMPLE.contents)
+    let action = create_new(&notes, &starter_notes())
         .with_context(|| format!("cannot write {}", notes.display()))?;
     done.push((notes, action));
     Ok(done)
+}
+
+/// The notes example with every setting commented out: the comments explain each key, and the
+/// example's invented values (`example-service`, its assessment and points) cannot reach a
+/// report until the auditor uncomments and rewrites them.
+fn starter_notes() -> String {
+    let mut starter = String::with_capacity(NOTES_EXAMPLE.contents.len() + 256);
+    for line in NOTES_EXAMPLE.contents.lines() {
+        if !(line.is_empty() || line.starts_with('#')) {
+            starter.push_str("# ");
+        }
+        starter.push_str(line);
+        starter.push('\n');
+    }
+    starter
 }
 
 /// Writes `contents` to `path` only if `path` does not exist.
@@ -172,7 +188,7 @@ mod tests {
     }
 
     #[test]
-    fn init_writes_every_file_and_creates_notes_from_the_example() {
+    fn init_writes_every_file_and_creates_commented_out_notes() {
         let directory = tempfile::tempdir().expect("temp dir");
         let dir = directory.path().join("report");
 
@@ -200,7 +216,21 @@ mod tests {
         }
         assert_eq!(
             fs::read_to_string(dir.join(NOTES_FILE)).expect("read"),
-            NOTES_EXAMPLE.contents
+            starter_notes()
+        );
+    }
+
+    #[test]
+    fn starter_notes_comment_out_every_setting_of_the_example() {
+        let starter = starter_notes();
+
+        assert!(starter
+            .lines()
+            .all(|line| line.is_empty() || line.starts_with('#')));
+        assert!(starter.contains("\n# artifact = \"example-service\"\n"));
+        assert_eq!(
+            starter.lines().count(),
+            NOTES_EXAMPLE.contents.lines().count()
         );
     }
 

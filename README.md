@@ -281,7 +281,7 @@ In the audited project's root:
 ```bash
 claims-mcp report init            # writes report/claims-report.typ, report/text.typ,
                                   # report/audit-notes.example.toml, and report/audit-notes.toml
-# edit report/audit-notes.toml as its comments say, then:
+# uncomment and fill in report/audit-notes.toml as its comments say, then:
 claims-mcp --catalog claims.json verify --json > integrity.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
@@ -292,7 +292,9 @@ typst compile --root . report/claims-report.typ audit.pdf \
 ```
 
 `report init` replaces the template files, so they always match the installed binary, but
-never replaces an existing `audit-notes.toml`; it prints what it wrote and what it kept. Pass a
+never replaces an existing `audit-notes.toml`; it prints what it wrote and what it kept. A new
+`audit-notes.toml` has every setting of the example commented out, so the example's invented
+project cannot end up in a report. Pass a
 directory (`claims-mcp report init docs/audit`) to write elsewhere, and adjust the paths above.
 Use `--input detail=full` and `audit-full.pdf` for the full record.
 
@@ -307,7 +309,7 @@ Paths are relative to `--root`. All inputs are optional:
 | `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
-| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: `report init` creates it from the commented example (also the resource `claims://report/audit-notes.example.toml`), which explains every key |
+| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: `report init` creates it with the commented example's settings commented out (also the resource `claims://report/audit-notes.example.toml`), which explains every key |
 | `date` | Report date (default today) |
 | `artifact`, `version`, `repository`, `method`, `assessment` | Override the matching sidecar key |
 
