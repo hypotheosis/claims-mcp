@@ -1,0 +1,56 @@
+# Notes for the PDF audit report (report/claims-report.typ) of one audited project.
+#
+# Copy this file into the audited project (for example as audit-notes.toml next to its claims
+# ledger), fill it in, and pass it with `--input notes=<path>`. Every key is optional; any key
+# except `points` can also be given as `--input key=value`, which wins over the file.
+#
+# Write only judgment here. The report computes every count, verdict, and gap from the ledger,
+# so do not restate them: prose that repeats a number goes stale on the next audit, and the
+# report then contradicts itself. Rewrite the assessment and points whenever the project is
+# re-audited.
+
+# Name of the audited project, shown on the cover, in the page header, and in the text.
+artifact = "example-service"
+
+# Version or release of the project that was audited.
+version = "1.4.0"
+
+# Base URL of the project's repository. Claims tagged `issue:N` link to `<repository>/issues/N`.
+repository = "https://github.com/example-org/example-service"
+
+# How the audit was carried out, shown on the cover. Defaults to "claims-audit skill
+# (claims-mcp)"; name the auditor's process here if it differed.
+method = "claims-audit skill (claims-mcp)"
+
+# The auditor's overall judgment, a few short paragraphs, shown under Result > Assessment.
+# Say what was audited (which documents and code the claims came from), whether the project
+# meets them, and which findings decide that, citing claim ids and tracking issues. Note
+# anything that limits the result, such as areas not audited or evidence that was not re-run.
+assessment = """
+example-service was audited against its README and docs/architecture.md. It meets every \
+audited requirement on authentication and storage. The two refutations (CLM-0042, CLM-0057) \
+concern retry limits documented in docs/architecture.md that the code does not enforce; both \
+are tracked as issue #12.
+
+The deployment guide was not audited.
+"""
+
+# Points for the evaluator: caveats a reader should weigh when relying on the verdicts. Add one
+# [[points]] table per point, each with a short title and a body of a sentence or two. Common
+# points: whether the audit was independent of the people or model that built the project,
+# evidence that comes from heuristic checks (text searches, scripted comparisons), tests whose
+# names promise more than they check, and changes made to the claim hierarchy during the audit.
+
+[[points]]
+title = "Independence"
+body = """
+The audit was not independent: the team that built example-service also audited it. Spot-check \
+the evidence locators, starting with integrity level 4.
+"""
+
+[[points]]
+title = "Heuristic checks"
+body = """
+Some evidence comes from text searches that can report false positives. Their locators name \
+the exact command so the result can be reproduced.
+"""

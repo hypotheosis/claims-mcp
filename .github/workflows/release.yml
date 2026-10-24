@@ -1,6 +1,7 @@
 # Release pipeline: pushing a tag `vX.Y.Z` on a commit in `main`, where X.Y.Z is `version` in
 # Cargo.toml, builds claims-mcp for Linux, Windows, and macOS and publishes a GitHub Release with
-# the archives, their SHA-256 checksums, and the audit report for the tagged commit.
+# the archives, their SHA-256 checksums, and the audit reports (summary and full) for the tagged
+# commit.
 #
 # A pull request that edits this file runs the builds as a dry run; nothing is published.
 name: Release

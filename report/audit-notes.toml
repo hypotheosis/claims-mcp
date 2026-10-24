@@ -1,12 +1,16 @@
 # Free-text sidecar for report/claims-report.typ (pass with --input notes=report/audit-notes.toml).
 #
+# These are claims-mcp's own notes for its self-audit. To report on another project, start from
+# report/audit-notes.example.toml instead of copying this file.
+#
 # SNAPSHOT: these notes record the auditor's judgment on the first self-audit of claims-mcp
-# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 with a note saying so. They are
-# not a default. Rewrite the assessment and points whenever the catalog is re-audited. Counts, verdicts, and gaps are deliberately left
-# out: the report computes those from the catalog, so prose here cannot contradict them.
+# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 and 0.2.1 with notes saying so.
+# They are not a default. Rewrite the assessment and points whenever the catalog is re-audited.
+# Counts, verdicts, and gaps are deliberately left out: the report computes those from the
+# catalog, so prose here cannot contradict them.
 
 artifact = "claims-mcp"
-version = "0.2.0"
+version = "0.2.1"
 repository = "https://github.com/hypotheosis/claims-mcp"
 method = "skills/claims-audit"
 
@@ -20,6 +24,9 @@ This assessment dates from the 0.1.0 audit and was not redone for 0.2.0. Version
 integrity seals (issue #9). Their behavior was not re-audited as claims, except CLM-0037, which \
 replaces CLM-0005 for the catalog's new schema version. The Integrity section shows the seal \
 check for this catalog.
+
+Version 0.2.1 adds the next_steps tool and tldr subcommand (PR #15) and the summary and full \
+detail levels of this report (PR #16). Neither was audited as claims.
 """
 
 [[points]]

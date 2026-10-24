@@ -26,6 +26,7 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 | `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
 | `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
+| `next_steps` | Ranked TL;DR: open claims by tier, each with one next step |
 
 ## Errors and constraints
 
@@ -123,21 +124,31 @@ Call `record_verdict` with `auditor` set to your model id or name:
 The server enforces that `supported` cites supporting evidence and `refuted` cites refuting
 evidence. Your `rationale` must explain *why* the cited evidence decides the claim.
 
+A `refuted` or `not_enough_info` rationale must end with `Fix: <one concrete next step>`: what
+to change, or which test or evidence would decide the claim. `next_steps` and
+`claims-mcp tldr` show the text after the last `Fix:` as the claim's next step, so make it
+specific enough to act on without rereading the rationale ("Fix: add a test that sends a
+1024-bit RSA JWK and asserts it is rejected", not "Fix: add tests"). The step must also stand
+alone, because items are re-sorted and truncated: never refer to other claims or text ("As
+above", "same as CLM-0012").
+
 Never infer support from the absence of failure ("no errors, so it works"). Absence of
 evidence is `not_enough_info`.
 
 #### Parent claims
 
 Judge leaf claims first. Once every active child of a parent is `supported`, record one
-`analysis` evidence item on the parent with locator `children: CLM-0003, CLM-0004` and a
-summary explaining how the children together cover the parent, then record the parent's
-verdict citing it. If any child is `refuted`, record `refutes` evidence on the parent naming
-that child and mark the parent `refuted`. Until then the report lists the parent under
-`decomposition`.
+`analysis` evidence item on the parent with locator `children of CLM-0002` (the parent's own
+id; do not list the children, since the report counts them from the catalog) and a summary
+explaining how the children together cover the parent, then record the parent's verdict citing
+it. If any child is `refuted`, record `refutes` evidence on the parent with the same locator,
+naming the refuted children in the summary, and mark the parent `refuted`. Until then the
+report lists the parent under `decomposition`.
 
 ### 5. Report
 
-Call `audit_report` and summarize for the user:
+Call `audit_report` and summarize for the user. On a large catalog, call `next_steps` first and
+lead the report with tiers 0-2:
 
 - Totals by verdict, and the share of level 3-4 claims that are supported.
 - Every non-empty gap list, with what each means and a concrete remediation:
@@ -153,13 +164,21 @@ Call `audit_report` and summarize for the user:
   | `dangling_links` | Parent was retired | Re-link or retire the child |
 
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
-- Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report. Build it
-  from a shell, not through this server (it never executes commands): `just report`, or
-  `claims-mcp verify --json > target/integrity.json`, then `typst compile --root .
-  report/claims-report.typ audit.pdf --input catalog=claims.json --input commit=<sha>
-  --input integrity=target/integrity.json`. Free text (the assessment and points for the
-  evaluator) goes in a TOML sidecar passed as `--input notes=<path>`. Tag a refuted claim
-  `issue:N` to link its tracking issue.
+- Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report:
+  1. Write the audited project's notes file, starting from `report/audit-notes.example.toml` in
+     the claims-mcp repository (never copy claims-mcp's own `report/audit-notes.toml`). Set
+     `artifact`, `version`, and `repository`; write an `assessment` that says what was audited,
+     whether the project meets it, and which findings decide that, citing claim ids and issues;
+     and add `[[points]]` for caveats the reader should weigh, such as whether the audit was
+     independent of the builder, heuristic evidence, and hierarchy changes during the audit.
+     Do not restate counts or verdicts; the report computes them.
+  2. Build the PDF from a shell, not through this server (it never executes commands):
+     `claims-mcp --catalog <ledger> verify --json > integrity.json`, then `typst compile --root .
+     <claims-mcp>/report/claims-report.typ audit.pdf --input catalog=<ledger> --input
+     notes=<notes file> --input commit=<sha> --input integrity=integrity.json`. Add
+     `--input detail=full` for the full record (every evidence item and verdict). Paths are
+     relative to `--root`, so the template, ledger, and notes must all be under it.
+  Tag a refuted claim `issue:N` to link its tracking issue.
 
 ### 6. Re-audit after fixes
 

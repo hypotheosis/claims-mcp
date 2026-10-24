@@ -26,7 +26,7 @@ Pick one:
 
 - **Download a release.** Each [GitHub release](https://github.com/hypotheosis/claims-mcp/releases)
   has an archive per platform, a `.sha256` checksum for each, and the audit report for that
-  version:
+  version (`audit.pdf`, the summary, and `audit-full.pdf`, every record):
 
   | Platform | Archive |
   |---|---|
@@ -144,6 +144,7 @@ Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
 |---|---|
 | *(none)* | Run the MCP server on stdio |
 | `verify [--json]` | Check every integrity seal; exit 1 if any check fails |
+| `tldr [--limit N] [--json]` | Print the ranked next steps; see [TL;DR of next steps](#tldr-of-next-steps) |
 | `seal --adopt` | Seal unsealed records once, to migrate a catalog (maintainers only) |
 
 ## Integrity seals
@@ -221,21 +222,62 @@ away from the file entirely, add deny rules to the project's `.claude/settings.j
 | `record_verdict` | Append a FEVER verdict; it must cite evidence that backs it |
 | `trace` | Ancestors and descendants of a claim, optionally depth-limited |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
+| `next_steps` | Ranked TL;DR: open claims in priority tiers, each with one next step |
+
+## TL;DR of next steps
+
+On a large catalog, `audit_report` is too long to act on. `next_steps` (MCP) and
+`claims-mcp tldr` (CLI) list only what to do next:
+
+```bash
+claims-mcp --catalog claims.json tldr             # Markdown, 10 items per tier
+claims-mcp --catalog claims.json tldr --limit 0   # every item
+claims-mcp --catalog claims.json tldr --json      # same data as the next_steps tool
+```
+
+Active **leaf** claims (no active children) are listed when they need work. A parent's verdict
+rolls up from its children, so a parent is listed only once every active child is done and its
+own verdict is not (missing, refuted, not_enough_info or stale): its step is then to record the
+roll-up verdict. Open claims are ranked into tiers:
+
+| Tier | Contents |
+|---|---|
+| 0. STOP | Shown only when the integrity check fails: make `claims-mcp verify` pass first (usually: restore the catalog from git) |
+| 1. Wrong | Refuted claims |
+| 2. Unproven | Other open claims at integrity level 3-4 (not_enough_info, unverified, stale, no evidence) |
+| 3. Everything else | Counts per `area:` tag |
+
+Tiers 1 and 2 are sorted by integrity level, then id. Each item shows its `issue:` tags and its
+next step: the text after the last `Fix:` in the latest verdict rationale (the `claims-audit`
+skill requires one on every `refuted` and `not_enough_info` verdict), or else the rationale's
+first sentence before the marker. Items beyond `--limit` are counted per area. The command exits
+0 whenever the catalog can be read; use `verify` to gate CI.
 
 ## Generate a PDF report
 
 [`report/claims-report.typ`](report/claims-report.typ) renders a catalog as a self-contained
-PDF audit report with [Typst](https://typst.app): result and assessment, integrity seal status,
-findings, coverage by integrity level, all eight gap categories, the claim hierarchy, the
-traceability matrix, and an evidence appendix with the full verdict history. It runs outside the
-server, which never executes commands.
+PDF audit report with [Typst](https://typst.app). It runs outside the server, which never
+executes commands. It has two detail levels:
+
+- **summary** (default): result and assessment, integrity seal status, findings grouped by
+  area (refuted claims in full, the rest as one-line next steps), coverage by integrity level,
+  and gap counts.
+- **full**: everything in the summary, plus every finding in full with its evidence, the claim
+  IDs in each gap, the claim hierarchy, the traceability matrix, and an evidence appendix with
+  each claim's full verdict history.
+
+Both collapse long claim ID lists into ranges and roll-up evidence into child counts, and both
+end with a glossary that defines every term the report uses (verdicts, stances, integrity levels,
+verification methods, seals), so readers need not know claims-mcp.
 
 ```bash
-just report                       # claims.json -> audit.pdf, stamped with the current commit
+just report                       # summary: claims.json -> audit.pdf (this repository's notes)
+just report full                  # full: claims.json -> audit-full.pdf
 # or, without just:
 claims-mcp --catalog claims.json verify --json > target/integrity.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
+  --input detail=summary \
   --input commit=$(git rev-parse --short HEAD) \
   --input notes=report/audit-notes.toml \
   --input integrity=target/integrity.json
@@ -246,15 +288,17 @@ Paths are relative to `--root`. All inputs are optional:
 | Input | Meaning |
 |---|---|
 | `catalog` | Catalog to report on (default `claims.json`) |
+| `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
-| `notes` | TOML sidecar with `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator; see [`report/audit-notes.toml`](report/audit-notes.toml) |
+| `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: start from [`report/audit-notes.example.toml`](report/audit-notes.example.toml), which explains every key ([`report/audit-notes.toml`](report/audit-notes.toml) is claims-mcp's own) |
 | `date` | Report date (default today) |
 | `artifact`, `version`, `repository`, `method`, `assessment` | Override the matching sidecar key |
 
 Tag a claim `issue:N` to link it to issue N of `repository` in the findings. The template applies
 the gap rules of spec section 4.1; `cargo test typst_template` checks that its totals, gaps, and
-matrix match `audit_report`. When `typst` is not installed that check is skipped and still
+matrix match `audit_report` in both detail levels, and that its text helpers pass
+`report/text-tests.typ`. When `typst` is not installed that check is skipped and still
 counts as passed, so a green `cargo test` does not prove it ran; set `REQUIRE_TYPST=1` (as CI
 should) to make a missing `typst` fail the tests instead.
 
@@ -285,7 +329,8 @@ just test     # cargo test
 - `claims-mcp verify`, which fails if `claims.json` was edited outside the tools
 - `cargo test` on Windows and macOS, and `cargo check` on the minimum supported Rust version
   (`rust-version` in `Cargo.toml`)
-- `just report` on the PR head commit; the PDF is uploaded as the run's
+- `just report` and `just report full` on the PR head commit; both PDFs (`audit.pdf`, the
+  summary, and `audit-full.pdf`, every record) are uploaded as the run's
   `audit-report-pr-<number>-<commit>` artifact (open the run's summary page to download it)
 
 ### Releasing

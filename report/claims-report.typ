@@ -1,4 +1,6 @@
-// PDF audit report for a claims-mcp catalog.
+// PDF audit report for a claims-mcp catalog. The rendered text is written for readers of the
+// audited project, who may not know claims-mcp: it introduces the tool once (`about-ledger`)
+// and refers to nothing that exists only in the claims-mcp repository.
 //
 //   typst compile --root . report/claims-report.typ audit.pdf \
 //     --input catalog=claims.json --input commit=$(git rev-parse --short HEAD) \
@@ -6,6 +8,9 @@
 //
 // Inputs (all optional):
 //   catalog     catalog path, relative to --root (default claims.json)
+//   detail      summary (default) or full. summary groups findings by area, shows refuted
+//               claims in full and the rest as one-line next steps, and omits the hierarchy,
+//               matrix, and evidence appendix; full includes everything.
 //   integrity   output of `claims-mcp verify --json` for that catalog, relative to --root.
 //               Typst cannot check HMAC seals itself; without this input the report says
 //               integrity was not checked.
@@ -16,20 +21,29 @@
 //   artifact, version, repository, method, assessment
 //               override the matching sidecar keys
 //
-// Gap rules follow spec section 4.1 exactly, as in src/report.rs. The computed totals, gaps,
+// Gap rules follow claims-mcp's design spec, section 4.1, as in src/report.rs. The computed totals, gaps,
 // and matrix, plus the integrity input, are exposed as <audit-report> metadata so
 // `typst query` can be compared with `audit_report`; see the `typst_template` tests in
-// src/report.rs.
+// src/report.rs. <report-layout> exposes the findings grouping and collapsed roll-up
+// locators for the same tests.
 
 // ---------------------------------------------------------------------------------------------
 // Inputs
 // ---------------------------------------------------------------------------------------------
+
+#import "text.typ": compress-ids, compress-runs, fix-step, reason-key, rich, wrappable
 
 // Typst resolves "/x" against --root and "x" against this file's directory. Catalog and notes
 // paths are given relative to the root, like the command-line paths around them.
 #let rooted(path) = if path.starts-with("/") { path } else { "/" + path }
 
 #let inputs = sys.inputs
+#let detail = inputs.at("detail", default: "summary")
+#assert(
+  detail in ("summary", "full"),
+  message: "detail must be \"summary\" or \"full\", not \"" + detail + "\"",
+)
+#let full = detail == "full"
 #let catalog-path = inputs.at("catalog", default: "claims.json")
 #let catalog = json(rooted(catalog-path))
 #let notes = if "notes" in inputs { toml(rooted(inputs.notes)) } else { (:) }
@@ -45,10 +59,12 @@
   let url = setting("repository", none)
   if url == none { none } else { url.trim("/", at: end) }
 }
-#let method = setting("method", "skills/claims-audit")
+#let method = setting("method", "claims-audit skill (claims-mcp)")
 #let assessment = setting("assessment", none)
 #let commit = inputs.at("commit", default: none)
 #let report-date = inputs.at("date", default: datetime.today().display())
+// Where readers of another project's report can find the tool that recorded the ledger.
+#let claims-mcp-url = "https://github.com/hypotheosis/claims-mcp"
 #let points = notes.at("points", default: ())
 
 // ---------------------------------------------------------------------------------------------
@@ -166,6 +182,104 @@
 #metadata((totals: totals, gaps: gaps, integrity: seal-check, matrix: matrix)) <audit-report>
 
 // ---------------------------------------------------------------------------------------------
+// Layout analysis: areas, findings, and roll-up locators
+// ---------------------------------------------------------------------------------------------
+
+#let all-verdicts = ("supported", "refuted", "not_enough_info", "unverified")
+#let humanize(name) = name.replace("_", " ")
+
+// The first parent that is an active claim, or none for a root.
+#let first-active-parent(claim) = claim.derived_from.find(
+  parent => parent in by-id and parent not in retired-set,
+)
+
+// A claim's area: its ancestor one level below a root, following first active parents. An
+// area claim is its own area; a root has none. Revisiting a claim stops the walk, so a
+// hand-edited cycle cannot loop forever; a claim whose walk ends in a cycle has no root above
+// it, so it is treated as a root (no area) and is still listed when it is a finding.
+#let area-of(claim) = {
+  let path = (claim.id,)
+  let parent = first-active-parent(claim)
+  while parent != none and parent not in path {
+    path.push(parent)
+    parent = first-active-parent(by-id.at(parent))
+  }
+  if parent != none or path.len() < 2 { none } else { path.at(-2) }
+}
+#let area = active.map(claim => (claim.id, area-of(claim))).to-dict()
+
+#let is-open(claim) = current-verdict(claim) in ("refuted", "not_enough_info")
+
+// Areas with active children head their group instead of being listed as findings. Roots and
+// childless areas are ordinary findings, so no refuted or undecided claim is hidden.
+#let is-heading-rollup(claim) = {
+  area.at(claim.id) == claim.id and children-of(claim.id).len() > 0
+}
+#let findings = active.filter(claim => is-open(claim) and not is-heading-rollup(claim))
+
+// Findings grouped by area. Roots and childless areas (claims directly below a root, with no
+// children) form the top-level group, listed first; then each heading area in catalog order. A
+// group is kept when it has findings or when its head is itself refuted or not enough info.
+#let finding-groups = {
+  let grouped = (:)
+  for claim in findings {
+    let key = area.at(claim.id)
+    let key = if key == none or key == claim.id { "" } else { key }
+    grouped.insert(key, grouped.at(key, default: ()) + (claim,))
+  }
+  let top = if "" in grouped { ((area: none, findings: grouped.at("")),) } else { () }
+  let heads = active.filter(claim => {
+    is-heading-rollup(claim) and (claim.id in grouped or is-open(claim))
+  })
+  top + heads.map(head => (area: head.id, findings: grouped.at(head.id, default: ())))
+}
+
+// Roll-up evidence names its claim's children: `children: CLM-0003, CLM-0004` (old skill
+// format) or `children of CLM-0002` (current). Either renders from the catalog's current
+// children, never from the locator text.
+#let rollup-pattern = regex("^\s*children(?::|\s+of\s+CLM-\d+)")
+#let is-rollup(item) = item.locator.match(rollup-pattern) != none
+#let rollup-locator(claim) = {
+  let kids = children-of(claim.id)
+  let prefix = "children of " + claim.id + ": "
+  if kids.len() == 0 { return prefix + "no active children" }
+  let counts = count-by(kids, id => current-verdict(by-id.at(id)))
+  let breakdown = all-verdicts
+    .filter(verdict => verdict in counts)
+    .map(verdict => str(counts.at(verdict)) + " " + humanize(verdict))
+    .join(", ")
+  let open = kids.filter(id => current-verdict(by-id.at(id)) != "supported")
+  let named = if open.len() == 0 { "" } else { ". Not supported: " + compress-ids(open) }
+  prefix + str(kids.len()) + " active (" + breakdown + ")" + named
+}
+// A roll-up's counts describe the children as they are now, which may differ from when the
+// evidence was recorded, so they are labelled as such.
+#let locator-text(claim, item) = if is-rollup(item) {
+  "Now: " + rollup-locator(claim)
+} else {
+  item.locator
+}
+
+#let rollup-locators = {
+  let rendered = (:)
+  for claim in claims {
+    for item in claim.evidence.filter(is-rollup) {
+      rendered.insert(item.id, rollup-locator(claim))
+    }
+  }
+  rendered
+}
+
+#metadata((
+  detail: detail,
+  areas: finding-groups.map(group => (
+    area: group.area,
+    findings: group.findings.map(claim => claim.id),
+  )),
+  rollup_locators: rollup-locators,
+)) <report-layout>
+
+// ---------------------------------------------------------------------------------------------
 // Presentation helpers
 // ---------------------------------------------------------------------------------------------
 
@@ -188,14 +302,34 @@
   )
 }
 
-// Zero-width spaces after separators let long paths and locators wrap inside table cells.
-#let wrappable(value) = value.replace(regex("[/_.:,=-]"), found => found.text + sym.zws)
+// Meanings shown both in the glossary and where the terms are used, so each is written once.
+#let integrity-levels = (
+  "4": [safety, security, or data loss],
+  "3": [a core function fails],
+  "2": [a function is degraded],
+  "1": [cosmetic or documentation],
+)
+#let verification-methods = (
+  inspection: [someone reads the code, documents, or output],
+  analysis: [reasoning, calculation, or static analysis],
+  demonstration: [running the system and observing its behavior],
+  test: [executing a defined test with pass/fail criteria],
+  formal_proof: [a machine-checked or rigorous mathematical proof],
+)
+#let level-meanings = {
+  integrity-levels.pairs().map(((level, meaning)) => [#level #meaning]).join("; ")
+}
+#let method-meanings = {
+  verification-methods
+    .pairs()
+    .map(((name, meaning)) => [_#name.replace("_", " ")_, #meaning])
+    .join("; ")
+}
+
 #let id-text(id) = raw(id)
 #let ids(list) = if list.len() == 0 { [none] } else { list.map(id-text).join(", ") }
 #let or-dash(value) = if value == none { [-] } else { [#value] }
-#let humanize(name) = name.replace("_", " ")
 #let level-text(claim) = or-dash(integrity(claim))
-#let all-verdicts = ("supported", "refuted", "not_enough_info", "unverified")
 
 // Tags of the form `issue:N` link a claim to an issue in `repository`.
 #let issue-links(claim) = claim.tags.filter(tag => tag.starts-with("issue:")).map(tag => {
@@ -219,6 +353,42 @@
   fill: (_, row) => if row == 0 { luma(235) },
   table.header(..header.map(strong)),
   ..rows.pos().flatten(),
+)
+
+// A full-width record: a header line of short fields, then the long text on its own lines, so
+// no column squeezes it.
+#let record-block(header, ..lines) = block(
+  width: 100%,
+  breakable: true,
+  above: 0.6em,
+  below: 0.6em,
+  inset: (left: 6pt, y: 2pt),
+  stroke: (left: 1.5pt + luma(170)),
+  {
+    text(size: 0.9em, header.join[ #sym.dot.c ])
+    for line in lines.pos() { linebreak() + line }
+  },
+)
+
+// Full mode also shows a roll-up's locator exactly as recorded (long id runs compressed), so
+// the sealed text is visible next to the current counts.
+#let evidence-block(claim, item) = record-block(
+  (strong(id-text(item.id)), item.kind, item.stance, wrappable(item.recorded_at)),
+  ..if full and is-rollup(item) {
+    (text(fill: luma(70))[Recorded: #rich(item.locator)],)
+  },
+  text(fill: luma(70), rich(locator-text(claim, item))),
+  rich(item.summary),
+)
+
+#let verdict-block(record) = record-block(
+  (
+    marker(record.verdict),
+    record.auditor,
+    wrappable(record.recorded_at),
+    [cites #ids(record.evidence_ids)],
+  ),
+  rich(record.rationale),
 )
 
 // ---------------------------------------------------------------------------------------------
@@ -252,20 +422,64 @@
     ([Method], raw(method)),
     ([Claims], [#active.len() active, #retired.len() retired]),
     ([Integrity], integrity-status()),
+    ([Detail], if full [full] else [summary (see Reproduce for the full report)]),
   ))
   pagebreak()
 }
 
+#let retired-claims() = {
+  heading(level: 2)[Retired claims]
+  [Retired claims are excluded from every total, gap, and table except this list#if full [ and
+    the evidence appendix].]
+  if retired.len() == 0 {
+    par(emph[No claims are retired.])
+  } else if full {
+    data-table(
+      columns: (auto, 2fr, 1.4fr, auto),
+      header: ([Claim], [Statement], [Reason], [Retired at]),
+      ..retired.map(claim => (
+        id-text(claim.id),
+        rich(claim.statement),
+        rich(claim.status.reason),
+        wrappable(claim.status.retired_at),
+      )),
+    )
+  } else {
+    let reasons = count-by(retired, claim => reason-key(claim.status.reason))
+    data-table(
+      columns: (auto, 1fr),
+      header: ([Claims], [Reason]),
+      ..reasons
+        .pairs()
+        .sorted(key: ((_, count)) => -count)
+        .map(((reason, count)) => (str(count), rich(reason))),
+      ([*#retired.len()*], [*Total retired*]),
+    )
+  }
+}
+
+// The one place the report explains claims-mcp; later sections name it without explanation.
+#let about-ledger() = par[
+  This report summarizes a claims ledger kept with
+  #link(claims-mcp-url)[claims-mcp], an open-source requirements-traceability tool. Each
+  requirement of #artifact is recorded as an atomic _claim_; an auditor attaches _evidence_
+  (tests, analysis, inspection, demonstration) and records a _verdict_ on each claim:
+  supported, refuted, or not enough info. Claims can be derived from broader claims, which
+  forms the hierarchy used to group the findings. Every term the report uses is defined in the
+  Glossary (@glossary).
+]
+
 #let section-result() = {
   heading[Result]
+  about-ledger()
   if tampered {
     block(width: 100%, fill: rgb("#f3d0d0"), stroke: 0.8pt + luma(60), inset: 8pt, radius: 3pt)[
-      *INTEGRITY CHECK FAILED.* The catalog was changed outside claims-mcp (see the Integrity
-      section). Its verdicts and evidence cannot be trusted, so this report is not a clean
+      *INTEGRITY CHECK FAILED.* The claims ledger was changed outside claims-mcp (see the
+      Integrity section). Its verdicts and evidence cannot be trusted, so this report is not a clean
       result.
     ]
   } else if seal-check == none {
-    par(emph[Integrity seals were not checked. Render with `just report` to include them.])
+    par(emph[Integrity seals were not checked; see the Integrity section.])
   }
   let evidence = active.map(claim => claim.evidence).flatten()
   let stances = count-by(evidence, item => item.stance)
@@ -293,57 +507,36 @@
   )
   heading(level: 2)[Assessment]
   if assessment == none { emph[No assessment provided.] } else { assessment }
-
-  heading(level: 2)[Retired claims]
-  [Retired claims are excluded from every total, gap, and table except this list and the
-    evidence appendix.]
-  if retired.len() == 0 {
-    par(emph[No claims are retired.])
-  } else {
-    data-table(
-      columns: (auto, 2fr, 1.4fr, auto),
-      header: ([Claim], [Statement], [Reason], [Retired at]),
-      ..retired.map(claim => (
-        id-text(claim.id),
-        claim.statement,
-        claim.status.reason,
-        wrappable(claim.status.retired_at),
-      )),
-    )
-  }
+  retired-claims()
 }
 
 #let finding(claim) = {
   let latest = claim.verdicts.last()
   let cited = claim.evidence.filter(item => item.id in latest.evidence_ids)
   let issues = issue-links(claim)
-  block(breakable: false, width: 100%, stroke: 0.5pt + luma(150), inset: 8pt, radius: 3pt, {
+  block(breakable: true, width: 100%, stroke: 0.5pt + luma(150), inset: 8pt, radius: 3pt, {
     [#strong(id-text(claim.id)) #h(0.4em) #marker(current-verdict(claim))]
-    par(claim.statement)
+    par(rich(claim.statement))
     field-table(
       ([Integrity / method], [IL #level-text(claim), #humanize(claim.verification_method)]),
-      ([Rationale], latest.rationale),
-      ([Auditor], [#latest.auditor, #latest.recorded_at]),
+      ([Rationale], rich(latest.rationale)),
+      ([Auditor], [#latest.auditor, #wrappable(latest.recorded_at)]),
       ([Linked issue], if issues.len() == 0 { [none] } else { issues.join(", ") }),
     )
     if cited.len() == 0 {
       emph[The verdict cites no evidence.]
     } else {
-      data-table(
-        columns: (auto, auto, 1.2fr, 2fr),
-        header: ([Evidence], [Stance], [Locator], [Summary]),
-        ..cited.map(item => (id-text(item.id), item.stance, wrappable(item.locator), item.summary)),
-      )
+      cited.map(item => evidence-block(claim, item)).join()
     }
   })
 }
 
 #let section-integrity() = {
   heading[Integrity]
-  [claims-mcp seals every claim, evidence item, and verdict when a tool records it. A record
-    whose seal fails was changed outside the server.]
+  [claims-mcp seals every claim, evidence item, and verdict as it is recorded. A record whose
+    seal fails was changed afterwards by other means, such as editing the ledger file by hand.]
   if seal-check == none {
-    par(emph[Not checked: no `integrity` input was given.])
+    par(emph[Not checked: the report was rendered without the result of `claims-mcp verify`.])
     return
   }
   if seal-check.verified {
@@ -356,20 +549,70 @@
     )
   }
   if seal-check.adopted.len() > 0 {
-    par[#seal-check.adopted.len() records were sealed by `claims-mcp seal --adopt` (migrated)
-      rather than recorded through the server:]
-    text(size: 7.5pt, seal-check.adopted.map(raw).join(", "))
+    par[#seal-check.adopted.len() records were sealed when an older ledger was migrated
+      (`claims-mcp seal --adopt`) rather than as they were recorded#if full [:] else [.]]
+    if full { text(size: 7.5pt, seal-check.adopted.map(raw).join(", ")) }
+  }
+}
+
+#let finding-counts(claims) = {
+  let counts = count-by(claims, current-verdict)
+  ("refuted", "not_enough_info")
+    .filter(verdict => verdict in counts)
+    .map(verdict => str(counts.at(verdict)) + " " + humanize(verdict))
+    .join(", ")
+}
+
+#let next-step-row(claim) = {
+  let step = fix-step(claim.verdicts.last().rationale)
+  (id-text(claim.id), rich(claim.statement), level-text(claim), or-dash(if step != none {
+    rich(step)
+  }))
+}
+
+#let finding-group(group) = {
+  if group.area == none {
+    heading(level: 2)[Top level]
+  } else {
+    let head = by-id.at(group.area)
+    heading(level: 2)[#id-text(head.id) #h(0.3em) #marker(current-verdict(head))]
+    par(rich(head.statement))
+  }
+  if group.findings.len() == 0 {
+    par(emph[No findings below this area.])
+  } else {
+    par(emph[#group.findings.len() findings: #finding-counts(group.findings).])
+  }
+  let refuted = group.findings.filter(claim => current-verdict(claim) == "refuted")
+  let cards = if full { group.findings } else { refuted }
+  cards.map(finding).join(v(0.6em))
+  if not full and refuted.len() < group.findings.len() {
+    v(0.6em)
+    data-table(
+      columns: (auto, 1fr, auto, 1fr),
+      header: ([Claim], [Statement], [IL], [Next step]),
+      ..group
+        .findings
+        .filter(claim => current-verdict(claim) != "refuted")
+        .map(next-step-row),
+    )
   }
 }
 
 #let section-findings() = {
   heading[Findings]
-  let findings = active.filter(claim => current-verdict(claim) in ("refuted", "not_enough_info"))
-  if findings.len() == 0 {
+  if finding-groups.len() == 0 {
     emph[No active claim is refuted or undecided.]
-  } else {
-    findings.map(finding).join(v(0.6em))
+    return
   }
+  [Active claims that are refuted or not enough info, grouped by area: the claim one level
+    below the root. Areas with children head their group instead of being listed; roots and
+    claims directly below a root with no children are under Top level.]
+  if not full {
+    [ Refuted claims are shown in full; the rest show the next step from their latest
+      rationale.]
+  }
+  finding-groups.map(finding-group).join()
 }
 
 #let section-points() = {
@@ -385,6 +628,9 @@
 
 #let section-coverage() = {
   heading[Coverage by integrity level]
+  [Each claim's _integrity level_ (IL, from the IEEE 1012 verification standard) rates the
+    consequence if it is wrong: #level-meanings. Higher levels call for more rigorous
+    verification.]
   let rows = ("4", "3", "2", "1", "unassigned").map(key => {
     let group = active.filter(claim => integrity-key(claim) == key)
     let verdicts = count-by(group, current-verdict)
@@ -409,11 +655,16 @@
   )
   [_Other_ counts claims that are unverified or not enough info.]
   heading(level: 2)[Rigor check]
-  if gaps.rigor.len() == 0 {
-    [No integrity level 3-4 claim is verified only by inspection.]
+  let critical = active.filter(claim => integrity(claim) in (3, 4)).len()
+  [Claims at integrity level 3 or 4 should be verified by test, analysis, demonstration, or
+    formal proof, not by _inspection_ alone (#verification-methods.inspection). ]
+  if critical == 0 {
+    [No active claim has integrity level 3 or 4.]
+  } else if gaps.rigor.len() == 0 {
+    [All #critical level 3-4 claims meet this: none relies on inspection alone.]
   } else {
-    [*RIGOR GAP:* these integrity level 3-4 claims are verified only by inspection:
-      #ids(gaps.rigor).]
+    [*RIGOR GAP:* #gaps.rigor.len() of the #critical level 3-4 claims rely on inspection
+      alone: #compress-ids(gaps.rigor).]
   }
 }
 
@@ -423,24 +674,30 @@
   refuted: [Current verdict is refuted.],
   not_enough_info: [Current verdict is not enough info.],
   stale: [Evidence was recorded after the latest verdict.],
-  rigor: [Integrity level 3-4 claim verified only by inspection.],
+  rigor: [Integrity level 3-4 claim that relies on inspection alone.],
   decomposition: [At least one active child is not supported.],
   dangling_links: [Claim derives from a retired claim.],
 )
 
 #let section-gaps() = {
-  heading[Gap summary]
-  [All eight gap categories of spec section 4.1 were checked, over active claims only.]
+  [#heading[Gap summary] <gaps>]
+  [Every active claim was checked against all eight gap categories below.]
   data-table(
-    columns: (auto, 1.4fr, auto, 1.6fr),
-    header: ([Gap], [Meaning], [Count], [Claims]),
+    columns: (auto, 1fr, auto),
+    header: ([Gap], [Meaning], [Count]),
     ..gaps.pairs().map(((name, members)) => (
       raw(name),
       gap-meanings.at(name),
       str(members.len()),
-      ids(members),
     )),
   )
+  let listed = gaps.pairs().filter(((_, members)) => members.len() > 0)
+  if full and listed.len() > 0 {
+    heading(level: 2)[Claims per gap]
+    for (name, members) in listed {
+      terms.item(raw(name), compress-ids(members))
+    }
+  }
 }
 
 #let tree-node(id, depth) = {
@@ -449,7 +706,7 @@
     [#strong(id-text(id)) #marker(current-verdict(claim)) #h(0.3em)]
     text(size: 0.85em)[#claim.level, IL #level-text(claim)]
     linebreak()
-    text(size: 0.85em, claim.statement)
+    text(size: 0.85em, rich(claim.statement))
   })
   for child in children-of(id) {
     tree-node(child, depth + 1)
@@ -458,8 +715,8 @@
 
 #let section-hierarchy() = {
   heading[Claim hierarchy]
-  [Active claims, indented under their parents by `derived_from`. A claim with several parents
-    appears under each. Roots are claims with no active parent.]
+  [Active claims, each indented under the claims it was derived from. A claim with several
+    parents appears under each. Roots are claims with no active parent.]
   let roots = active.filter(claim => claim.derived_from.all(parent => parent in retired-set))
   for root in roots {
     tree-node(root.id, 0)
@@ -479,8 +736,11 @@
     ),
     ..active.map(claim => (
       id-text(claim.id),
-      claim.statement,
-      or-dash(claim.at("source", default: none)),
+      rich(claim.statement),
+      {
+        let source = claim.at("source", default: none)
+        if source == none { [-] } else { rich(source) }
+      },
       ids(claim.derived_from),
       claim.level,
       level-text(claim),
@@ -488,7 +748,7 @@
       if claim.evidence.len() == 0 {
         [-]
       } else {
-        claim.evidence.map(item => wrappable(item.locator)).join(linebreak())
+        claim.evidence.map(item => rich(locator-text(claim, item))).join(linebreak())
       },
       marker(current-verdict(claim)),
     )),
@@ -500,46 +760,105 @@
     id-text(claim.id)
     if claim.status.state != "active" { [ (retired)] }
   })
-  par(claim.statement)
+  par(rich(claim.statement))
   if claim.evidence.len() == 0 {
     par(emph[No evidence.])
   } else {
-    data-table(
-      columns: (auto, auto, auto, 1.3fr, 2fr, auto),
-      header: ([Evidence], [Kind], [Stance], [Locator], [Summary], [Recorded]),
-      ..claim.evidence.map(item => (
-        id-text(item.id),
-        item.kind,
-        item.stance,
-        wrappable(item.locator),
-        item.summary,
-        wrappable(item.recorded_at),
-      )),
-    )
+    claim.evidence.map(item => evidence-block(claim, item)).join()
   }
   if claim.verdicts.len() == 0 {
     par(emph[No verdicts.])
   } else {
-    data-table(
-      columns: (auto, auto, auto, 2fr, auto),
-      header: ([Verdict], [Auditor], [Cites], [Rationale], [Recorded]),
-      ..claim.verdicts.map(record => (
-        marker(record.verdict),
-        record.auditor,
-        ids(record.evidence_ids),
-        record.rationale,
-        wrappable(record.recorded_at),
-      )),
-    )
+    claim.verdicts.map(verdict-block).join()
   }
 }
 
 #let section-evidence() = {
   heading[Evidence appendix]
   [Every evidence item, grouped by claim, followed by the claim's full verdict history in the
-    order recorded (the history is append-only, so the last row is the current verdict).]
+    order recorded (the history is append-only, so the last entry is the current verdict).]
   set text(size: 8.5pt)
   claims.map(evidence-entry).join()
+}
+
+#let glossary-group(title, ..entries) = {
+  heading(level: 2, title)
+  for (term, meaning) in entries.pos() {
+    terms.item(term, meaning)
+  }
+}
+
+#let section-glossary() = {
+  [#heading[Glossary] <glossary>]
+  glossary-group(
+    [Claims],
+    ([Claim (`CLM-NNNN`)], [One atomic, checkable statement about #artifact: a requirement,
+      or a promise its documentation or code makes.]),
+    ([Source], [Where the claim's statement comes from, such as a document and section.]),
+    ([Parent, child], [A child claim is derived from a broader parent claim and narrows it. A
+      parent holds only if all of its children do.]),
+    ([Root], [A claim with no active parent: the broadest statements in the ledger.]),
+    ([Area], [A claim directly below a root. Findings are grouped by area.]),
+    ([Retired], [A claim withdrawn from the audit, for example because more precise claims
+      replaced it. It is kept with its reason but excluded from every total and gap.]),
+    ([Claim level], [Where a claim sits in the requirements hierarchy, broadest first:
+      _system_ (the whole system or a top-level task), _software_, _component_ (one module),
+      _unit_ (one function or type), _artifact_ (a concrete produced file or output).]),
+    ([Integrity level (IL)], [How serious it would be if the claim were wrong, from the IEEE
+      1012 verification standard: #level-meanings. Higher levels call for more rigorous
+      verification.]),
+    ([Verification method], [How a claim is meant to be verified: #method-meanings.]),
+  )
+  glossary-group(
+    [Evidence],
+    ([Evidence (`EVD-NNNN`)], [Something the auditor observed about a claim, recorded with a
+      locator, a kind, a stance, and a summary of what it shows.]),
+    ([Locator], [Where to find the evidence again: a file and line, a test name, a command, or
+      a URL.]),
+    ([Kind], [The form of the evidence: _test_ (an executed test), _inspection_ (reading an
+      artifact), _analysis_ (reasoning or static analysis), _demonstration_ (running the
+      system), _proof_ (proof output), _log_ (captured log or command output), or _other_.]),
+    ([Stance], [Whether the evidence _supports_ the claim (shows it holds), _refutes_ it (shows
+      it does not), or is _neutral_ (relevant but decides nothing).]),
+    ([Roll-up], [Evidence on a parent claim that summarizes its children's verdicts. The
+      report shows "Now: children of CLM-NNNN" with the children's current counts and those not
+      yet supported, which may have changed since the evidence was recorded; the full report
+      also shows the locator as recorded.]),
+  )
+  glossary-group(
+    [Verdicts and findings],
+    ([#marker("supported")], [The cited evidence shows the claim holds.]),
+    ([#marker("refuted")], [The cited evidence shows the claim does not hold.]),
+    ([#marker("not_enough_info")], [The evidence gathered cannot decide the claim.]),
+    ([#marker("unverified")], [No verdict has been recorded yet.]),
+    ([Current verdict], [A claim's latest verdict. Verdicts are never edited; a new verdict is
+      appended, so earlier ones remain as history.]),
+    ([Rationale], [The auditor's explanation of why the cited evidence leads to the verdict.]),
+    ([Auditor], [The person or AI model that recorded a verdict.]),
+    ([Finding], [An active claim whose current verdict is refuted or not enough info.]),
+    ([Next step], [For a finding, the text after "Fix:" in its rationale: the one action
+      that would fix the claim or decide it.]),
+    ([Gap], [A category of open problem, such as a claim with no evidence or a stale verdict.
+      The eight categories are defined in the Gap summary (@gaps).]),
+    ([Rigor gap], [A claim at integrity level 3 or 4 that relies on inspection alone.]),
+  )
+  glossary-group(
+    [Integrity],
+    ([Seal], [A keyed checksum (HMAC) that claims-mcp computes over each claim, evidence item,
+      and verdict as it is recorded. A record whose seal no longer matches was changed
+      afterwards by other means.]),
+    ([Adopted record], [A record sealed when an older ledger without seals was migrated. Its
+      seal shows it has not changed since the migration, not since it was first recorded.]),
+  )
+  if full {
+    glossary-group(
+      [Report sections],
+      ([Traceability matrix], [One row per active claim, tracing it from its source through its
+        parents, verification method, and evidence to its current verdict.]),
+      ([Evidence appendix], [Every evidence item of every claim, followed by the claim's full
+        verdict history.]),
+    )
+  }
 }
 
 #let section-reproduce() = {
@@ -559,7 +878,9 @@
     " \\\n  --input integrity=" + inputs.integrity
   } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
-  [Regenerate this PDF:]
+  [Regenerate this PDF with the #link(claims-mcp-url)[claims-mcp] command-line tool and its
+    report template (`report/claims-report.typ` in the claims-mcp repository; adjust the path
+    to where it is on your machine) using #link("https://typst.app")[Typst]:]
   raw(
     block: true,
     lang: "sh",
@@ -567,16 +888,23 @@
       + (if "integrity" in inputs {
         "claims-mcp --catalog " + catalog-path + " verify --json > " + inputs.integrity + "\n"
       } else { "" })
-      + "typst compile --root . report/claims-report.typ audit.pdf \\\n  --input catalog="
+      + "typst compile --root . report/claims-report.typ "
+      + (if full { "audit-full.pdf" } else { "audit.pdf" })
+      + " \\\n  --input catalog="
       + catalog-path
+      + " \\\n  --input detail="
+      + detail
       + commit-flag
       + notes-flag
       + integrity-flag,
   )
-  [Re-run the checks. `cargo test` runs the server's tests; `cargo test typst_template` also
-    confirms that this template's totals, gaps, and matrix match `audit_report` (it needs the
-    Typst CLI on `PATH`). Each evidence locator names the test, command, or file to re-inspect.]
-  raw(block: true, lang: "sh", "cargo test\ncargo test typst_template")
+  if not full {
+    par[This is the summary. Render with `--input detail=full` for every finding in full, every
+      claim per gap, the claim hierarchy, the traceability matrix, and the evidence appendix
+      with each claim's verdict history.]
+  }
+  par[To re-check a verdict, follow the locators of its evidence: each names the test, command,
+    or file in #artifact to re-run or re-inspect.]
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -597,6 +925,8 @@
   },
 )
 #show heading.where(level: 1): set block(above: 1.6em, below: 0.9em)
+// External links (claims-mcp, Typst, issues) are underlined so print readers can spot them.
+#show link: underline
 
 #cover()
 
@@ -610,8 +940,11 @@
   section-points()
   section-coverage()
   section-gaps()
-  section-hierarchy()
-  section-matrix()
-  section-evidence()
+  if full {
+    section-hierarchy()
+    section-matrix()
+    section-evidence()
+  }
+  section-glossary()
   section-reproduce()
 }
