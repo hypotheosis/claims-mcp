@@ -169,8 +169,9 @@ lead the report with tiers 0-2:
      `report/` and creates `report/audit-notes.toml` from the commented example (it never
      replaces an existing notes file). Without a shell, read the MCP resource
      `claims://report/audit-notes.example.toml` and write the notes file from it. Fill it in
-     as the example's comments say: set `artifact`, `version`, and `repository`; write an `assessment` that says what was audited,
-     whether the project meets it, and which findings decide that, citing claim ids and issues;
+     as the example's comments say: set `artifact`, `version`, and `repository`; write an
+     `assessment` that says what was audited, whether the project meets it, and which
+     findings decide that, citing claim ids and issues;
      and add `[[points]]` for caveats the reader should weigh, such as whether the audit was
      independent of the builder, heuristic evidence, and hierarchy changes during the audit.
      Do not restate counts or verdicts; the report computes them.
