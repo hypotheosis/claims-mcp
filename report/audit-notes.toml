@@ -16,9 +16,9 @@ method = "skills/claims-audit"
 
 assessment = """
 claims-mcp was audited against concept.md and the design spec. The server itself meets every \
-audited requirement. The one refutation (CLM-0034) concerns a process artifact, not the \
-server: the implementation plan no longer matches the committed source, which is tracked as \
-issue #1.
+audited requirement. That audit's one refutation (CLM-0034) concerned a process artifact, not \
+the server: the implementation plan no longer matched the committed source. Issue #1 resolved \
+it by marking the plan as historical; CLM-0034 was retired and replaced by CLM-0066.
 
 This assessment dates from the 0.1.0 audit and was not redone for 0.2.0. Version 0.2.0 adds \
 integrity seals (issue #9). Their behavior was not re-audited as claims, except CLM-0037, which \
