@@ -548,6 +548,10 @@ pub(crate) mod tests {
         pub(crate) head: Option<String>,
         /// Paths `path_exists` denies; every other path exists.
         pub(crate) absent_paths: Vec<String>,
+        /// How many times `grep_count` ran.
+        ///
+        /// Rust note: `Cell` allows mutation through the `&self` the trait methods take.
+        pub(crate) grep_calls: std::cell::Cell<u32>,
     }
 
     impl FakeRepo {
@@ -580,6 +584,7 @@ pub(crate) mod tests {
         }
 
         fn grep_count(&self, _: &str, _: &str, _: bool, _: &[String]) -> Result<u32> {
+            self.grep_calls.set(self.grep_calls.get() + 1);
             Ok(self.grep_hits)
         }
 

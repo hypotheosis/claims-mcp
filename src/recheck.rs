@@ -112,6 +112,7 @@ pub fn recheck(catalog: &Catalog, probe: &impl RepoProbe) -> Result<RecheckRepor
         head_lines: HashMap::new(),
         commits: HashMap::new(),
         hunks: HashMap::new(),
+        searches: HashMap::new(),
     };
     let mut checked = 0;
     let mut items = Vec::new();
@@ -163,6 +164,8 @@ struct Checker<'probe, P> {
     commits: HashMap<String, bool>,
     /// Hunks from `(commit, path)` to `HEAD`.
     hunks: HashMap<(String, String), Vec<Hunk>>,
+    /// Hits at `HEAD` per `(pattern, case_insensitive, scope)`.
+    searches: HashMap<(String, bool, Vec<String>), u32>,
 }
 
 impl<P: RepoProbe> Checker<'_, P> {
@@ -229,13 +232,25 @@ impl<P: RepoProbe> Checker<'_, P> {
         Ok(compare_lines(anchor, hunks))
     }
 
-    fn check_search(&self, anchor: &SearchAnchor) -> Result<(AnchorStatus, String)> {
-        let hits = self.probe.grep_count(
-            &self.head,
-            &anchor.pattern,
+    fn check_search(&mut self, anchor: &SearchAnchor) -> Result<(AnchorStatus, String)> {
+        let key = (
+            anchor.pattern.clone(),
             anchor.case_insensitive,
-            &anchor.scope,
-        )?;
+            anchor.scope.clone(),
+        );
+        let hits = match self.searches.get(&key) {
+            Some(hits) => *hits,
+            None => {
+                let hits = self.probe.grep_count(
+                    &self.head,
+                    &anchor.pattern,
+                    anchor.case_insensitive,
+                    &anchor.scope,
+                )?;
+                self.searches.insert(key, hits);
+                hits
+            }
+        };
         let head = short_commit(&self.head);
         Ok(match (anchor.hits, hits) {
             (before, now) if before == now => (AnchorStatus::Current, String::new()),
@@ -491,6 +506,26 @@ mod tests {
             vec![AnchorStatus::CommitMissing, AnchorStatus::CommitMissing]
         );
         assert_eq!(report.current, 1, "the search still finds nothing");
+    }
+
+    #[test]
+    fn recheck_runs_each_distinct_search_once() {
+        let repo = FakeRepo::default();
+        let mut catalog = Catalog::default();
+        let id = catalog
+            .add_claim(new_claim("absent"), at(0))
+            .expect("claim")
+            .id;
+        for _ in 0..3 {
+            let mut item = evidence(Stance::Refutes);
+            item.anchor =
+                Some(pin(&repo, NewAnchor::Search(search_input("x", None))).expect("pin"));
+            catalog.add_evidence(id, item, at(1)).expect("evidence");
+        }
+        let now = FakeRepo::default();
+        let report = recheck(&catalog, &now).expect("recheck");
+        assert_eq!((report.checked, report.current), (3, 3));
+        assert_eq!(now.grep_calls.get(), 1);
     }
 
     #[test]
