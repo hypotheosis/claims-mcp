@@ -243,7 +243,8 @@ An evidence `locator` is free text. To make evidence point at an exact, checkabl
 
 Claims take a `source_anchor` (a file anchor) on the text that makes them, such as the README
 line that promises a feature. If the claim is refuted, that is the text to fix; `audit_report`
-lists refuted claims without one under `refuted_without_source_anchor`.
+lists refuted claims without one under `refuted_without_source_anchor`. `update_claim` can
+replace a `source_anchor` but not remove it.
 
 The server, not the caller, records the commit, and for a search it runs `git grep` itself and
 records the hit count (a `hits` value the caller passes must match). It rejects paths outside

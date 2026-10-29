@@ -455,11 +455,12 @@ impl fmt::Display for FileAnchor {
 impl fmt::Display for SearchAnchor {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         let flags = if self.case_insensitive { "-iE" } else { "-E" };
+        let scope: Vec<_> = self.scope.iter().map(|path| shell_word(path)).collect();
         write!(
             formatter,
-            "git grep {flags} '{}' -- {} @ {} ({} hits)",
-            self.pattern,
-            self.scope.join(" "),
+            "git grep {flags} {} -- {} @ {} ({} hits)",
+            shell_quote(&self.pattern),
+            scope.join(" "),
             short_commit(&self.commit),
             self.hits
         )
@@ -472,6 +473,25 @@ impl fmt::Display for Anchor {
             Self::File(anchor) => anchor.fmt(formatter),
             Self::Search(anchor) => anchor.fmt(formatter),
         }
+    }
+}
+
+/// `text` in POSIX single quotes, so a copied command passes it to git unchanged. A `'`
+/// inside becomes `'\''`: close the quotes, an escaped quote, reopen.
+fn shell_quote(text: &str) -> String {
+    format!("'{}'", text.replace('\'', r"'\''"))
+}
+
+/// `word` as is when the shell would read it unchanged, otherwise [`shell_quote`]d.
+fn shell_word(word: &str) -> Cow<'_, str> {
+    let plain = !word.is_empty()
+        && word
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || b"_./-".contains(&byte));
+    if plain {
+        Cow::Borrowed(word)
+    } else {
+        Cow::Owned(shell_quote(word))
     }
 }
 

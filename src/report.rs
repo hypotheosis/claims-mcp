@@ -707,8 +707,11 @@ mod tests {
             Some(pin_file(&repo, file_input("README.md", Some((4, 4)))).expect("pin"));
         let claim = catalog.add_claim(input, at(0)).expect("claim").id;
         let mut cited = Vec::new();
+        // A quote in the pattern and a space in a scope path exercise the shell quoting.
+        let mut search = search_input("rate.?limit|throttl|can't wait", None);
+        search.scope = vec!["src".to_owned(), "my docs".to_owned()];
         for anchor in [
-            NewAnchor::Search(search_input("rate.?limit|throttl", None)),
+            NewAnchor::Search(search),
             NewAnchor::File(file_input("src/server.rs", Some((40, 61)))),
         ] {
             let mut item = evidence(Stance::Refutes);
@@ -729,7 +732,8 @@ mod tests {
         assert_eq!(
             refuting,
             vec![
-                "git grep -iE 'rate.?limit|throttl' -- src @ 0123456789ab (0 hits)".to_owned(),
+                r"git grep -iE 'rate.?limit|throttl|can'\''t wait' -- 'my docs' src @ 0123456789ab (0 hits)"
+                    .to_owned(),
                 "src/server.rs:40-61 @ 0123456789ab".to_owned(),
             ]
         );

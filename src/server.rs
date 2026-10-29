@@ -231,8 +231,8 @@ impl ClaimsServer {
     #[tool(
         description = "Update a claim's metadata. Omitted or null fields are unchanged; list \
         fields replace the whole list ([] empties it); source \"\" removes the source; \
-        integrity_level cannot be removed. A new derived_from link must point at an active \
-        claim; an existing link to a parent retired later may be kept. Evidence and verdicts \
+        integrity_level and source_anchor can be replaced but not removed. A new derived_from \
+        link must point at an active claim; an existing link to a parent retired later may be kept. Evidence and verdicts \
         cannot be edited. To change what a judged claim means, retire it and add a new one."
     )]
     async fn update_claim(&self, Parameters(params): Parameters<UpdateClaimParams>) -> ToolResult {
@@ -242,6 +242,8 @@ impl ClaimsServer {
                 .mutate(move |catalog| {
                     let mut update = params.update;
                     if let Some(input) = params.source_anchor {
+                        // Fail on a missing or retired claim before running git.
+                        catalog.ensure_active(params.id)?;
                         let repo = GitCli::for_store(&store)?;
                         update.source_anchor = Some(anchor::pin_file(&repo, input)?);
                     }
@@ -278,6 +280,7 @@ impl ClaimsServer {
                 .mutate(move |catalog| {
                     let mut evidence = params.evidence;
                     if let Some(input) = params.anchor {
+                        catalog.ensure_active(params.claim_id)?;
                         let repo = GitCli::for_store(&store)?;
                         evidence.anchor = Some(anchor::pin(&repo, input)?);
                     }
@@ -971,6 +974,21 @@ mod tests {
             "{}",
             text_of(&refused)
         );
+        // A missing claim is reported as such, before git is consulted.
+        let params: AddEvidenceParams = serde_json::from_value(serde_json::json!({
+            "claim_id": "CLM-0099",
+            "kind": "inspection",
+            "locator": "src/lib.rs:1",
+            "summary": "anchored evidence on a claim that does not exist",
+            "stance": "refutes",
+            "anchor": {"file": {"path": "src/lib.rs"}}
+        }))
+        .expect("evidence params parse");
+        let refused = server
+            .add_evidence(Parameters(params))
+            .await
+            .expect("tool result");
+        assert_eq!(text_of(&refused), "claim CLM-0099 not found");
         // Claims without anchors still work outside git.
         let added = server
             .add_claim(Parameters(claim_input("plain", Vec::new())))

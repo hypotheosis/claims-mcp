@@ -688,6 +688,15 @@ impl Catalog {
         self.claims.binary_search_by_key(&id, |claim| claim.id).ok()
     }
 
+    /// Checks that `id` exists and is active, so callers can fail fast before slow work.
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::ClaimNotFound`] or [`ClaimsError::Retired`].
+    pub fn ensure_active(&self, id: ClaimId) -> Result<()> {
+        self.active_index(id).map(|_| ())
+    }
+
     /// Index of `id`, failing if it is missing or retired.
     fn active_index(&self, id: ClaimId) -> Result<usize> {
         let index = self.index_of(id).ok_or(ClaimsError::ClaimNotFound(id))?;

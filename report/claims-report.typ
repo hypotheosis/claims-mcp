@@ -110,12 +110,20 @@
   let lines = file.at("lines", default: none)
   file.path + if lines != none { ":" + line-text(lines) } else { "" } + " @ " + short-commit(file.commit)
 }
+// POSIX single quotes, as `shell_quote` and `shell_word` in src/model.rs.
+#let shell-quote(text) = "'" + text.replace("'", "'\\''") + "'"
+#let shell-word(word) = if word.match(regex("^[A-Za-z0-9_./-]+$")) != none {
+  word
+} else {
+  shell-quote(word)
+}
 #let anchor-text(anchor) = if "file" in anchor {
   file-anchor-text(anchor.file)
 } else {
   let search = anchor.search
   let flags = if search.at("case_insensitive", default: false) { "-iE" } else { "-E" }
-  ("git grep " + flags + " '" + search.pattern + "' -- " + search.scope.join(" ") + " @ "
+  ("git grep " + flags + " " + shell-quote(search.pattern) + " -- "
+    + search.scope.map(shell-word).join(" ") + " @ "
     + short-commit(search.commit) + " (" + str(search.hits) + " hits)")
 }
 #let source-anchor(claim) = claim.at("source_anchor", default: none)
