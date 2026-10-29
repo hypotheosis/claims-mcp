@@ -90,7 +90,8 @@ using these tools.
   and stable.
 - **Ids** are never reused. `next_claim_seq` and `next_evidence_seq` only ever increase. Evidence ids
   are unique across the whole catalog.
-- **Optional fields** (`integrity_level`, `source`) are omitted when absent. Empty arrays are always
+- **Optional fields** (`integrity_level`, `source`, `source_anchor`, evidence `anchor`) are
+  omitted when absent. Empty arrays are always
   emitted, so the shape is uniform.
 - `schema_version` is `2`. A `1` (written before integrity seals, issue #9) is still read, but
   the server refuses to write to it until `claims-mcp seal --adopt` migrates it. Any other value
@@ -107,6 +108,15 @@ using these tools.
   check fails; reads and `audit_report` still work. This deters casual hand edits; it is not
   cryptographic security, because the key is in the public source. See `src/seal.rs` and the
   README's "Integrity seals" section.
+- **Anchors** (issue #21): an evidence item may carry `anchor`, and a claim `source_anchor`,
+  pinned to the commit at `HEAD` of the catalog's git repository when recorded:
+  `{"file": {"path", "lines"?: {"start", "end"}, "commit", "dirty"?}}` or (evidence only)
+  `{"search": {"pattern", "case_insensitive"?, "scope": [..], "hits", "commit", "dirty"?}}`.
+  The server sets `commit`, `dirty` (the anchored paths had uncommitted changes), and a
+  search's `hits` (from `git grep -c -E` at that commit); callers never supply them. Both
+  fields are omitted when absent, so records written before them keep their seals, and the
+  schema version stays 2. `src/anchor.rs` validates and pins; `src/recheck.rs` compares with
+  `HEAD`.
 
 ### 3.2 Enumerations (serialized snake_case)
 
@@ -163,16 +173,17 @@ server does not fail the protocol request.
 
 | Tool | Parameters | Returns |
 |---|---|---|
-| `add_claim` | `statement`, `kind`, `level`, `verification_method`, optional `integrity_level`, `source`, `derived_from[]`, `artifacts[]`, `tags[]` | the full claim |
+| `add_claim` | `statement`, `kind`, `level`, `verification_method`, optional `integrity_level`, `source`, `source_anchor` (`{path, lines?}`), `derived_from[]`, `artifacts[]`, `tags[]` | the full claim |
 | `add_claims` | `claims[]` (same shape as `add_claim`; `derived_from` accepts `@N`) | the created claims, in order |
 | `get_claim` | `id` | the claim, plus `current_verdict` and `children[]` (ids of active claims whose `derived_from` contains it) |
 | `list_claims` | optional `verdict` (includes `unverified`), `kind`, `level`, `tag`, `artifact` (substring), `text` (case-insensitive substring of the statement), `include_retired` (default false) | summaries: `id`, `statement`, `kind`, `level`, `integrity_level`, `current_verdict`, `evidence_count`, `retired` (bool) |
 | `update_claim` | `id` plus any optional metadata field; list fields replace the whole list | the updated claim |
 | `retire_claim` | `id`, `reason` | the updated claim |
-| `add_evidence` | `claim_id`, `kind`, `locator`, `summary`, `stance` | the evidence item, including its id |
+| `add_evidence` | `claim_id`, `kind`, `locator`, `summary`, `stance`, optional `anchor` (`{file: {path, lines?}}` or `{search: {pattern, case_insensitive?, scope[], hits?}}`) | the evidence item, including its id and pinned anchor |
 | `record_verdict` | `claim_id`, `verdict`, `rationale`, `auditor`, `evidence_ids[]` | the claim, with the new verdict appended |
 | `trace` | `id`, `direction` (`up` / `down` / `both`, default `both`), optional `max_depth` (default unlimited) | breadth-first `ancestors` and `descendants` lists of `{id, statement, current_verdict, depth, retired}` nodes (each claim once, at its shortest depth) |
 | `audit_report` | optional `include_matrix` (default true) | the report described in 4.1 |
+| `recheck` | none | `head`, `checked`, `current`, and `items[]` (`claim`, `role`, `evidence`?, `stance`?, `anchor`, `status`, `detail`) for every anchor on an active claim that is not current; `status` is `moved`, `changed`, `overturned`, `missing`, `commit_missing`, or `unpinned` |
 
 The server also lists read-only resources, one per PDF report file compiled into the binary
 (`src/report/files.rs`, issue #18): `claims://report/claims-report.typ`,
@@ -195,8 +206,12 @@ and the `claims-mcp report init` command, which writes the same files into a pro
   - `decomposition`: claims that have active children where at least one child's current verdict
     is not `supported`. A parent is only as verified as its decomposition.
   - `dangling_links`: active claims whose `derived_from` includes a retired claim.
+  - `refuted_without_source_anchor`: refuted claims with no `source_anchor`, so nothing points
+    at the text that makes the claim.
 - `matrix` (traceability matrix): one row per active claim with `id`, `statement`, `derived_from`,
-  `children`, `verification_method`, `evidence_locators`, and `current_verdict`.
+  `children`, `verification_method`, `evidence_locators`, `refuting_locators` (each `refutes`
+  evidence item's anchor in short form, or its locator when it has none), and
+  `current_verdict`.
 
 Each gap lists claim ids. The report is computed in one pass over the claims plus one child-index
 build, which is O(n + e) where e is the number of links.

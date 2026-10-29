@@ -14,17 +14,31 @@ use rmcp::{tool, tool_handler, tool_router, ErrorData, RoleServer, ServerHandler
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::anchor::{self, GitCli, NewAnchor, NewFileAnchor};
 use crate::catalog::{ClaimFilter, ClaimUpdate, NewClaim, NewEvidence, NewVerdict};
 use crate::error;
 use crate::model::ClaimId;
+use crate::recheck;
 use crate::report::{self, files, next_steps, TraceDirection};
 use crate::store::CatalogStore;
+
+/// A new claim as the tools take it: the claim plus an optional source anchor to pin.
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct ClaimInput {
+    /// The claim.
+    #[serde(flatten)]
+    pub claim: NewClaim,
+    /// Exact place the claim is made, such as the README lines that promise a feature. The
+    /// server pins it to the current commit.
+    #[serde(default)]
+    pub source_anchor: Option<NewFileAnchor>,
+}
 
 /// Parameters for `add_claims`.
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct AddClaimsParams {
     /// Claims to create, in order. `derived_from` may use `@N` for an earlier entry.
-    pub claims: Vec<NewClaim>,
+    pub claims: Vec<ClaimInput>,
 }
 
 /// Parameters naming one claim.
@@ -42,6 +56,9 @@ pub struct UpdateClaimParams {
     /// Fields to change.
     #[serde(flatten)]
     pub update: ClaimUpdate,
+    /// New exact place the claim is made; the server pins it to the current commit.
+    #[serde(default)]
+    pub source_anchor: Option<NewFileAnchor>,
 }
 
 /// Parameters for `retire_claim`.
@@ -61,6 +78,12 @@ pub struct AddEvidenceParams {
     /// The evidence.
     #[serde(flatten)]
     pub evidence: NewEvidence,
+    /// Machine-checkable location: `{"file": {"path", "lines": {"start", "end"}}}` for code
+    /// or text, or `{"search": {"pattern", "case_insensitive", "scope"}}` for a `git grep -E`
+    /// search (zero hits shows something is absent). The server pins it to the current
+    /// commit and counts search hits itself.
+    #[serde(default)]
+    pub anchor: Option<NewAnchor>,
 }
 
 /// Parameters for `record_verdict`.
@@ -136,12 +159,17 @@ impl ClaimsServer {
 
     #[tool(
         description = "Create one claim: an atomic, falsifiable assertion. Returns the claim \
-        with its new CLM id."
+        with its new CLM id. Give source_anchor ({path, lines}) when the claim comes from a \
+        file in the repository, so a refutation points back at the text to fix."
     )]
-    async fn add_claim(&self, Parameters(new_claim): Parameters<NewClaim>) -> ToolResult {
+    async fn add_claim(&self, Parameters(input): Parameters<ClaimInput>) -> ToolResult {
+        let store = self.store.clone();
         respond(
             self.store
-                .mutate(move |catalog| catalog.add_claim(new_claim, Utc::now()))
+                .mutate(move |catalog| {
+                    let mut repo = LazyRepo::new(&store);
+                    catalog.add_claim(repo.pin_claim(input)?, Utc::now())
+                })
                 .await,
         )
     }
@@ -152,9 +180,23 @@ impl ClaimsServer {
         registered in one call."
     )]
     async fn add_claims(&self, Parameters(params): Parameters<AddClaimsParams>) -> ToolResult {
+        let store = self.store.clone();
         respond(
             self.store
-                .mutate(move |catalog| catalog.add_claims(params.claims, Utc::now()))
+                .mutate(move |catalog| {
+                    let mut repo = LazyRepo::new(&store);
+                    let claims = params
+                        .claims
+                        .into_iter()
+                        .enumerate()
+                        .map(|(index, input)| {
+                            repo.pin_claim(input).map_err(|error| {
+                                error::ClaimsError::Validation(format!("claims[{index}]: {error}"))
+                            })
+                        })
+                        .collect::<error::Result<Vec<_>>>()?;
+                    catalog.add_claims(claims, Utc::now())
+                })
                 .await,
         )
     }
@@ -189,14 +231,24 @@ impl ClaimsServer {
     #[tool(
         description = "Update a claim's metadata. Omitted or null fields are unchanged; list \
         fields replace the whole list ([] empties it); source \"\" removes the source; \
-        integrity_level cannot be removed. A new derived_from link must point at an active \
-        claim; an existing link to a parent retired later may be kept. Evidence and verdicts \
+        integrity_level and source_anchor can be replaced but not removed. A new derived_from \
+        link must point at an active claim; an existing link to a parent retired later may be kept. Evidence and verdicts \
         cannot be edited. To change what a judged claim means, retire it and add a new one."
     )]
     async fn update_claim(&self, Parameters(params): Parameters<UpdateClaimParams>) -> ToolResult {
+        let store = self.store.clone();
         respond(
             self.store
-                .mutate(move |catalog| catalog.update_claim(params.id, params.update, Utc::now()))
+                .mutate(move |catalog| {
+                    let mut update = params.update;
+                    if let Some(input) = params.source_anchor {
+                        // Fail on a missing or retired claim before running git.
+                        catalog.ensure_active(params.id)?;
+                        let repo = GitCli::for_store(&store)?;
+                        update.source_anchor = Some(anchor::pin_file(&repo, input)?);
+                    }
+                    catalog.update_claim(params.id, update, Utc::now())
+                })
                 .await,
         )
     }
@@ -215,14 +267,24 @@ impl ClaimsServer {
 
     #[tool(
         description = "Attach evidence to a claim. Use a precise locator (path:line, test \
-        name, command) and an honest stance: supports, refutes, or neutral. Returns the \
-        evidence with its EVD id."
+        name, command) and an honest stance: supports, refutes, or neutral. Add an anchor \
+        whenever the evidence is in the repository: a file anchor for code or text, or a \
+        search anchor to show something is absent (e.g. a promised feature with no \
+        implementation). Anchors are pinned to the current commit so recheck can tell when \
+        they go stale. Returns the evidence with its EVD id."
     )]
     async fn add_evidence(&self, Parameters(params): Parameters<AddEvidenceParams>) -> ToolResult {
+        let store = self.store.clone();
         respond(
             self.store
                 .mutate(move |catalog| {
-                    catalog.add_evidence(params.claim_id, params.evidence, Utc::now())
+                    let mut evidence = params.evidence;
+                    if let Some(input) = params.anchor {
+                        catalog.ensure_active(params.claim_id)?;
+                        let repo = GitCli::for_store(&store)?;
+                        evidence.anchor = Some(anchor::pin(&repo, input)?);
+                    }
+                    catalog.add_evidence(params.claim_id, evidence, Utc::now())
                 })
                 .await,
         )
@@ -295,6 +357,55 @@ impl ClaimsServer {
                 .read(move |catalog| Ok(next_steps::next_steps(catalog, limit)))
                 .await,
         )
+    }
+
+    #[tool(
+        annotations(read_only_hint = true),
+        description = "Compare every source and evidence anchor on active claims with the \
+        repository's HEAD. Lists each anchor that is not current: moved (same lines, new \
+        line numbers), changed (anchored lines or search hit count changed), overturned (an \
+        absence search now matches, or a matching search finds nothing), missing (file \
+        gone), commit_missing (history rewritten), or unpinned (recorded on a dirty tree). \
+        Re-audit the claims it lists."
+    )]
+    async fn recheck(&self) -> ToolResult {
+        let store = self.store.clone();
+        respond(
+            self.store
+                .read(move |catalog| recheck::recheck(catalog, &GitCli::for_store(&store)?))
+                .await,
+        )
+    }
+}
+
+/// The catalog's git repository, found only when an anchor needs it, so claims and evidence
+/// without anchors work outside git.
+struct LazyRepo<'store> {
+    store: &'store CatalogStore,
+    repo: Option<GitCli>,
+}
+
+impl<'store> LazyRepo<'store> {
+    fn new(store: &'store CatalogStore) -> Self {
+        Self { store, repo: None }
+    }
+
+    /// The repository, discovered on first use.
+    fn get(&mut self) -> error::Result<&GitCli> {
+        if self.repo.is_none() {
+            self.repo = Some(GitCli::for_store(self.store)?);
+        }
+        // Rust note: `get_or_insert_with` cannot be used because discovery can fail.
+        Ok(self.repo.as_ref().expect("repository was just discovered"))
+    }
+
+    /// Pins the input's source anchor, if any, into the claim.
+    fn pin_claim(&mut self, input: ClaimInput) -> error::Result<NewClaim> {
+        let mut claim = input.claim;
+        if let Some(source) = input.source_anchor {
+            claim.source_anchor = Some(anchor::pin_file(self.get()?, source)?);
+        }
+        Ok(claim)
     }
 }
 
@@ -388,6 +499,8 @@ fn respond<T: Serialize>(result: error::Result<T>) -> ToolResult {
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
     use crate::model::{
         ClaimKind, ClaimLevel, ClaimRef, EvidenceKind, Stance, Verdict, VerificationMethod,
@@ -410,7 +523,14 @@ mod tests {
         serde_json::from_str(text_of(result)).expect("tool output is JSON")
     }
 
-    fn claim_input(statement: &str, derived_from: Vec<ClaimRef>) -> NewClaim {
+    fn claim_input(statement: &str, derived_from: Vec<ClaimRef>) -> ClaimInput {
+        ClaimInput {
+            claim: new_claim(statement, derived_from),
+            source_anchor: None,
+        }
+    }
+
+    fn new_claim(statement: &str, derived_from: Vec<ClaimRef>) -> NewClaim {
         NewClaim {
             statement: statement.to_owned(),
             kind: ClaimKind::Functional,
@@ -418,6 +538,7 @@ mod tests {
             verification_method: VerificationMethod::Test,
             integrity_level: None,
             source: Some("prompt".to_owned()),
+            source_anchor: None,
             derived_from,
             artifacts: Vec::new(),
             tags: Vec::new(),
@@ -446,6 +567,7 @@ mod tests {
                 "get_claim",
                 "list_claims",
                 "next_steps",
+                "recheck",
                 "trace"
             ]
         );
@@ -508,7 +630,7 @@ mod tests {
     }
 
     #[test]
-    fn registers_all_eleven_tools() {
+    fn registers_all_twelve_tools() {
         let (_directory, server) = server();
         let mut names: Vec<String> = server
             .tool_router
@@ -527,6 +649,7 @@ mod tests {
                 "get_claim",
                 "list_claims",
                 "next_steps",
+                "recheck",
                 "record_verdict",
                 "retire_claim",
                 "trace",
@@ -585,7 +708,9 @@ mod tests {
                     locator: "tests/x.rs:1".to_owned(),
                     summary: "passes".to_owned(),
                     stance: Stance::Supports,
+                    anchor: None,
                 },
+                anchor: None,
             }))
             .await
             .expect("add_evidence");
@@ -683,5 +808,192 @@ mod tests {
         .expect("flat JSON parses");
         assert_eq!(params.claim_id, ClaimId::new(3));
         assert!(params.verdict.evidence_ids.is_empty());
+    }
+
+    /// Runs `git` in `directory`, panicking with its stderr on failure.
+    fn git(directory: &Path, args: &[&str]) {
+        let output = std::process::Command::new("git")
+            .arg("-C")
+            .arg(directory)
+            .args([
+                "-c",
+                "user.name=tester",
+                "-c",
+                "user.email=tester@example.com",
+            ])
+            .args(args)
+            .output()
+            .expect("run git");
+        assert!(
+            output.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    /// A git repository with one commit holding a README and a source file, and a server
+    /// whose catalog lives in it.
+    fn repo_server() -> (tempfile::TempDir, ClaimsServer) {
+        let directory = tempfile::tempdir().expect("create temp dir");
+        let root = directory.path();
+        git(root, &["init", "--quiet"]);
+        std::fs::write(
+            root.join("README.md"),
+            "# Demo\n\nFeatures:\n- rate limiting on every endpoint\n",
+        )
+        .expect("write README");
+        std::fs::create_dir(root.join("src")).expect("mkdir src");
+        std::fs::write(root.join("src/lib.rs"), "fn serve() {}\n").expect("write lib.rs");
+        git(root, &["add", "README.md", "src"]);
+        git(root, &["commit", "--quiet", "-m", "initial"]);
+        let store = CatalogStore::new(root.join("claims.json"));
+        (directory, ClaimsServer::new(store))
+    }
+
+    /// The flow for a feature a document promises but the code lacks: the claim is anchored
+    /// to the README line, refuted by a zero-hit search, and recheck overturns the refutation
+    /// once an implementation is committed.
+    #[tokio::test]
+    async fn absence_refutation_is_pinned_and_rechecked() {
+        let (directory, server) = repo_server();
+        let root = directory.path();
+        let input: ClaimInput = serde_json::from_value(serde_json::json!({
+            "statement": "Every endpoint is rate limited",
+            "kind": "functional",
+            "level": "software",
+            "verification_method": "inspection",
+            "source": "README.md Features list",
+            "source_anchor": {"path": "README.md", "lines": {"start": 4, "end": 4}}
+        }))
+        .expect("claim input parses");
+        let claim = json_of(
+            &server
+                .add_claim(Parameters(input))
+                .await
+                .expect("add_claim"),
+        );
+        assert_eq!(claim["source_anchor"]["path"], "README.md");
+        assert_eq!(
+            claim["source_anchor"]["commit"].as_str().map(str::len),
+            Some(40)
+        );
+
+        let params: AddEvidenceParams = serde_json::from_value(serde_json::json!({
+            "claim_id": "CLM-0001",
+            "kind": "inspection",
+            "locator": "git grep -iE 'throttl|governor' -- .",
+            "summary": "No throttling exists anywhere in the repository.",
+            "stance": "refutes",
+            "anchor": {"search": {"pattern": "throttl|governor", "case_insensitive": true,
+                                  "scope": ["."], "hits": 0}}
+        }))
+        .expect("evidence params parse");
+        let evidence = json_of(&server.add_evidence(Parameters(params)).await.expect("add"));
+        assert_eq!(evidence["anchor"]["search"]["hits"], 0);
+        // The uncommitted catalog and its untracked lock file do not make the anchor dirty.
+        assert!(evidence["anchor"]["search"].get("dirty").is_none());
+
+        let report = json_of(
+            &server
+                .audit_report(Parameters(AuditReportParams {
+                    include_matrix: true,
+                }))
+                .await
+                .expect("audit_report"),
+        );
+        assert_eq!(report["integrity"]["verified"], true);
+
+        // The committed catalog records the pattern and summary, but searches skip it, so the
+        // absence still holds.
+        git(root, &["add", "claims.json"]);
+        git(root, &["commit", "--quiet", "-m", "record the audit"]);
+        let current = json_of(&server.recheck().await.expect("recheck"));
+        assert_eq!(
+            (current["checked"].as_u64(), current["current"].as_u64()),
+            (Some(2), Some(2))
+        );
+
+        std::fs::write(root.join("src/lib.rs"), "fn serve() {}\nfn throttle() {}\n")
+            .expect("implement the feature");
+        git(root, &["commit", "--quiet", "-am", "add throttling"]);
+        let after = json_of(&server.recheck().await.expect("recheck"));
+        assert_eq!(after["items"].as_array().map(Vec::len), Some(1));
+        assert_eq!(after["items"][0]["status"], "overturned");
+        assert_eq!(after["items"][0]["evidence"], "EVD-0001");
+    }
+
+    #[tokio::test]
+    async fn anchors_are_validated_against_the_repository() {
+        let (_directory, server) = repo_server();
+        let mut input = claim_input("anchored", Vec::new());
+        input.source_anchor = Some(NewFileAnchor {
+            path: "README.md".to_owned(),
+            lines: Some(crate::model::LineRange { start: 4, end: 9 }),
+        });
+        let refused = server
+            .add_claim(Parameters(input))
+            .await
+            .expect("tool result");
+        assert_eq!(refused.is_error, Some(true));
+        assert!(text_of(&refused).contains("README.md, which has 4 lines"));
+
+        let mut input = claim_input("anchored", Vec::new());
+        input.source_anchor = Some(NewFileAnchor {
+            path: "../outside.md".to_owned(),
+            lines: None,
+        });
+        let refused = server
+            .add_claims(Parameters(AddClaimsParams {
+                claims: vec![claim_input("fine", Vec::new()), input],
+            }))
+            .await
+            .expect("tool result");
+        assert_eq!(refused.is_error, Some(true));
+        assert!(
+            text_of(&refused).contains("claims[1]"),
+            "{}",
+            text_of(&refused)
+        );
+    }
+
+    #[tokio::test]
+    async fn anchors_outside_git_are_explained_errors() {
+        let (_directory, server) = server();
+        let mut input = claim_input("anchored", Vec::new());
+        input.source_anchor = Some(NewFileAnchor {
+            path: "README.md".to_owned(),
+            lines: None,
+        });
+        let refused = server
+            .add_claim(Parameters(input))
+            .await
+            .expect("tool result");
+        assert_eq!(refused.is_error, Some(true));
+        assert!(
+            text_of(&refused).starts_with("git rev-parse"),
+            "{}",
+            text_of(&refused)
+        );
+        // A missing claim is reported as such, before git is consulted.
+        let params: AddEvidenceParams = serde_json::from_value(serde_json::json!({
+            "claim_id": "CLM-0099",
+            "kind": "inspection",
+            "locator": "src/lib.rs:1",
+            "summary": "anchored evidence on a claim that does not exist",
+            "stance": "refutes",
+            "anchor": {"file": {"path": "src/lib.rs"}}
+        }))
+        .expect("evidence params parse");
+        let refused = server
+            .add_evidence(Parameters(params))
+            .await
+            .expect("tool result");
+        assert_eq!(text_of(&refused), "claim CLM-0099 not found");
+        // Claims without anchors still work outside git.
+        let added = server
+            .add_claim(Parameters(claim_input("plain", Vec::new())))
+            .await
+            .expect("tool result");
+        assert_eq!(added.is_error, Some(false));
     }
 }

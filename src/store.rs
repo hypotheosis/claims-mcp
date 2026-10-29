@@ -60,6 +60,17 @@ impl CatalogStore {
         &self.paths.catalog
     }
 
+    /// Returns the directory that holds the catalog; its git repository is the one anchors
+    /// are pinned to.
+    pub fn directory(&self) -> &Path {
+        &self.paths.directory
+    }
+
+    /// The catalog file and its sidecar lock and temp files.
+    pub fn own_files(&self) -> [&Path; 3] {
+        [&self.paths.catalog, &self.paths.lock, &self.paths.temp]
+    }
+
     /// Runs `operation` against a fresh read of the catalog without writing.
     ///
     /// Blocking file I/O runs on tokio's blocking thread pool so the async reactor stays free.

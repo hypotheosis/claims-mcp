@@ -145,6 +145,7 @@ Add `.<name>.lock` and `.<name>.tmp` to `.gitignore`.
 | *(none)* | Run the MCP server on stdio |
 | `verify [--json]` | Check every integrity seal; exit 1 if any check fails |
 | `tldr [--limit N] [--json]` | Print the ranked next steps; see [TL;DR of next steps](#tldr-of-next-steps) |
+| `recheck [--json]` | Compare every anchor with `HEAD`; exit 1 if any is not current; see [Anchors](#anchors) |
 | `seal --adopt` | Seal unsealed records once, to migrate a catalog (maintainers only) |
 | `report init [DIR]` | Write the PDF report template and a notes file to `DIR` (default `report`); see [Generate a PDF report](#generate-a-pdf-report) |
 
@@ -219,15 +220,53 @@ away from the file entirely, add deny rules to the project's `.claude/settings.j
 | `list_claims` | Filtered summaries (verdict, kind, level, tag, artifact, text, include_retired) |
 | `update_claim` | Edit metadata; evidence and verdicts cannot be changed |
 | `retire_claim` | Withdraw a claim; it stays so trace links remain valid |
-| `add_evidence` | Attach evidence with a locator and a stance (supports / refutes / neutral) |
+| `add_evidence` | Attach evidence with a locator, an optional commit-pinned anchor, and a stance (supports / refutes / neutral) |
 | `record_verdict` | Append a FEVER verdict; it must cite evidence that backs it |
 | `trace` | Ancestors and descendants of a claim, optionally depth-limited |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
 | `next_steps` | Ranked TL;DR: open claims in priority tiers, each with one next step |
+| `recheck` | Anchors that moved, changed, or were overturned since they were recorded |
 
 The server also offers read-only resources: the PDF report's files, under `claims://report/`.
 `claims://report/audit-notes.example.toml` is the commented example of the report's notes file,
 so an agent with only the MCP connection can write one.
+
+## Anchors
+
+An evidence `locator` is free text. To make evidence point at an exact, checkable place, add an
+`anchor`, which the server pins to the commit checked out at the time:
+
+| Anchor | Shape | Use it for |
+|---|---|---|
+| file | `{"file": {"path": "src/server.rs", "lines": {"start": 40, "end": 61}}}` | Code or text that shows the finding; omit `lines` for the whole file |
+| search | `{"search": {"pattern": "rate.?limit\|throttl", "case_insensitive": true, "scope": ["src"]}}` | A `git grep -E` search; with zero hits, it shows that something does not exist |
+
+Claims take a `source_anchor` (a file anchor) on the text that makes them, such as the README
+line that promises a feature. If the claim is refuted, that is the text to fix; `audit_report`
+lists refuted claims without one under `refuted_without_source_anchor`. `update_claim` can
+replace a `source_anchor` but not remove it.
+
+The server, not the caller, records the commit, and for a search it runs `git grep` itself and
+records the hit count (a `hits` value the caller passes must match). It rejects paths outside
+the repository, line ranges past the end of the file, and search scopes that do not exist (a
+misspelled directory would otherwise "prove" anything absent). Anchors need the catalog to be inside
+a git repository; evidence without one works anywhere. An anchor on a file with uncommitted
+changes is marked `dirty`.
+
+`claims-mcp recheck` (and the `recheck` tool) compares every anchor on an active claim with
+`HEAD`:
+
+| Status | Meaning |
+|---|---|
+| `moved` | The anchored lines are unchanged but at new line numbers (shown) |
+| `changed` | The anchored lines or file changed, or a search's hit count changed |
+| `overturned` | An absence search now matches, or a matching search now finds nothing |
+| `missing` | The file no longer exists |
+| `commit_missing` | The pinned commit was removed by a history rewrite |
+| `unpinned` | Recorded on uncommitted changes, so the commit may not show what was seen |
+
+It exits 1 if any anchor is not current. The PDF report takes its `--json` output as the
+`recheck` input.
 
 ## TL;DR of next steps
 
@@ -283,12 +322,14 @@ claims-mcp report init            # writes report/claims-report.typ, report/text
                                   # report/audit-notes.example.toml, and report/audit-notes.toml
 # uncomment and fill in report/audit-notes.toml as its comments say, then:
 claims-mcp --catalog claims.json verify --json > integrity.json
+claims-mcp --catalog claims.json recheck --json > recheck.json
 typst compile --root . report/claims-report.typ audit.pdf \
   --input catalog=claims.json \
   --input detail=summary \
   --input commit=$(git rev-parse --short HEAD) \
   --input notes=report/audit-notes.toml \
-  --input integrity=integrity.json
+  --input integrity=integrity.json \
+  --input recheck=recheck.json
 ```
 
 `report init` replaces the template files, so they always match the installed binary, but
@@ -308,6 +349,7 @@ Paths are relative to `--root`. All inputs are optional:
 | `catalog` | Catalog to report on (default `claims.json`) |
 | `detail` | `summary` (default) or `full`; any other value is an error |
 | `integrity` | Output of `claims-mcp verify --json` for that catalog. Typst cannot check seals itself; without this input the report says integrity was not checked. A failed check puts a warning on the result and lists the failing records |
+| `recheck` | Output of `claims-mcp recheck --json`. Flags anchors that moved, changed, or were overturned, on the evidence and in an Anchor recheck section; without it the report says anchors were not rechecked |
 | `commit` | Catalog commit shown on the cover and in the reproduce section |
 | `notes` | TOML sidecar with the audited project's name and the auditor's prose: `artifact`, `version`, `repository`, `method`, `assessment`, and `[[points]]` (`title`, `body`) for the evaluator. Each audited project needs its own: `report init` creates it with the commented example's settings commented out (also the resource `claims://report/audit-notes.example.toml`), which explains every key |
 | `date` | Report date (default today) |
