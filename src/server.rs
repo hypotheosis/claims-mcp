@@ -14,8 +14,6 @@ use rmcp::{tool, tool_handler, tool_router, ErrorData, RoleServer, ServerHandler
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use std::path::{Path, PathBuf};
-
 use crate::anchor::{self, GitCli, NewAnchor, NewFileAnchor};
 use crate::catalog::{ClaimFilter, ClaimUpdate, NewClaim, NewEvidence, NewVerdict};
 use crate::error;
@@ -165,11 +163,11 @@ impl ClaimsServer {
         file in the repository, so a refutation points back at the text to fix."
     )]
     async fn add_claim(&self, Parameters(input): Parameters<ClaimInput>) -> ToolResult {
-        let directory = self.directory();
+        let store = self.store.clone();
         respond(
             self.store
                 .mutate(move |catalog| {
-                    let mut repo = LazyRepo::new(&directory);
+                    let mut repo = LazyRepo::new(&store);
                     catalog.add_claim(repo.pin_claim(input)?, Utc::now())
                 })
                 .await,
@@ -182,11 +180,11 @@ impl ClaimsServer {
         registered in one call."
     )]
     async fn add_claims(&self, Parameters(params): Parameters<AddClaimsParams>) -> ToolResult {
-        let directory = self.directory();
+        let store = self.store.clone();
         respond(
             self.store
                 .mutate(move |catalog| {
-                    let mut repo = LazyRepo::new(&directory);
+                    let mut repo = LazyRepo::new(&store);
                     let claims = params
                         .claims
                         .into_iter()
@@ -238,13 +236,13 @@ impl ClaimsServer {
         cannot be edited. To change what a judged claim means, retire it and add a new one."
     )]
     async fn update_claim(&self, Parameters(params): Parameters<UpdateClaimParams>) -> ToolResult {
-        let directory = self.directory();
+        let store = self.store.clone();
         respond(
             self.store
                 .mutate(move |catalog| {
                     let mut update = params.update;
                     if let Some(input) = params.source_anchor {
-                        let repo = GitCli::discover(&directory)?;
+                        let repo = GitCli::for_store(&store)?;
                         update.source_anchor = Some(anchor::pin_file(&repo, input)?);
                     }
                     catalog.update_claim(params.id, update, Utc::now())
@@ -274,13 +272,13 @@ impl ClaimsServer {
         they go stale. Returns the evidence with its EVD id."
     )]
     async fn add_evidence(&self, Parameters(params): Parameters<AddEvidenceParams>) -> ToolResult {
-        let directory = self.directory();
+        let store = self.store.clone();
         respond(
             self.store
                 .mutate(move |catalog| {
                     let mut evidence = params.evidence;
                     if let Some(input) = params.anchor {
-                        let repo = GitCli::discover(&directory)?;
+                        let repo = GitCli::for_store(&store)?;
                         evidence.anchor = Some(anchor::pin(&repo, input)?);
                     }
                     catalog.add_evidence(params.claim_id, evidence, Utc::now())
@@ -368,41 +366,31 @@ impl ClaimsServer {
         Re-audit the claims it lists."
     )]
     async fn recheck(&self) -> ToolResult {
-        let directory = self.directory();
+        let store = self.store.clone();
         respond(
             self.store
-                .read(move |catalog| recheck::recheck(catalog, &GitCli::discover(&directory)?))
+                .read(move |catalog| recheck::recheck(catalog, &GitCli::for_store(&store)?))
                 .await,
         )
     }
 }
 
-impl ClaimsServer {
-    /// Directory of the catalog file, owned so it can move into a blocking closure.
-    fn directory(&self) -> PathBuf {
-        self.store.directory().to_path_buf()
-    }
-}
-
 /// The catalog's git repository, found only when an anchor needs it, so claims and evidence
 /// without anchors work outside git.
-struct LazyRepo<'dir> {
-    directory: &'dir Path,
+struct LazyRepo<'store> {
+    store: &'store CatalogStore,
     repo: Option<GitCli>,
 }
 
-impl<'dir> LazyRepo<'dir> {
-    fn new(directory: &'dir Path) -> Self {
-        Self {
-            directory,
-            repo: None,
-        }
+impl<'store> LazyRepo<'store> {
+    fn new(store: &'store CatalogStore) -> Self {
+        Self { store, repo: None }
     }
 
     /// The repository, discovered on first use.
     fn get(&mut self) -> error::Result<&GitCli> {
         if self.repo.is_none() {
-            self.repo = Some(GitCli::discover(self.directory)?);
+            self.repo = Some(GitCli::for_store(self.store)?);
         }
         // Rust note: `get_or_insert_with` cannot be used because discovery can fail.
         Ok(self.repo.as_ref().expect("repository was just discovered"))
@@ -508,6 +496,8 @@ fn respond<T: Serialize>(result: error::Result<T>) -> ToolResult {
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
+
     use super::*;
     use crate::model::{
         ClaimKind, ClaimLevel, ClaimRef, EvidenceKind, Stance, Verdict, VerificationMethod,
@@ -888,15 +878,16 @@ mod tests {
         let params: AddEvidenceParams = serde_json::from_value(serde_json::json!({
             "claim_id": "CLM-0001",
             "kind": "inspection",
-            "locator": "rg rate.?limit src",
-            "summary": "No rate limiting exists in src.",
+            "locator": "git grep -iE 'throttl|governor' -- .",
+            "summary": "No throttling exists anywhere in the repository.",
             "stance": "refutes",
-            "anchor": {"search": {"pattern": "rate.?limit|throttl", "case_insensitive": true,
-                                  "scope": ["src"], "hits": 0}}
+            "anchor": {"search": {"pattern": "throttl|governor", "case_insensitive": true,
+                                  "scope": ["."], "hits": 0}}
         }))
         .expect("evidence params parse");
         let evidence = json_of(&server.add_evidence(Parameters(params)).await.expect("add"));
         assert_eq!(evidence["anchor"]["search"]["hits"], 0);
+        // The uncommitted catalog and its untracked lock file do not make the anchor dirty.
         assert!(evidence["anchor"]["search"].get("dirty").is_none());
 
         let report = json_of(
@@ -909,18 +900,19 @@ mod tests {
         );
         assert_eq!(report["integrity"]["verified"], true);
 
+        // The committed catalog records the pattern and summary, but searches skip it, so the
+        // absence still holds.
+        git(root, &["add", "claims.json"]);
+        git(root, &["commit", "--quiet", "-m", "record the audit"]);
         let current = json_of(&server.recheck().await.expect("recheck"));
         assert_eq!(
             (current["checked"].as_u64(), current["current"].as_u64()),
             (Some(2), Some(2))
         );
 
-        std::fs::write(
-            root.join("src/lib.rs"),
-            "fn serve() {}\nfn rate_limit() {}\n",
-        )
-        .expect("implement the feature");
-        git(root, &["commit", "--quiet", "-am", "add rate limiting"]);
+        std::fs::write(root.join("src/lib.rs"), "fn serve() {}\nfn throttle() {}\n")
+            .expect("implement the feature");
+        git(root, &["commit", "--quiet", "-am", "add throttling"]);
         let after = json_of(&server.recheck().await.expect("recheck"));
         assert_eq!(after["items"].as_array().map(Vec::len), Some(1));
         assert_eq!(after["items"][0]["status"], "overturned");

@@ -14,6 +14,7 @@ use serde::Deserialize;
 
 use crate::error::{ClaimsError, Result};
 use crate::model::{line_count_text, short_commit, Anchor, FileAnchor, LineRange, SearchAnchor};
+use crate::store::CatalogStore;
 
 /// Tool input for a file anchor; the server adds the commit.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, JsonSchema)]
@@ -289,23 +290,44 @@ fn validation(message: impl Into<String>) -> ClaimsError {
 #[derive(Debug, Clone)]
 pub struct GitCli {
     root: PathBuf,
+    /// Repository-relative paths of the catalog and its lock and temp files. Searches and the
+    /// dirty check skip them: the catalog records every search pattern, so a committed
+    /// catalog would match its own absence searches, and it changes on every write.
+    excluded: Vec<String>,
 }
 
 impl GitCli {
-    /// Finds the repository that contains `directory`.
+    /// Finds the repository that contains the store's catalog.
     ///
     /// # Errors
     ///
-    /// [`ClaimsError::Git`] if git is not installed or `directory` is not in a repository.
-    pub fn discover(directory: &Path) -> Result<Self> {
-        let output = git_command(directory)
-            .args(["rev-parse", "--show-toplevel"])
+    /// [`ClaimsError::Git`] if git is not installed or the catalog is not in a repository.
+    pub fn for_store(store: &CatalogStore) -> Result<Self> {
+        let command = "rev-parse --show-toplevel --show-prefix";
+        let output = git_command(store.directory())
+            .args(["rev-parse", "--show-toplevel", "--show-prefix"])
             .output()
-            .map_err(|source| spawn_error("rev-parse --show-toplevel", &source))?;
-        let root = checked_stdout("rev-parse --show-toplevel", &output)?;
+            .map_err(|source| spawn_error(command, &source))?;
+        let stdout = checked_stdout(command, &output)?;
+        // Line 1 is the repository root; line 2 is the catalog directory relative to it,
+        // with a trailing `/` (empty at the root).
+        let mut lines = stdout.lines();
+        let root = lines.next().unwrap_or_default();
+        let prefix = lines.next().unwrap_or_default();
+        let excluded = store
+            .own_files()
+            .iter()
+            .filter_map(|path| path.file_name())
+            .map(|name| format!("{prefix}{}", name.to_string_lossy()))
+            .collect();
         Ok(Self {
-            root: PathBuf::from(root.trim_end()),
+            root: PathBuf::from(root),
+            excluded,
         })
+    }
+
+    fn is_excluded(&self, path: &str) -> bool {
+        self.excluded.iter().any(|excluded| excluded == path)
     }
 
     /// Runs `git <args>` in the repository root.
@@ -347,6 +369,34 @@ fn checked_stdout(command: &str, output: &Output) -> Result<String> {
             message: String::from_utf8_lossy(&output.stderr).trim().to_owned(),
         })
     }
+}
+
+/// `(path, count)` from `git grep -c <commit>` output, whose lines are `<commit>:<path>:<count>`.
+/// A path may contain `:`, so the commit prefix is stripped and the count split off the end.
+fn grep_counts<'out>(stdout: &'out str, commit: &str) -> impl Iterator<Item = (&'out str, u32)> {
+    let prefix = format!("{commit}:");
+    stdout.lines().filter_map(move |line| {
+        let (path, count) = line.strip_prefix(&prefix)?.rsplit_once(':')?;
+        Some((path, count.parse().ok()?))
+    })
+}
+
+/// Paths from `git status --porcelain -z`: NUL-separated `XY <path>` entries, where a rename
+/// or copy (`R`/`C`) is followed by one more entry holding the original path.
+fn status_paths(stdout: &str) -> Vec<&str> {
+    let mut paths = Vec::new();
+    let mut entries = stdout.split('\0').filter(|entry| !entry.is_empty());
+    while let Some(entry) = entries.next() {
+        let (Some(status), Some(path)) = (entry.get(..2), entry.get(3..)) else {
+            continue;
+        };
+        paths.push(path);
+        if status.contains(['R', 'C']) {
+            // Rust note: `extend` with an `Option` adds its value if there is one.
+            paths.extend(entries.next());
+        }
+    }
+    paths
 }
 
 /// Lines in `bytes`; a final line without a newline still counts.
@@ -391,12 +441,13 @@ impl RepoProbe for GitCli {
     }
 
     fn is_dirty(&self, paths: &[String]) -> Result<bool> {
-        let mut args = vec!["status", "--porcelain", "--untracked-files=all", "--"];
+        let mut args = vec!["status", "--porcelain", "-z", "--untracked-files=all", "--"];
         args.extend(paths.iter().map(String::as_str));
         let output = self.run(&args)?;
-        Ok(!checked_stdout("status --porcelain", &output)?
-            .trim()
-            .is_empty())
+        let stdout = checked_stdout("status --porcelain", &output)?;
+        Ok(status_paths(&stdout)
+            .into_iter()
+            .any(|path| !self.is_excluded(path)))
     }
 
     fn line_count(&self, revision: Revision<'_>, path: &str) -> Result<Option<u32>> {
@@ -444,14 +495,15 @@ impl RepoProbe for GitCli {
         args.extend(["-e", pattern, commit, "--"]);
         args.extend(scope.iter().map(String::as_str));
         let output = self.run(&args)?;
-        // `git grep` exits 1 when nothing matches, which is a result, not a failure.
-        if output.status.code() == Some(1) && output.stderr.is_empty() {
+        // `git grep` exits 1 when nothing matches (errors exit 128), so 1 is a result even if
+        // git also printed a warning.
+        if output.status.code() == Some(1) {
             return Ok(0);
         }
-        // Each line is `<commit>:<path>:<count>`; the count is after the last colon.
-        Ok(checked_stdout("grep", &output)?
-            .lines()
-            .filter_map(|line| line.rsplit_once(':')?.1.parse::<u32>().ok())
+        let stdout = checked_stdout("grep", &output)?;
+        Ok(grep_counts(&stdout, commit)
+            .filter(|(path, _)| !self.is_excluded(path))
+            .map(|(_, count)| count)
             .sum())
     }
 
@@ -687,6 +739,24 @@ pub(crate) mod tests {
                     new_count: 1
                 },
             ]
+        );
+    }
+
+    #[test]
+    fn parses_grep_counts_with_colons_in_paths() {
+        let stdout = format!("{HEAD}:src/a.rs:3\n{HEAD}:docs/a:b.md:2\n");
+        assert_eq!(
+            grep_counts(&stdout, HEAD).collect::<Vec<_>>(),
+            vec![("src/a.rs", 3), ("docs/a:b.md", 2)]
+        );
+    }
+
+    #[test]
+    fn parses_status_entries_including_renames() {
+        let stdout = " M claims.json\0?? .claims.json.lock\0R  new.rs\0old.rs\0";
+        assert_eq!(
+            status_paths(stdout),
+            vec!["claims.json", ".claims.json.lock", "new.rs", "old.rs"]
         );
     }
 

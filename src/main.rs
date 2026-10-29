@@ -182,9 +182,9 @@ async fn verify(store: &CatalogStore, json: bool) -> anyhow::Result<ExitCode> {
 
 /// Prints the anchor recheck; the exit code is 1 when any anchor is not current.
 async fn recheck(store: &CatalogStore, json: bool) -> anyhow::Result<ExitCode> {
-    let directory = store.directory().to_path_buf();
+    let repo_store = store.clone();
     let report = store
-        .read(move |catalog| recheck::recheck(catalog, &GitCli::discover(&directory)?))
+        .read(move |catalog| recheck::recheck(catalog, &GitCli::for_store(&repo_store)?))
         .await
         .context("failed to recheck the catalog's anchors")?;
     let mut out = std::io::stdout().lock();
