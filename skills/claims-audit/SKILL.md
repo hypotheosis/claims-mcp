@@ -20,13 +20,14 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 | `add_claim` | Add a single claim discovered later |
 | `list_claims` | Find claims by verdict, kind, level, tag, artifact, or text |
 | `get_claim` | Read one claim with evidence, verdict history, and children |
-| `update_claim` | Fix metadata (tags, artifacts, source) without changing what the claim means |
+| `update_claim` | Fix metadata (tags, artifacts, source, source anchor) without changing what the claim means |
 | `retire_claim` | Withdraw a claim that was wrong or is superseded |
-| `add_evidence` | Record one finding with a precise locator and an honest stance |
+| `add_evidence` | Record one finding with a precise locator, a commit-pinned anchor, and an honest stance |
 | `record_verdict` | Append a FEVER verdict that cites the evidence it relies on |
 | `trace` | Walk the hierarchy up (why does this exist?) or down (how is it verified?) |
 | `audit_report` | Totals, gap lists, and the traceability matrix |
 | `next_steps` | Ranked TL;DR: open claims by tier, each with one next step |
+| `recheck` | Find anchors that moved, changed, or were overturned since they were recorded |
 
 ## Errors and constraints
 
@@ -50,6 +51,10 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 - Evidence cited by a verdict must belong to the same claim; `supported` needs cited `supports`
   evidence and `refuted` needs cited `refutes` evidence.
 - `update_claim`: omitted fields are unchanged and list fields replace the whole list.
+- Anchors need the catalog to sit in a git repository. The server pins each one to `HEAD` and
+  rejects a path outside the repository, a line range past the end of the file, or a search
+  `hits` that differs from what it counts itself. Commit the code you audit first: an anchor
+  recorded on uncommitted changes is marked `dirty`, and `recheck` reports it as `unpinned`.
 
 ## Workflow
 
@@ -57,7 +62,11 @@ accept the producing agent's own summary, commit message, or "done" report as ev
 
 - Identify the **artifact** under audit (files, modules, a PR, generated output).
 - Identify the **source** it was produced from: the prompt, task, ticket, or spec section.
-  Quote or cite it; this becomes the `source` field on every claim.
+  Quote or cite it; this becomes the `source` field on every claim. When the source is a
+  file in the repository (README, spec, docs), also set `source_anchor` to the exact lines
+  that make the claim, e.g. `{"path": "README.md", "lines": {"start": 42, "end": 44}}`. If
+  the claim is refuted, that is the text someone has to fix, and the report lists refuted
+  claims without one under `refuted_without_source_anchor`.
 - Call `list_claims` with a relevant `text` or `artifact` filter first. If claims already
   exist, continue from step 3 rather than registering duplicates.
 
@@ -106,10 +115,31 @@ For each claim (start with the highest integrity level):
 2. Record **every** relevant finding with `add_evidence`:
    - `locator`: precise and reproducible, such as `src/store.rs:88`,
      `cargo test store::tests::atomic_save`, or the exact command run.
+   - `anchor`: whenever the finding is in the repository, give a machine-checkable anchor
+     next to the free-text locator. Use `{"file": {"path", "lines": {"start", "end"}}}` for
+     code or text that shows the finding, and `{"search": {"pattern", "case_insensitive",
+     "scope"}}` for a search (see *Absence* below). The server pins it to the current commit.
    - `summary`: what you observed, not what you concluded.
    - `stance`: `supports`, `refutes`, or `neutral`. Record refuting and neutral findings
      too; leaving them out biases the audit.
 3. One finding per evidence item. Do not merge a passing test and a code reading into one.
+
+#### Absence: a feature that does not exist
+
+When a document promises something the code lacks, there is no line to point at. Show the
+absence instead, so anyone can repeat it:
+
+1. Record `refutes` evidence with a `search` anchor: a `git grep -E` pattern broad enough to
+   catch any reasonable implementation (synonyms, config keys, error codes, e.g.
+   `rate.?limit|throttl|429`), `case_insensitive: true`, and a `scope` that covers every
+   place it could live. The server runs the search and records the hit count; it must be 0.
+2. Where the feature would have to plug in (a router, a middleware stack, a config struct),
+   add a second `refutes` item with a `file` anchor on those lines, saying what is there
+   instead. A search alone can miss an implementation filed under an unexpected name.
+3. Set `source_anchor` on the claim (step 1), so the refutation points back at the promise.
+
+`recheck` reruns the search later; if it starts matching, the refutation is `overturned` and
+the claim needs re-auditing.
 
 ### 4. Adjudicate (FEVER)
 
@@ -132,8 +162,11 @@ specific enough to act on without rereading the rationale ("Fix: add a test that
 alone, because items are re-sorted and truncated: never refer to other claims or text ("As
 above", "same as CLM-0012").
 
-Never infer support from the absence of failure ("no errors, so it works"). Absence of
-evidence is `not_enough_info`.
+Never infer support from the absence of failure ("no errors, so it works"), and never infer
+absence from not having looked. If you did not search, or searched without a defined scope
+and a pattern that would catch any reasonable implementation, the verdict is
+`not_enough_info`. A demonstrated absence, a zero-hit `search` anchor plus a `file` anchor on
+where the feature would plug in (see *Absence* above), is evidence and supports `refuted`.
 
 #### Parent claims
 
@@ -162,6 +195,7 @@ lead the report with tiers 0-2:
   | `rigor` | High-integrity claim checked only by inspection | Add a test or analysis |
   | `decomposition` | A parent's sub-claims are not all supported | Resolve the children first |
   | `dangling_links` | Parent was retired | Re-link or retire the child |
+  | `refuted_without_source_anchor` | Nothing points at the text that makes a refuted claim | Set `source_anchor` with `update_claim` |
 
 - Offer the traceability `matrix` as a table when the user needs a V&V record.
 - Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report:
@@ -176,17 +210,22 @@ lead the report with tiers 0-2:
      independent of the builder, heuristic evidence, and hierarchy changes during the audit.
      Do not restate counts or verdicts; the report computes them.
   2. Build the PDF from a shell, not through this server (it never executes commands):
-     `claims-mcp --catalog <ledger> verify --json > integrity.json`, then `typst compile --root .
+     `claims-mcp --catalog <ledger> verify --json > integrity.json` and
+     `claims-mcp --catalog <ledger> recheck --json > recheck.json`, then `typst compile --root .
      report/claims-report.typ audit.pdf --input catalog=<ledger> --input
-     notes=report/audit-notes.toml --input commit=<sha> --input integrity=integrity.json`. Add
+     notes=report/audit-notes.toml --input commit=<sha> --input integrity=integrity.json
+     --input recheck=recheck.json`. Add
      `--input detail=full` for the full record (every evidence item and verdict). Paths are
      relative to `--root`, so the template, ledger, and notes must all be under it.
   Tag a refuted claim `issue:N` to link its tracking issue.
 
 ### 6. Re-audit after fixes
 
-Focus on `refuted`, `not_enough_info`, and `stale` claims: gather new evidence, then record
-a new verdict. History is append-only, so the earlier verdict remains as the audit trail.
+Call `recheck` first: every anchor it lists as `changed`, `overturned`, `missing`, or
+`commit_missing` means the evidence no longer describes the code, so re-audit that claim
+(`moved` anchors still hold; re-record them if you want current line numbers). Then focus on
+`refuted`, `not_enough_info`, and `stale` claims: gather new evidence, then record a new
+verdict. History is append-only, so the earlier verdict remains as the audit trail.
 
 ## Anti-patterns
 

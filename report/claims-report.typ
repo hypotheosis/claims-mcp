@@ -17,6 +17,9 @@
 //   integrity   output of `claims-mcp verify --json` for that catalog, relative to --root.
 //               Typst cannot check HMAC seals itself; without this input the report says
 //               integrity was not checked.
+//   recheck     output of `claims-mcp recheck --json`, relative to --root. Flags source and
+//               evidence anchors that moved, changed, or were overturned since they were
+//               recorded; without it the report says anchors were not rechecked.
 //   commit      catalog commit shown on the cover and in the reproduce section; a "-dirty"
 //               suffix (git describe --dirty) marks uncommitted changes
 //   notes       TOML sidecar: artifact, version, repository, method, assessment, [[points]]
@@ -53,6 +56,8 @@
 // `verified`, `records`, `problems` (record, problem), `adopted`; none when not checked.
 #let seal-check = if "integrity" in inputs { json(rooted(inputs.integrity)) } else { none }
 #let tampered = seal-check != none and not seal-check.verified
+// `head`, `checked`, `current`, `items` (claim, role, evidence?, anchor, status, detail).
+#let anchor-check = if "recheck" in inputs { json(rooted(inputs.recheck)) } else { none }
 #let setting(key, default) = inputs.at(key, default: notes.at(key, default: default))
 
 #let artifact = setting("artifact", "unnamed artifact")
@@ -92,6 +97,32 @@
 #let integrity-key(claim) = {
   let level = integrity(claim)
   if level == none { "unassigned" } else { str(level) }
+}
+
+// Anchors, written exactly as Display writes them in src/model.rs.
+#let short-commit(commit) = commit.slice(0, calc.min(12, commit.len()))
+#let line-text(lines) = if lines.start == lines.end {
+  str(lines.start)
+} else {
+  str(lines.start) + "-" + str(lines.end)
+}
+#let file-anchor-text(file) = {
+  let lines = file.at("lines", default: none)
+  file.path + if lines != none { ":" + line-text(lines) } else { "" } + " @ " + short-commit(file.commit)
+}
+#let anchor-text(anchor) = if "file" in anchor {
+  file-anchor-text(anchor.file)
+} else {
+  let search = anchor.search
+  let flags = if search.at("case_insensitive", default: false) { "-iE" } else { "-E" }
+  ("git grep " + flags + " '" + search.pattern + "' -- " + search.scope.join(" ") + " @ "
+    + short-commit(search.commit) + " (" + str(search.hits) + " hits)")
+}
+#let source-anchor(claim) = claim.at("source_anchor", default: none)
+// Where a refuting evidence item points: its anchor, or its free-text locator.
+#let refuting-locator(item) = {
+  let anchor = item.at("anchor", default: none)
+  if anchor == none { item.locator } else { anchor-text(anchor) }
 }
 
 // Parent id -> ids of its active children, in catalog order.
@@ -148,6 +179,9 @@
     child => current-verdict(by-id.at(child)) != "supported",
   ),
   dangling_links: claim => claim.derived_from.any(parent => parent in retired-set),
+  refuted_without_source_anchor: claim => (
+    current-verdict(claim) == "refuted" and source-anchor(claim) == none
+  ),
 )
 #let gaps = gap-rules.pairs().map(((name, rule)) => (
   name,
@@ -179,6 +213,10 @@
   children: children-of(claim.id),
   verification_method: claim.verification_method,
   evidence_locators: claim.evidence.map(item => item.locator),
+  refuting_locators: claim
+    .evidence
+    .filter(item => item.stance == "refutes")
+    .map(refuting-locator),
   current_verdict: current-verdict(claim),
 ))
 
@@ -373,6 +411,29 @@
   },
 )
 
+// Recheck result for one anchor: `(claim id, evidence id or "source")` -> item.
+#let anchor-flags = if anchor-check == none {
+  (:)
+} else {
+  anchor-check.items.map(item => (
+    item.claim + "/" + item.at("evidence", default: "source"),
+    item,
+  )).to-dict()
+}
+#let anchor-flag(claim, record) = {
+  let flag = anchor-flags.at(claim.id + "/" + record, default: none)
+  if flag != none {
+    linebreak()
+    text(fill: rgb("#a33"))[*#upper(humanize(flag.status)):* #rich(flag.detail)]
+  }
+}
+#let anchor-line(claim, item) = {
+  let anchor = item.at("anchor", default: none)
+  if anchor != none {
+    text(fill: luma(70))[Anchor: #wrappable(anchor-text(anchor))#anchor-flag(claim, item.id)]
+  }
+}
+
 // Full mode also shows a roll-up's locator exactly as recorded (long id runs compressed), so
 // the sealed text is visible next to the current counts.
 #let evidence-block(claim, item) = record-block(
@@ -381,6 +442,7 @@
     (text(fill: luma(70))[Recorded: #rich(item.locator)],)
   },
   text(fill: luma(70), rich(locator-text(claim, item))),
+  ..if item.at("anchor", default: none) != none { (anchor-line(claim, item),) },
   rich(item.summary),
 )
 
@@ -522,6 +584,12 @@
     par(rich(claim.statement))
     field-table(
       ([Integrity / method], [IL #level-text(claim), #humanize(claim.verification_method)]),
+      ..{
+        let anchor = source-anchor(claim)
+        if anchor != none {
+          (([Claim made at], [#wrappable(file-anchor-text(anchor))#anchor-flag(claim, "source")]),)
+        }
+      },
       ([Rationale], rich(latest.rationale)),
       ([Auditor], [#latest.auditor, #wrappable(latest.recorded_at)]),
       ([Linked issue], if issues.len() == 0 { [none] } else { issues.join(", ") }),
@@ -555,6 +623,32 @@
     par[#seal-check.adopted.len() records were sealed when an older ledger was migrated
       (`claims-mcp seal --adopt`) rather than as they were recorded#if full [:] else [.]]
     if full { text(size: 7.5pt, seal-check.adopted.map(raw).join(", ")) }
+  }
+}
+
+#let section-anchors() = {
+  heading(level: 2)[Anchor recheck]
+  [Anchors pin a claim's source text and its evidence to a commit. A recheck compares each one
+    with the latest commit, so evidence about code that has since changed is not trusted.]
+  if anchor-check == none {
+    par(emph[Not checked: the report was rendered without the result of `claims-mcp
+      recheck`.])
+    return
+  }
+  par[#anchor-check.checked anchors checked against commit
+    #raw(short-commit(anchor-check.head)): #anchor-check.current current,
+    #anchor-check.items.len() to re-audit.]
+  if anchor-check.items.len() > 0 {
+    data-table(
+      columns: (auto, auto, auto, 1fr),
+      header: ([Claim], [Record], [Status], [Detail]),
+      ..anchor-check.items.map(item => (
+        id-text(item.claim),
+        raw(item.at("evidence", default: "source")),
+        humanize(item.status),
+        [#rich(item.detail) #linebreak() #text(fill: luma(70), wrappable(item.anchor))],
+      )),
+    )
   }
 }
 
@@ -680,11 +774,12 @@
   rigor: [Integrity level 3-4 claim that relies on inspection alone.],
   decomposition: [At least one active child is not supported.],
   dangling_links: [Claim derives from a retired claim.],
+  refuted_without_source_anchor: [Refuted claim with no anchor on the text that makes it.],
 )
 
 #let section-gaps() = {
   [#heading[Gap summary] <gaps>]
-  [Every active claim was checked against all eight gap categories below.]
+  [Every active claim was checked against all nine gap categories below.]
   data-table(
     columns: (auto, 1fr, auto),
     header: ([Gap], [Meaning], [Count]),
@@ -842,7 +937,7 @@
     ([Next step], [For a finding, the text after "Fix:" in its rationale: the one action
       that would fix the claim or decide it.]),
     ([Gap], [A category of open problem, such as a claim with no evidence or a stale verdict.
-      The eight categories are defined in the Gap summary (@gaps).]),
+      The nine categories are defined in the Gap summary (@gaps).]),
     ([Rigor gap], [A claim at integrity level 3 or 4 that relies on inspection alone.]),
   )
   glossary-group(
@@ -852,6 +947,11 @@
       afterwards by other means.]),
     ([Adopted record], [A record sealed when an older ledger without seals was migrated. Its
       seal shows it has not changed since the migration, not since it was first recorded.]),
+    ([Anchor], [A file and line range, or a code search, pinned to the commit that was checked
+      out when it was recorded. A search with no matches shows that something does not exist,
+      such as a feature a document promises.]),
+    ([Recheck], [A comparison of every anchor with the latest commit. It reports anchors whose
+      lines moved or changed, whose file is gone, or whose search result is overturned.]),
   )
   if full {
     glossary-group(
@@ -880,6 +980,9 @@
   let integrity-flag = if "integrity" in inputs {
     " \\\n  --input integrity=" + inputs.integrity
   } else { "" }
+  let recheck-flag = if "recheck" in inputs {
+    " \\\n  --input recheck=" + inputs.recheck
+  } else { "" }
   let commit-flag = if commit == none { "" } else { " \\\n  --input commit=" + commit }
   [Regenerate this PDF with the #link(claims-mcp-url)[claims-mcp] command-line tool and
     #link("https://typst.app")[Typst]. `claims-mcp report init` writes the report template to
@@ -891,6 +994,9 @@
       + (if "integrity" in inputs {
         "claims-mcp --catalog " + catalog-path + " verify --json > " + inputs.integrity + "\n"
       } else { "" })
+      + (if "recheck" in inputs {
+        "claims-mcp --catalog " + catalog-path + " recheck --json > " + inputs.recheck + "\n"
+      } else { "" })
       + "typst compile --root . report/claims-report.typ "
       + (if full { "audit-full.pdf" } else { "audit.pdf" })
       + " \\\n  --input catalog="
@@ -899,7 +1005,8 @@
       + detail
       + commit-flag
       + notes-flag
-      + integrity-flag,
+      + integrity-flag
+      + recheck-flag,
   )
   if not full {
     par[This is the summary. Render with `--input detail=full` for every finding in full, every
@@ -939,6 +1046,7 @@
 } else {
   section-result()
   section-integrity()
+  section-anchors()
   section-findings()
   section-points()
   section-coverage()

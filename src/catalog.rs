@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{ClaimsError, Result};
 use crate::model::{
-    Claim, ClaimId, ClaimKind, ClaimLevel, ClaimRef, ClaimStatus, CurrentVerdict, Evidence,
-    EvidenceId, EvidenceKind, IntegrityLevel, Seal, Stance, Verdict, VerdictRecord,
+    Anchor, Claim, ClaimId, ClaimKind, ClaimLevel, ClaimRef, ClaimStatus, CurrentVerdict, Evidence,
+    EvidenceId, EvidenceKind, FileAnchor, IntegrityLevel, Seal, Stance, Verdict, VerdictRecord,
     VerificationMethod,
 };
 
@@ -37,6 +37,10 @@ pub struct NewClaim {
     /// Where the claim came from (prompt, spec section, ticket).
     #[serde(default)]
     pub source: Option<String>,
+    /// Pinned location of the claim's source text. Never read from tool input: the server
+    /// pins the caller's anchor and sets it.
+    #[serde(skip)]
+    pub source_anchor: Option<FileAnchor>,
     /// Parent claims: existing ids, or `@N` for an earlier entry of the same batch.
     #[serde(default)]
     pub derived_from: Vec<ClaimRef>,
@@ -70,6 +74,9 @@ pub struct ClaimUpdate {
     /// New source.
     #[serde(default)]
     pub source: Option<String>,
+    /// New pinned source location, set by the server from the caller's anchor.
+    #[serde(skip)]
+    pub source_anchor: Option<FileAnchor>,
     /// Replacement parent list (existing claim ids only).
     #[serde(default)]
     pub derived_from: Option<Vec<ClaimId>>,
@@ -92,6 +99,9 @@ pub struct NewEvidence {
     pub summary: String,
     /// Whether it supports, refutes, or is neutral toward the claim.
     pub stance: Stance,
+    /// Pinned location, set by the server from the caller's anchor.
+    #[serde(skip)]
+    pub anchor: Option<Anchor>,
 }
 
 /// Input for `record_verdict`.
@@ -473,6 +483,7 @@ impl Catalog {
             integrity_level: new_claim.integrity_level,
             verification_method: new_claim.verification_method,
             source: optional_text(new_claim.source),
+            source_anchor: new_claim.source_anchor,
             derived_from: dedup_ids(derived_from),
             artifacts: clean_list(new_claim.artifacts),
             tags: clean_list(new_claim.tags),
@@ -545,6 +556,9 @@ impl Catalog {
         if let Some(source) = update.source {
             claim.source = optional_text(Some(source));
         }
+        if let Some(anchor) = update.source_anchor {
+            claim.source_anchor = Some(anchor);
+        }
         if let Some(parents) = derived_from {
             claim.derived_from = parents;
         }
@@ -599,6 +613,7 @@ impl Catalog {
             locator: required_text("locator", &new_evidence.locator)?,
             summary: required_text("summary", &new_evidence.summary)?,
             stance: new_evidence.stance,
+            anchor: new_evidence.anchor,
             recorded_at: now,
             seal: None,
         };
@@ -797,6 +812,7 @@ pub(crate) mod tests {
             verification_method: VerificationMethod::Test,
             integrity_level: None,
             source: None,
+            source_anchor: None,
             derived_from: Vec::new(),
             artifacts: Vec::new(),
             tags: Vec::new(),
@@ -809,6 +825,7 @@ pub(crate) mod tests {
             locator: "tests/a.rs:1".to_owned(),
             summary: "observed".to_owned(),
             stance,
+            anchor: None,
         }
     }
 

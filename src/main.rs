@@ -1,8 +1,10 @@
 //! `claims-mcp`: a stdio MCP server that maintains a JSON catalog of verifiable claims.
 
+mod anchor;
 mod catalog;
 mod error;
 mod model;
+mod recheck;
 mod report;
 mod seal;
 mod server;
@@ -18,6 +20,9 @@ use clap::{Parser, Subcommand};
 use rmcp::ServiceExt;
 use tracing_subscriber::EnvFilter;
 
+use crate::anchor::GitCli;
+use crate::model::short_commit;
+use crate::recheck::RecheckReport;
 use crate::report::files::{self, InitAction};
 use crate::report::next_steps::{self, AreaCount, NextSteps, Tier};
 use crate::seal::IntegrityReport;
@@ -66,6 +71,13 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+    /// Compare every anchor on active claims with the repository's HEAD; exits 1 if any is
+    /// not current.
+    Recheck {
+        /// Print the result as JSON (the `recheck` input of report/claims-report.typ).
+        #[arg(long)]
+        json: bool,
+    },
     /// Seal records that have no seal, for maintainers migrating a catalog.
     Seal {
         /// Seal every unsealed record as adopted. Required: adoption is the only sealing
@@ -109,6 +121,7 @@ async fn main() -> ExitCode {
         Some(Command::Tldr { limit, json }) => {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
         }
+        Some(Command::Recheck { json }) => recheck(&store, json).await,
         Some(Command::Seal { adopt: _ }) => adopt(&store).await.map(|()| ExitCode::SUCCESS),
         Some(Command::Report {
             action: ReportCommand::Init { dir },
@@ -165,6 +178,53 @@ async fn verify(store: &CatalogStore, json: bool) -> anyhow::Result<ExitCode> {
     } else {
         ExitCode::FAILURE
     })
+}
+
+/// Prints the anchor recheck; the exit code is 1 when any anchor is not current.
+async fn recheck(store: &CatalogStore, json: bool) -> anyhow::Result<ExitCode> {
+    let directory = store.directory().to_path_buf();
+    let report = store
+        .read(move |catalog| recheck::recheck(catalog, &GitCli::discover(&directory)?))
+        .await
+        .context("failed to recheck the catalog's anchors")?;
+    let mut out = std::io::stdout().lock();
+    if json {
+        serde_json::to_writer(&mut out, &report)?;
+        writeln!(out)?;
+    } else {
+        write_recheck(&mut out, &report)?;
+    }
+    Ok(if report.all_current() {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::FAILURE
+    })
+}
+
+/// Human-readable form of a recheck report.
+fn write_recheck(out: &mut impl Write, report: &RecheckReport) -> std::io::Result<()> {
+    writeln!(
+        out,
+        "{} anchors checked against {}: {} current, {} need re-audit",
+        report.checked,
+        short_commit(&report.head),
+        report.current,
+        report.items.len()
+    )?;
+    for item in &report.items {
+        let record = item
+            .evidence
+            .map_or_else(|| "source".to_owned(), |id| id.to_string());
+        writeln!(
+            out,
+            "  {} {record} {}: {}\n    {}",
+            item.claim,
+            item.status.label(),
+            item.detail,
+            item.anchor
+        )?;
+    }
+    Ok(())
 }
 
 /// Human-readable form of an integrity report.

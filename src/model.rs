@@ -357,6 +357,139 @@ pub struct Seal {
     pub mac: String,
 }
 
+/// An inclusive, 1-based range of lines in a file.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct LineRange {
+    /// First line, counting from 1.
+    pub start: u32,
+    /// Last line, at least `start`.
+    pub end: u32,
+}
+
+impl LineRange {
+    /// Returns `true` if the two ranges share at least one line.
+    pub fn overlaps(self, other: LineRange) -> bool {
+        self.start <= other.end && other.start <= self.end
+    }
+}
+
+impl fmt::Display for LineRange {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.start == self.end {
+            write!(formatter, "{}", self.start)
+        } else {
+            write!(formatter, "{}-{}", self.start, self.end)
+        }
+    }
+}
+
+/// A file, or lines in it, at the commit that was checked out when the anchor was recorded.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FileAnchor {
+    /// Path relative to the repository root.
+    pub path: String,
+    /// The anchored lines; the whole file when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub lines: Option<LineRange>,
+    /// Full commit id of `HEAD` when the anchor was recorded.
+    pub commit: String,
+    /// `true` if the file had uncommitted changes then, so `commit` may not show what was seen.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub dirty: bool,
+}
+
+/// A `git grep -E` search and how many lines it matched at the pinned commit. With zero hits
+/// it shows that something does not exist, such as a feature a document promises.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SearchAnchor {
+    /// POSIX extended regular expression, as `git grep -E` reads it.
+    pub pattern: String,
+    /// Whether the search ignores case (`git grep -i`).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub case_insensitive: bool,
+    /// Paths searched, relative to the repository root (`.` is the whole repository).
+    pub scope: Vec<String>,
+    /// Matching lines at `commit`, counted by the server.
+    pub hits: u32,
+    /// Full commit id of `HEAD` when the search was recorded.
+    pub commit: String,
+    /// `true` if a scope path had uncommitted changes then.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub dirty: bool,
+}
+
+/// Machine-checkable location behind an evidence item, pinned to a commit so it can be
+/// rechecked later (`claims-mcp recheck`).
+///
+/// Rust note: serde's default enum form is "externally tagged": `{"file": {...}}` or
+/// `{"search": {...}}`, like a one-key dict whose key names the variant.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Anchor {
+    /// A file or line range.
+    File(FileAnchor),
+    /// A search; with zero hits, a demonstrated absence.
+    Search(SearchAnchor),
+}
+
+impl Anchor {
+    /// Whether the anchored content had uncommitted changes when it was recorded.
+    pub fn dirty(&self) -> bool {
+        match self {
+            Self::File(anchor) => anchor.dirty,
+            Self::Search(anchor) => anchor.dirty,
+        }
+    }
+}
+
+impl fmt::Display for FileAnchor {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "{}", self.path)?;
+        if let Some(lines) = self.lines {
+            write!(formatter, ":{lines}")?;
+        }
+        write!(formatter, " @ {}", short_commit(&self.commit))
+    }
+}
+
+impl fmt::Display for SearchAnchor {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let flags = if self.case_insensitive { "-iE" } else { "-E" };
+        write!(
+            formatter,
+            "git grep {flags} '{}' -- {} @ {} ({} hits)",
+            self.pattern,
+            self.scope.join(" "),
+            short_commit(&self.commit),
+            self.hits
+        )
+    }
+}
+
+impl fmt::Display for Anchor {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::File(anchor) => anchor.fmt(formatter),
+            Self::Search(anchor) => anchor.fmt(formatter),
+        }
+    }
+}
+
+/// `1 line` or `N lines`.
+pub fn line_count_text(count: u32) -> String {
+    if count == 1 {
+        "1 line".to_owned()
+    } else {
+        format!("{count} lines")
+    }
+}
+
+/// The first 12 characters of a commit id, the usual abbreviated form.
+pub fn short_commit(commit: &str) -> &str {
+    // Commit ids are ASCII hex, so any byte index is a char boundary.
+    commit.get(..12).unwrap_or(commit)
+}
+
 /// One piece of evidence attached to a claim.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Evidence {
@@ -370,6 +503,9 @@ pub struct Evidence {
     pub summary: String,
     /// Whether it supports or refutes the claim.
     pub stance: Stance,
+    /// Commit-pinned location that `recheck` can verify; absent for free-text-only evidence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor: Option<Anchor>,
     /// When it was recorded.
     pub recorded_at: DateTime<Utc>,
     /// Integrity seal; `None` only in unsealed (schema v1) catalogs or after tampering.
@@ -414,6 +550,9 @@ pub struct Claim {
     /// Where the claim came from (prompt, spec section, ticket).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    /// Commit-pinned location of the text that makes the claim, such as a README line.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_anchor: Option<FileAnchor>,
     /// Parent claims this one refines (upstream trace links).
     #[serde(default)]
     pub derived_from: Vec<ClaimId>,

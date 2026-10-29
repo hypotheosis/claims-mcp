@@ -115,6 +115,15 @@ pub enum ClaimsError {
         problems: Vec<IntegrityProblem>,
     },
 
+    /// A git command needed for an anchor or a recheck failed.
+    #[error("git {command} failed: {message}")]
+    Git {
+        /// The git subcommand and its arguments.
+        command: String,
+        /// git's error output, or why it could not be run.
+        message: String,
+    },
+
     /// Serializing the catalog or a tool response failed.
     #[error("failed to encode JSON: {0}")]
     Encode(#[from] serde_json::Error),

@@ -12,7 +12,8 @@ use serde::{Deserialize, Serialize};
 use crate::catalog::Catalog;
 use crate::error::Result;
 use crate::model::{
-    Claim, ClaimId, ClaimKind, ClaimLevel, CurrentVerdict, IntegrityLevel, VerificationMethod,
+    Claim, ClaimId, ClaimKind, ClaimLevel, CurrentVerdict, IntegrityLevel, Stance,
+    VerificationMethod,
 };
 use crate::seal::{self, IntegrityReport};
 
@@ -52,6 +53,8 @@ pub struct Gaps {
     pub decomposition: Vec<ClaimId>,
     /// Claims whose `derived_from` includes a retired claim.
     pub dangling_links: Vec<ClaimId>,
+    /// Refuted claims with no `source_anchor`, so nothing points at the text to fix.
+    pub refuted_without_source_anchor: Vec<ClaimId>,
 }
 
 /// One row of the traceability matrix.
@@ -69,6 +72,9 @@ pub struct MatrixRow {
     pub verification_method: VerificationMethod,
     /// Locators of every attached evidence item.
     pub evidence_locators: Vec<String>,
+    /// Where the claim is refuted: each `refutes` evidence item's anchor, or its locator when
+    /// it has none.
+    pub refuting_locators: Vec<String>,
     /// Latest verdict or `unverified`.
     pub current_verdict: CurrentVerdict,
 }
@@ -172,6 +178,16 @@ pub fn audit_report(catalog: &Catalog, include_matrix: bool) -> AuditReport {
                 children: claim_children.iter().map(|child| child.id).collect(),
                 verification_method: claim.verification_method,
                 evidence_locators: claim.evidence.iter().map(|e| e.locator.clone()).collect(),
+                refuting_locators: claim
+                    .evidence
+                    .iter()
+                    .filter(|e| e.stance == Stance::Refutes)
+                    .map(|e| {
+                        e.anchor
+                            .as_ref()
+                            .map_or_else(|| e.locator.clone(), ToString::to_string)
+                    })
+                    .collect(),
                 current_verdict: verdict,
             });
         }
@@ -213,7 +229,12 @@ fn classify_gaps(
     }
     match verdict {
         CurrentVerdict::Unverified => gaps.unverified.push(claim.id),
-        CurrentVerdict::Refuted => gaps.refuted.push(claim.id),
+        CurrentVerdict::Refuted => {
+            gaps.refuted.push(claim.id);
+            if claim.source_anchor.is_none() {
+                gaps.refuted_without_source_anchor.push(claim.id);
+            }
+        }
         CurrentVerdict::NotEnoughInfo => gaps.not_enough_info.push(claim.id),
         CurrentVerdict::Supported => {}
     }
@@ -346,9 +367,12 @@ mod tests {
     use serde_json::{json, Value};
 
     use super::*;
+    use crate::anchor::tests::{file_input, search_input, FakeRepo, HEAD};
+    use crate::anchor::{pin, pin_file, NewAnchor};
     use crate::catalog::tests::{at, evidence, new_claim, verdict};
     use crate::catalog::{NewClaim, NewEvidence, NewVerdict};
     use crate::model::{ClaimRef, EvidenceId, EvidenceKind, Stance, Verdict};
+    use crate::recheck::{self, RecheckReport};
 
     fn child_of(statement: &str, parent: ClaimId) -> NewClaim {
         NewClaim {
@@ -541,6 +565,7 @@ mod tests {
         dir: tempfile::TempDir,
         catalog_input: OsString,
         integrity_input: OsString,
+        recheck_input: Option<OsString>,
     }
 
     impl TemplateRun {
@@ -570,7 +595,22 @@ mod tests {
                 dir,
                 catalog_input,
                 integrity_input,
+                recheck_input: None,
             }
+        }
+
+        /// Also passes `report` as the `recheck` input, as `just report` does.
+        fn with_recheck(mut self, report: &RecheckReport) -> Self {
+            let path = self.dir.path().join("recheck.json");
+            std::fs::write(
+                &path,
+                serde_json::to_vec(report).expect("serialize recheck"),
+            )
+            .expect("write recheck");
+            let mut input = OsString::from("recheck=");
+            input.push(&path);
+            self.recheck_input = Some(input);
+            self
         }
 
         fn pdf(&self) -> PathBuf {
@@ -588,6 +628,11 @@ mod tests {
                 .arg(&self.catalog_input)
                 .arg("--input")
                 .arg(&self.integrity_input)
+                .args(
+                    self.recheck_input
+                        .iter()
+                        .flat_map(|input| [OsStr::new("--input"), input.as_os_str()]),
+                )
                 .arg("--input")
                 .arg(format!("detail={detail}"))
                 .output()
@@ -643,6 +688,75 @@ mod tests {
             assert_eq!(rendered.layout["detail"], detail);
             rendered
         }))
+    }
+
+    /// A refuted claim anchored to a README line, refuted by an absence search and a file
+    /// anchor, with a recheck that flags the search as overturned. The template's
+    /// `refuting_locators` must format anchors exactly as `Display` does.
+    #[test]
+    fn typst_template_renders_anchors_and_recheck() {
+        if !typst_available() {
+            return;
+        }
+        let repo = FakeRepo::default()
+            .with_file(HEAD, "README.md", 10)
+            .with_file(HEAD, "src/server.rs", 80);
+        let mut catalog = Catalog::default();
+        let mut input = new_claim("every endpoint is rate limited");
+        input.source_anchor =
+            Some(pin_file(&repo, file_input("README.md", Some((4, 4)))).expect("pin"));
+        let claim = catalog.add_claim(input, at(0)).expect("claim").id;
+        let mut cited = Vec::new();
+        for anchor in [
+            NewAnchor::Search(search_input("rate.?limit|throttl", None)),
+            NewAnchor::File(file_input("src/server.rs", Some((40, 61)))),
+        ] {
+            let mut item = evidence(Stance::Refutes);
+            item.anchor = Some(pin(&repo, anchor).expect("pin"));
+            cited.push(
+                catalog
+                    .add_evidence(claim, item, at(1))
+                    .expect("evidence")
+                    .id,
+            );
+        }
+        catalog
+            .record_verdict(claim, verdict(Verdict::Refuted, cited), at(2))
+            .expect("refuted");
+        let refuting = audit_report(&catalog, true).matrix.expect("matrix")[0]
+            .refuting_locators
+            .clone();
+        assert_eq!(
+            refuting,
+            vec![
+                "git grep -iE 'rate.?limit|throttl' -- src @ 0123456789ab (0 hits)".to_owned(),
+                "src/server.rs:40-61 @ 0123456789ab".to_owned(),
+            ]
+        );
+        assert!(audit_report(&catalog, false)
+            .gaps
+            .refuted_without_source_anchor
+            .is_empty());
+
+        let now = FakeRepo {
+            grep_hits: 2,
+            head: Some("fedcba9876543210fedcba9876543210fedcba98".to_owned()),
+            ..FakeRepo::default()
+        }
+        .with_file("fedcba9876543210fedcba9876543210fedcba98", "README.md", 10)
+        .with_file(
+            "fedcba9876543210fedcba9876543210fedcba98",
+            "src/server.rs",
+            80,
+        );
+        let recheck = recheck::recheck(&catalog, &now).expect("recheck");
+        assert_eq!(recheck.items.len(), 1);
+
+        let run = TemplateRun::new(&catalog).with_recheck(&recheck);
+        let expected = serde_json::to_value(audit_report(&catalog, true)).expect("serialize");
+        for detail in DETAILS {
+            assert_eq!(run.render(detail).report, expected, "detail={detail}");
+        }
     }
 
     /// root <- areas A and B. A <- parent <- ten leaves: the first refuted, the second not
@@ -703,6 +817,7 @@ mod tests {
                     locator: format!("children: {}", listed.join(", ")),
                     summary: "Two leaves are open.".to_owned(),
                     stance: Stance::Neutral,
+                    anchor: None,
                 },
                 at(3),
             )
@@ -965,6 +1080,7 @@ mod tests {
                     locator: format!("children of {parent}"),
                     summary: "Both children hold.".to_owned(),
                     stance: Stance::Supports,
+                    anchor: None,
                 },
                 at(3),
             )
