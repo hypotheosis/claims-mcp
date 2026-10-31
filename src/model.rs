@@ -528,7 +528,7 @@ pub struct Evidence {
     pub anchor: Option<Anchor>,
     /// When it was recorded.
     pub recorded_at: DateTime<Utc>,
-    /// Integrity seal; `None` only in unsealed (schema v1) catalogs or after tampering.
+    /// Integrity seal; absent only in an unsealed catalog or after tampering.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seal: Option<Seal>,
 }
