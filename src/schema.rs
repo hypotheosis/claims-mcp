@@ -10,9 +10,7 @@ use crate::catalog::{Catalog, SCHEMA_VERSION};
 pub const LATEST_ID: &str = "https://hypotheosis.github.io/claims-mcp/schema/claims.schema.json";
 
 fn versioned_id() -> String {
-    format!(
-        "https://hypotheosis.github.io/claims-mcp/schema/v{SCHEMA_VERSION}/claims.schema.json"
-    )
+    format!("https://hypotheosis.github.io/claims-mcp/schema/v{SCHEMA_VERSION}/claims.schema.json")
 }
 
 /// Generates the canonical JSON Schema 2020-12 document for a catalog.
