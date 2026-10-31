@@ -1,0 +1,78 @@
+# Documentation site: builds the mdBook in docs/site and checks its internal links on pull
+# requests; on pushes to main, also deploys it to GitHub Pages.
+#
+# Only main deploys, even from a manual run on another branch. Deploying needs the repository's
+# Pages source set to "GitHub Actions". Pull requests skip the Pages steps, so they pass before
+# that is set.
+name: Docs
+
+on:
+  pull_request:
+    paths: ["docs/site/**", ".github/workflows/docs.yml"]
+  push:
+    branches: [main]
+    paths: ["docs/site/**", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  MDBOOK_VERSION: v0.5.4
+  MDBOOK_SHA256: 5222beabd3e37dc5be0d18ff99b79058469354db5c220153a1b92db5ba12be89
+
+jobs:
+  build:
+    name: build and link-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install mdBook
+        run: |
+          archive="mdbook-${MDBOOK_VERSION}-x86_64-unknown-linux-musl.tar.gz"
+          curl -sSfL -o "$archive" \
+            "https://github.com/rust-lang/mdBook/releases/download/${MDBOOK_VERSION}/${archive}"
+          echo "${MDBOOK_SHA256}  ${archive}" | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf "$archive" -C "$HOME/.local/bin" mdbook
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build
+        run: mdbook build docs/site
+      # mdBook doesn't report broken links, so lychee checks the built HTML: every relative
+      # link and #fragment must resolve. --offline skips external URLs. 404.html is skipped
+      # because its links are absolute under site-url (/claims-mcp/) and resolve only when
+      # served from Pages.
+      - name: Check links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --offline --include-fragments --no-progress
+            --exclude-path '404\.html$'
+            --root-dir ${{ github.workspace }}/docs/site/book
+            docs/site/book
+          fail: true
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          path: docs/site/book
+
+  deploy:
+    name: deploy to Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

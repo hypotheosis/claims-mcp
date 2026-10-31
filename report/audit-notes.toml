@@ -33,8 +33,11 @@ serves the template and the notes example as MCP resources (PR #19). These were 
 claims either.
 
 Version 0.2.3 adds commit-pinned anchors on evidence and claim sources, absence refutations, and \
-the recheck command and tool (PR #22, issue #21). These were not audited as claims, and this \
-catalog's evidence has no anchors, so the anchor recheck covers none of it.
+the recheck command and tool (PR #22, issue #21). These were not audited as claims.
+
+After 0.2.3, the detailed documentation moved from the README to a documentation site. Claims \
+CLM-0067 to CLM-0077 check the site against the code, and theirs is the only evidence in this \
+catalog with anchors, so the anchor recheck covers only the documentation claims.
 """
 
 [[points]]

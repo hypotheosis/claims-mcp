@@ -1,0 +1,19 @@
+[book]
+title = "claims-mcp"
+description = "A sealed ledger of claims, evidence and verdicts for requirements traceability and audits"
+language = "en"
+src = "src"
+
+[build]
+# Fail the build when SUMMARY.md lists a page that doesn't exist.
+create-missing = false
+
+[output.html]
+site-url = "/claims-mcp/"
+git-repository-url = "https://github.com/hypotheosis/claims-mcp"
+edit-url-template = "https://github.com/hypotheosis/claims-mcp/edit/main/docs/site/{path}"
+default-theme = "light"
+preferred-dark-theme = "navy"
+
+[output.html.search]
+enable = true

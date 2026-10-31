@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 67,
+  "next_claim_seq": 78,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "735703cb3961f672d4d26cd1f5db974c73a1412a860ec75f370e55e8cab8b351"
+    "mac": "5dd00356474934b9114b8b9ff2bfe423bad70c087aab156c1ac5c0acdf54bf7c"
   },
-  "next_evidence_seq": 124,
+  "next_evidence_seq": 135,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "efa98c755d4e74ea431ecbbcd3fd82dde57591c87db760ee1b55fb7f8d14f578"
+    "mac": "e2217d7efd85be3c708ea7d9bad7d34942d8fc8dca3c7af861046a55730d02ff"
   },
   "claims": [
     {
@@ -2732,7 +2732,9 @@
         "docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "The detailed documentation moved from README.md to the docs site (docs/site/, commit c72d3c8); README.md no longer documents these. Replaced by CLM-0067.",
+        "retired_at": "2026-10-31T14:01:25.711183486Z"
       },
       "evidence": [
         {
@@ -2789,10 +2791,10 @@
         }
       ],
       "created_at": "2026-10-23T12:48:15.994077102Z",
-      "updated_at": "2026-10-23T15:51:51.340323543Z",
+      "updated_at": "2026-10-31T14:01:25.711183486Z",
       "seal": {
         "by": "server",
-        "mac": "2fe166f2be64ae8cb63114a615fd868cd85a2678ae87e011a66e7ca7e555ab26"
+        "mac": "14713cc874101758907fc2a8f872a0c966f7ad93d8d44a1852ac246c99af4ae6"
       }
     },
     {
@@ -4214,7 +4216,9 @@
         "docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "The seal caveat and deny rules moved from README.md to the docs site (concepts/seals.md, guides/migrating.md; commit c72d3c8). Replaced by CLM-0068.",
+        "retired_at": "2026-10-31T14:01:25.723725898Z"
       },
       "evidence": [
         {
@@ -4246,10 +4250,10 @@
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.866140813Z",
+      "updated_at": "2026-10-31T14:01:25.723725898Z",
       "seal": {
         "by": "server",
-        "mac": "817d6e23d397350e485f4dbfe836f56792e62fbfa3e7a6bcf553898c89d7509f"
+        "mac": "0daaa0913e49915bf4206a1bf28df5708198cecb1a9078d283aded4c0b6fda0d"
       }
     },
     {
@@ -4558,7 +4562,9 @@
         "docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "The 'Generate a PDF report' section moved from README.md to the docs site (guides/reports.md; commit c72d3c8). Replaced by CLM-0069.",
+        "retired_at": "2026-10-31T14:01:25.733685512Z"
       },
       "evidence": [
         {
@@ -4590,10 +4596,10 @@
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.918234636Z",
+      "updated_at": "2026-10-31T14:01:25.733685512Z",
       "seal": {
         "by": "server",
-        "mac": "34b4360c3a865e27f8d804dac814f2c3b923315a162aec8565ebc493f159de49"
+        "mac": "155330550145bf8870d4bdc8c37f04e58dc705762a993d8d4f55928a7ac25578"
       }
     },
     {
@@ -4913,7 +4919,9 @@
         "docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "CI and release documentation moved from README.md to the docs site (development.md; commit c72d3c8). Replaced by CLM-0070.",
+        "retired_at": "2026-10-31T14:01:25.742986214Z"
       },
       "evidence": [
         {
@@ -4945,10 +4953,10 @@
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.969066708Z",
+      "updated_at": "2026-10-31T14:01:25.742986214Z",
       "seal": {
         "by": "server",
-        "mac": "ce9ec2bd01a2092d1b568b0116df019961775f3ad9199da688d67004bc2a154b"
+        "mac": "80b4bbad7b72d4987a40f372a73125430a009ac5326287f4efa0678c8401b550"
       }
     },
     {
@@ -5006,6 +5014,816 @@
       "seal": {
         "by": "server",
         "mac": "36342891ad7fcaa2f17919f09b8415b77b28b647e11bcaa828c1212bca07a675"
+      }
+    },
+    {
+      "id": "CLM-0067",
+      "statement": "The documentation site documents installing, configuring and building claims-mcp, the MCP tool reference, and skill installation via cp -r skills/claims-audit ~/.claude/skills/",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "spec 9 (replaces CLM-0032 after the README moved to the docs site)",
+      "source_anchor": {
+        "path": "docs/site/src/guides/install.md",
+        "lines": {
+          "start": 94,
+          "end": 110
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0019"
+      ],
+      "artifacts": [
+        "docs/site/src/guides/install.md",
+        "docs/site/src/reference/cli.md",
+        "docs/site/src/reference/tools.md",
+        "docs/site/src/development.md"
+      ],
+      "tags": [
+        "spec",
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0130",
+          "kind": "inspection",
+          "locator": "docs/site/src/guides/install.md:6-110; reference/cli.md; reference/tools.md; development.md:1-15",
+          "summary": "install.md covers release download, cargo install and cargo build --release, registration, and the skill install with 'cp -r skills/claims-audit ~/.claude/skills/' (line 102). cli.md has the --catalog/CLAIMS_CATALOG/RUST_LOG configuration table; tools.md is the tool reference; development.md has the just build tasks.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/guides/install.md",
+              "lines": {
+                "start": 6,
+                "end": 110
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.626473704Z",
+          "seal": {
+            "by": "server",
+            "mac": "517e92121382606abb994c7610f37a9e15da596c0f23b28d3719489aa212364e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All four documented topics are on the site, including the exact cp -r skill install command (EVD-0130).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0130"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.214838152Z",
+          "seal": {
+            "by": "server",
+            "mac": "490fa110945d5e396dafb75131e0c741f166dae3cd4cb67bb40c10874a7e0e4b"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.214838152Z",
+      "seal": {
+        "by": "server",
+        "mac": "c3e76f1efc75f82106e9f96ea2e8b05eda012039923784e83bf894c1aa13d4f0"
+      }
+    },
+    {
+      "id": "CLM-0068",
+      "statement": "The documentation site states that the seals are a deterrent, not cryptographic security, because the key is in public source, and shows permissions.deny rules that block edits to claims.json",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #9 section 5; acceptance criterion 12 (replaces CLM-0053 after the README moved to the docs site)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/seals.md",
+        "lines": {
+          "start": 34,
+          "end": 39
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/seals.md",
+        "docs/site/src/guides/migrating.md"
+      ],
+      "tags": [
+        "issue:9",
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0131",
+          "kind": "inspection",
+          "locator": "docs/site/src/concepts/seals.md:34-39; docs/site/src/guides/migrating.md:23-33",
+          "summary": "seals.md: 'Seals are a deterrent, not cryptographic security. The key is in the public source.' migrating.md gives the permissions.deny rules Edit(**/claims.json), Write(**/claims.json) and Bash(claims-mcp seal:*).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/guides/migrating.md",
+              "lines": {
+                "start": 23,
+                "end": 33
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.640235769Z",
+          "seal": {
+            "by": "server",
+            "mac": "e1f34c4485d3924727df61cd337cb378158d96b2c4e1290abebe95398d9c0665"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The site states the deterrent threat model and gives the deny rules (EVD-0131).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0131"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.224224903Z",
+          "seal": {
+            "by": "server",
+            "mac": "ac3f9e2527e151de2cf35bee84c44418860a479245d8c89ba341a0a8af924435"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.224224903Z",
+      "seal": {
+        "by": "server",
+        "mac": "b37e94936cfa00eebfd3b1fdfe2f7b503485b201171b34f3b649701dc2e64138"
+      }
+    },
+    {
+      "id": "CLM-0069",
+      "statement": "The documentation site has a PDF reports guide and the claims-audit skill's Report step mentions the PDF as an optional output",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #2 acceptance criteria 6-7 (replaces CLM-0059 after the README moved to the docs site)",
+      "source_anchor": {
+        "path": "docs/site/src/guides/reports.md",
+        "lines": {
+          "start": 1,
+          "end": 3
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0054"
+      ],
+      "artifacts": [
+        "docs/site/src/guides/reports.md",
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "issue:2",
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0132",
+          "kind": "inspection",
+          "locator": "docs/site/src/guides/reports.md (whole page); skills/claims-audit/SKILL.md step 5 'Optionally, when a reviewer needs a fixed record of the audit, offer a PDF report'",
+          "summary": "The site has a 'PDF reports' guide covering detail levels, report init, the typst compile command and every input. The skill's Report step still offers the PDF as optional.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/guides/reports.md",
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.652284740Z",
+          "seal": {
+            "by": "server",
+            "mac": "a551c2013d1df72286eb3fc5e80d1b59ee91bb5ec5eca33cd44e0b021d4571bc"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both documentation items are present (EVD-0132).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0132"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.234335307Z",
+          "seal": {
+            "by": "server",
+            "mac": "d87e41f87cae0f0793fb405307e224b39b81b6b6cbf767d37922460973c27142"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.234335307Z",
+      "seal": {
+        "by": "server",
+        "mac": "8e289de66d4baac7aea78e39f2d5a534092d8e6699007dc13eede5b5e5e1e331"
+      }
+    },
+    {
+      "id": "CLM-0070",
+      "statement": "The documentation site documents the CI checks and how to cut a release",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "issue #4 acceptance criterion 5 (replaces CLM-0065 after the README moved to the docs site)",
+      "source_anchor": {
+        "path": "docs/site/src/development.md",
+        "lines": {
+          "start": 29,
+          "end": 64
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0060"
+      ],
+      "artifacts": [
+        "docs/site/src/development.md"
+      ],
+      "tags": [
+        "issue:4",
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0133",
+          "kind": "inspection",
+          "locator": "docs/site/src/development.md:29-64 ('Continuous integration', 'Releasing')",
+          "summary": "The CI section lists fmt/clippy/build/test with REQUIRE_TYPST, verify, the Windows/macOS/MSRV jobs, the audit report artifact and the docs workflow. Releasing gives the version-bump PR, tag and push commands, what release.yml checks and publishes, and that tags can't be moved.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/development.md",
+              "lines": {
+                "start": 29,
+                "end": 64
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.663658868Z",
+          "seal": {
+            "by": "server",
+            "mac": "501519d99698491369ec006926c4a0063cf0da0b0d8fd91a20196ae044c6bc27"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "development.md has both sections with the required content (EVD-0133).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0133"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.245310164Z",
+          "seal": {
+            "by": "server",
+            "mac": "77cb71bcd8a7fdc2aa5517a3226a961d5a5df84d2a2705006b54609e30ca73e8"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.245310164Z",
+      "seal": {
+        "by": "server",
+        "mac": "f076dc230b39c4470d1e2345651f671cad23967b873b553ab32d591f982e68e8"
+      }
+    },
+    {
+      "id": "CLM-0071",
+      "statement": "The documentation site describes the shipped behaviour of claims-mcp",
+      "kind": "documentation",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/superpowers/specs/2026-10-31-docs-site-design.md, Dogfooding",
+      "derived_from": [],
+      "artifacts": [
+        "docs/site/src"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0134",
+          "kind": "analysis",
+          "locator": "children of CLM-0071",
+          "summary": "The children check the site's highest-risk factual statements against the code: the tool list, the CLI subcommands and exit codes, the recheck statuses, the seal write/read behaviour and the verification methods. All are supported. Positioning prose (why/*) is argument, not checkable behaviour, so it is deliberately not claimed.",
+          "stance": "supports",
+          "recorded_at": "2026-10-31T14:02:34.685211988Z",
+          "seal": {
+            "by": "server",
+            "mac": "b13273a4b27dcb671259d792d08ea97e8c2f73264ff10b9044f3a136b3addae9"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every active child is supported, and together they cover the site's checkable reference statements (EVD-0134).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0134"
+          ],
+          "recorded_at": "2026-10-31T14:02:39.268798383Z",
+          "seal": {
+            "by": "server",
+            "mac": "5c5076e254d937525afc458e7e3b0d0de9afb994f0af67685018291629d04395"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:39.268798383Z",
+      "seal": {
+        "by": "server",
+        "mac": "cca82020d0568dca175bc4e2d397250567b9db6dcae6122b5f1154c37ef37a07"
+      }
+    },
+    {
+      "id": "CLM-0072",
+      "statement": "The MCP tools reference lists exactly the tools the server registers",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/reference/tools.md",
+        "lines": {
+          "start": 8,
+          "end": 21
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/tools.md",
+        "src/server.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0124",
+          "kind": "inspection",
+          "locator": "src/server.rs:150-375 (#[tool_router] impl); docs/site/src/reference/tools.md:8-21",
+          "summary": "The tool_router impl defines 12 #[tool] methods: add_claim, add_claims, get_claim, list_claims, update_claim, retire_claim, add_evidence, record_verdict, trace, audit_report, next_steps, recheck. The reference table lists the same 12 names, no more and no fewer.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 150,
+                "end": 375
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.541414680Z",
+          "seal": {
+            "by": "server",
+            "mac": "cb00c1ceb6cf29159221bf9ce7674866c61683c92adf2673dd767160cf77a67a"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The server registers 12 tools and the reference lists the same 12 (EVD-0124).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0124"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.151002839Z",
+          "seal": {
+            "by": "server",
+            "mac": "ca3b2141be77c53f265eb679758edb2fea478ddb38dc30c6e6f7d7c134193105"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.151002839Z",
+      "seal": {
+        "by": "server",
+        "mac": "670b52c1c5d69818524560ac409bcb0d7d0557b7faa77b0b18a64822955f8847"
+      }
+    },
+    {
+      "id": "CLM-0073",
+      "statement": "The command-line reference lists exactly the subcommands defined in src/main.rs",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/reference/cli.md",
+        "lines": {
+          "start": 23,
+          "end": 30
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/cli.md",
+        "src/main.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0125",
+          "kind": "inspection",
+          "locator": "src/main.rs:56-106 (enum Command, enum ReportCommand); docs/site/src/reference/cli.md:23-30",
+          "summary": "Command has Verify{json}, Tldr{limit,json}, Recheck{json}, Seal{adopt}, Report{Init{dir}}, and no subcommand runs the server. The reference table lists (none), verify [--json], tldr [--limit N] [--json], recheck [--json], seal --adopt and report init [DIR], matching one to one.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 56,
+                "end": 106
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.562553521Z",
+          "seal": {
+            "by": "server",
+            "mac": "7f997b4755ab110bd7033c87d18bb0469984bafaab502766df7a8114a217bd48"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The documented subcommands match the clap Command and ReportCommand enums one to one (EVD-0125).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0125"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.169997613Z",
+          "seal": {
+            "by": "server",
+            "mac": "4c0e0d13cd22c015f40e1b825e31a02cb78eb09021b3ff68f519f98e3f593d12"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.169997613Z",
+      "seal": {
+        "by": "server",
+        "mac": "cb15d8710773b884153cefdd4423017b76f64fd61698be538a36f6a79bdfa1ce"
+      }
+    },
+    {
+      "id": "CLM-0074",
+      "statement": "The six recheck statuses documented in concepts/anchors.md match the AnchorStatus enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/anchors.md",
+        "lines": {
+          "start": 32,
+          "end": 39
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/anchors.md",
+        "src/recheck.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0126",
+          "kind": "inspection",
+          "locator": "src/recheck.rs:19-35 (enum AnchorStatus); docs/site/src/concepts/anchors.md:32-39",
+          "summary": "AnchorStatus has Current plus Moved, Changed, Overturned, Missing, CommitMissing and Unpinned. The docs table lists moved, changed, overturned, missing, commit_missing and unpinned, the six non-current statuses recheck reports; current anchors aren't listed by recheck, as the page says.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/recheck.rs",
+              "lines": {
+                "start": 19,
+                "end": 35
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.575698645Z",
+          "seal": {
+            "by": "server",
+            "mac": "4435be145a64fba9d2dc694049921423111e2343375f0b0cd89553af94ae3e2d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The six documented statuses are exactly AnchorStatus's non-current variants (EVD-0126).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0126"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.178144670Z",
+          "seal": {
+            "by": "server",
+            "mac": "6c3552b284019a9380ecc4985821c7a650c3fe3db306706cd0af8776a7580ecb"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.178144670Z",
+      "seal": {
+        "by": "server",
+        "mac": "de3edf89b7f13f6a90023f553d50b2dccab8c028991524de0b2dcddc9bb5969c"
+      }
+    },
+    {
+      "id": "CLM-0075",
+      "statement": "After a hand edit breaks a seal, the server refuses every write while reads keep working, as concepts/seals.md states",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/seals.md",
+        "lines": {
+          "start": 9,
+          "end": 11
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/seals.md",
+        "src/store.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0127",
+          "kind": "test",
+          "locator": "cargo test --release tampered_catalog_refuses_writes_but_allows_reads (src/store.rs:380)",
+          "summary": "Ran at c72d3c8: 1 passed, 0 failed. The test tampers with a sealed catalog and asserts that a write is refused while a read still succeeds, matching concepts/seals.md lines 9-11.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 379,
+                "end": 400
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.586777062Z",
+          "seal": {
+            "by": "server",
+            "mac": "b53fe3bb3b6fe023cfc3a363201840e094a9331783ebc44b6d1838569545c9f2"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A passing test exercises exactly the documented behaviour: writes refused, reads allowed after tampering (EVD-0127).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0127"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.185419784Z",
+          "seal": {
+            "by": "server",
+            "mac": "5293043c5bb165e8ae8d12920217094dcaca61ab2c4914f00e7354d23b6881a5"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.185419784Z",
+      "seal": {
+        "by": "server",
+        "mac": "525fc44ebfe26a9009e2b0ab9eb3d8437ba87a976073cf32d2586e377e4dacba"
+      }
+    },
+    {
+      "id": "CLM-0076",
+      "statement": "claims-mcp verify exits 1 when any seal check fails, and tldr exits 0 whenever the catalog can be read, as the command-line reference states",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/reference/cli.md",
+        "lines": {
+          "start": 26,
+          "end": 27
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/cli.md",
+        "src/main.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0128",
+          "kind": "inspection",
+          "locator": "src/main.rs:160-182 (fn verify), src/main.rs:256-259 (fn tldr)",
+          "summary": "verify returns ExitCode::SUCCESS when the integrity report is verified and ExitCode::FAILURE (1) otherwise. tldr returns anyhow::Result<()> and its doc comment says the exit code is 0 whenever the catalog could be read; it only errors when reading fails.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 160,
+                "end": 182
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.605490504Z",
+          "seal": {
+            "by": "server",
+            "mac": "eeb89c6559761fcaa17aef59b523bbe60e3acf3239071b8a37c5d0abacfe08de"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The code's exit-code logic for verify and tldr matches the reference's Exit code column (EVD-0128).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0128"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.195903039Z",
+          "seal": {
+            "by": "server",
+            "mac": "cbc55f15d2be55c7c1944db2db3d1b5cbbdf0595d1976eae67fce0df8a38da30"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.195903039Z",
+      "seal": {
+        "by": "server",
+        "mac": "c0ca15a8cabc77af5e6cde9c052598602ebc34c83e21ce588bc8bacce93f7945"
+      }
+    },
+    {
+      "id": "CLM-0077",
+      "statement": "The five verification methods documented in concepts/integrity-and-methods.md, including formal_proof, match the VerificationMethod enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/integrity-and-methods.md",
+        "lines": {
+          "start": 24,
+          "end": 30
+        },
+        "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/integrity-and-methods.md",
+        "src/model.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0129",
+          "kind": "inspection",
+          "locator": "src/model.rs:168-184 (enum VerificationMethod, snake_case); docs/site/src/concepts/integrity-and-methods.md:24-30",
+          "summary": "VerificationMethod has Inspection, Analysis, Demonstration, Test and FormalProof, serialized snake_case. The docs table lists inspection, analysis, demonstration, test and formal_proof with matching meanings.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/model.rs",
+              "lines": {
+                "start": 168,
+                "end": 184
+              },
+              "commit": "c72d3c8cf79315433dc76fe42010ec432beb6138"
+            }
+          },
+          "recorded_at": "2026-10-31T14:02:16.616087179Z",
+          "seal": {
+            "by": "server",
+            "mac": "acf1b13d3a826c9483c47f5a1beb7c923126458c4a52137bdc3f99c276e39847"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The five documented methods match the VerificationMethod enum and its serialized names (EVD-0129).",
+          "auditor": "claude-opus-5-5",
+          "evidence_ids": [
+            "EVD-0129"
+          ],
+          "recorded_at": "2026-10-31T14:02:31.205389351Z",
+          "seal": {
+            "by": "server",
+            "mac": "6d20feddbccc6066e42b8c1d8fe03131f4440cee96fd83aa25870731bb9a39bf"
+          }
+        }
+      ],
+      "created_at": "2026-10-31T14:01:19.791821168Z",
+      "updated_at": "2026-10-31T14:02:31.205389351Z",
+      "seal": {
+        "by": "server",
+        "mac": "d314adc8fddd4448d4a3a5adc330fa80f9ca04cb151364478017910222a796db"
       }
     }
   ]

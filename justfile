@@ -28,3 +28,11 @@ report detail="summary" catalog="claims.json" out=(if detail == "full" { "audit-
         --input notes={{notes}} \
         --input integrity=target/integrity.json \
         --input recheck=target/recheck.json
+
+# Build the documentation site into docs/site/book (requires mdbook).
+docs:
+    mdbook build docs/site
+
+# Serve the documentation site with live reload at http://localhost:3000.
+docs-serve:
+    mdbook serve docs/site
