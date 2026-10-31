@@ -17,7 +17,9 @@ const VERDICT_ORDER = ['supported', 'refuted', 'not_enough_info', 'unverified'];
 const SECTIONS = ['start', 'loading', 'overview', 'claims'];
 const THEME_KEY = 'claims-viewer.theme';
 
-const state = { catalog: null, source: null, repo: null, filter: {} };
+// `loadedSearch` is the query string the current catalog came from ('' for a file), so that
+// history navigation reloads only when the source changes, not on every hash change.
+const state = { catalog: null, source: null, repo: null, filter: {}, loadedSearch: null };
 const $ = (id) => document.getElementById(id);
 
 /** Creates an element. String children become text nodes; `on*` attributes become listeners. */
@@ -109,6 +111,7 @@ function showStartError(message) {
 }
 
 async function load(pending) {
+  state.loadedSearch = location.search;
   show('loading');
   try {
     const { text, source } = await pending;
@@ -134,6 +137,7 @@ async function load(pending) {
 
 function loadFromQuery() {
   const params = new URLSearchParams(location.search);
+  state.loadedSearch = location.search;
   const repo = parseRepoInput(params.get('repo') ?? '');
   if (!repo) {
     resetToStart();
@@ -149,6 +153,7 @@ function loadFromQuery() {
 
 function resetToStart() {
   state.catalog = null;
+  state.loadedSearch = location.search;
   $('source-label').textContent = '';
   $('nav').hidden = true;
   $('change-source').hidden = true;
@@ -442,5 +447,9 @@ wireStart();
 $('theme-toggle').addEventListener('click', toggleTheme);
 updateThemeButton();
 window.addEventListener('hashchange', render);
-window.addEventListener('popstate', loadFromQuery);
+// Browsers fire popstate on every fragment navigation as well as on back/forward, so only a
+// changed query string (a different source) reloads; hashchange handles everything else.
+window.addEventListener('popstate', () => {
+  if (location.search !== state.loadedSearch) loadFromQuery();
+});
 loadFromQuery();
