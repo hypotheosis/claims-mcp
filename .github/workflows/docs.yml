@@ -42,12 +42,15 @@ jobs:
       - name: Build
         run: mdbook build docs/site
       # mdBook doesn't report broken links, so lychee checks the built HTML: every relative
-      # link and #fragment must resolve. --offline skips external URLs.
+      # link and #fragment must resolve. --offline skips external URLs. 404.html is skipped
+      # because its links are absolute under site-url (/claims-mcp/) and resolve only when
+      # served from Pages.
       - name: Check links
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
             --offline --include-fragments --no-progress
+            --exclude-path '404\.html$'
             --root-dir ${{ github.workspace }}/docs/site/book
             docs/site/book
           fail: true
