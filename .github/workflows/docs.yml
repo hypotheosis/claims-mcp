@@ -1,8 +1,9 @@
 # Documentation site: builds the mdBook in docs/site and checks its internal links on pull
 # requests; on pushes to main, also deploys it to GitHub Pages.
 #
-# Deploying needs the repository's Pages source set to "GitHub Actions". Pull requests skip the
-# Pages steps, so they pass before that is set.
+# Only main deploys, even from a manual run on another branch. Deploying needs the repository's
+# Pages source set to "GitHub Actions". Pull requests skip the Pages steps, so they pass before
+# that is set.
 name: Docs
 
 on:
@@ -55,15 +56,15 @@ jobs:
             docs/site/book
           fail: true
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
           path: docs/site/book
 
   deploy:
     name: deploy to Pages
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     permissions:
