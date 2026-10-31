@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claims viewer</title>
+  <meta name="description" content="Browse a claims-mcp claims.json: verdicts, evidence and the claim hierarchy.">
+  <script>
+    // Apply a saved theme before first paint, so a dark-mode choice doesn't flash light.
+    try {
+      const saved = localStorage.getItem('claims-viewer.theme');
+      if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+    } catch { /* storage unavailable: follow the system setting */ }
+  </script>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+        integrity="sha384-L1dWfspMTHU/ApYnFiMz2QID/PlP1xCW9visvBdbEkOLkSSWsP6ZJWhPw6apiXxU"
+        crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+  <link rel="stylesheet" href="viewer.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="./">claims<span>viewer</span></a>
+      <span id="source-label" class="source-label mono"></span>
+      <nav id="nav" hidden aria-label="Views">
+        <a href="#overview" data-view="overview">Overview</a>
+        <a href="#claims" data-view="claims">Claims</a>
+      </nav>
+      <div class="topbar-actions">
+        <button id="change-source" class="outline secondary small" type="button" hidden>Open another</button>
+        <button id="theme-toggle" class="outline secondary small" type="button" aria-label="Switch theme">Dark</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="start" hidden>
+      <hgroup>
+        <h1>Browse a claims ledger</h1>
+        <p>Open the <code>claims.json</code> of a public GitHub repository, or a file on your machine.</p>
+      </hgroup>
+      <div class="start-grid">
+        <article>
+          <h2>From GitHub</h2>
+          <form id="repo-form">
+            <label for="repo-input">Repository</label>
+            <input id="repo-input" name="repo" placeholder="owner/name or https://github.com/owner/name"
+                   autocomplete="off" spellcheck="false" required>
+            <details>
+              <summary>More options</summary>
+              <label for="ref-input">Branch, tag or commit</label>
+              <input id="ref-input" name="ref" placeholder="HEAD (the default branch)" spellcheck="false">
+              <label for="path-input">Catalog path</label>
+              <input id="path-input" name="path" placeholder="claims.json" spellcheck="false">
+            </details>
+            <button type="submit">Open</button>
+          </form>
+          <p class="hint">Public repositories only. Nothing is stored.</p>
+        </article>
+        <article>
+          <h2>From a file</h2>
+          <label id="drop-zone" class="drop-zone" for="file-input">
+            <strong>Drop a claims.json here</strong>
+            <span>or click to choose one. It stays on your machine.</span>
+            <input id="file-input" type="file" accept=".json,application/json">
+          </label>
+        </article>
+      </div>
+      <p id="start-error" class="error" role="alert" hidden></p>
+      <p class="hint">Example: <a href="index.html?repo=hypotheosis/claims-mcp">claims-mcp's own ledger</a>.</p>
+    </section>
+
+    <section id="loading" aria-busy="true" hidden>Loading the catalog…</section>
+
+    <section id="overview" hidden></section>
+
+    <section id="claims" hidden>
+      <div id="list-pane">
+        <form id="filters" role="search" onsubmit="return false"></form>
+        <div id="claim-list"></div>
+      </div>
+      <div id="claim-detail"></div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <small>Part of the <a href="../introduction.html">claims-mcp documentation</a>.
+    The viewer shows a ledger as recorded; it doesn't check seals or recompute the audit.</small>
+  </footer>
+</body>
+</html>

@@ -73,6 +73,8 @@ can hold the proof as its strongest evidence. See
   line, catalog format
 - [Development](https://hypotheosis.github.io/claims-mcp/development.html): building, CI,
   releasing
+- [Claims viewer](https://hypotheosis.github.io/claims-mcp/viewer/): browse any public
+  repository's `claims.json` in the browser
 
 The site's sources are in [`docs/site/`](docs/site/).
 
