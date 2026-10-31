@@ -1,0 +1,701 @@
+{
+  "$defs": {
+    "Anchor": {
+      "description": "Machine-checkable location behind an evidence item, pinned to a commit so it can be\nrechecked later (`claims-mcp recheck`).\n\nRust note: serde's default enum form is \"externally tagged\": `{\"file\": {...}}` or\n`{\"search\": {...}}`, like a one-key dict whose key names the variant.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "A file or line range.",
+          "properties": {
+            "file": {
+              "$ref": "#/$defs/FileAnchor"
+            }
+          },
+          "required": [
+            "file"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A search; with zero hits, a demonstrated absence.",
+          "properties": {
+            "search": {
+              "$ref": "#/$defs/SearchAnchor"
+            }
+          },
+          "required": [
+            "search"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Claim": {
+      "description": "A single atomic, falsifiable assertion and everything recorded about it.",
+      "properties": {
+        "artifacts": {
+          "default": [],
+          "description": "Artifacts the claim is about (paths, modules, URLs).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "created_at": {
+          "description": "When the claim was created.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "derived_from": {
+          "default": [],
+          "description": "Parent claims this one refines (upstream trace links).",
+          "items": {
+            "pattern": "^[Cc][Ll][Mm]-[0-9]+$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "evidence": {
+          "default": [],
+          "description": "Evidence gathered so far.",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "Unique, never-reused id.",
+          "pattern": "^[Cc][Ll][Mm]-[0-9]+$",
+          "type": "string"
+        },
+        "integrity_level": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/IntegrityLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "IEEE 1012 integrity level, if assigned."
+        },
+        "kind": {
+          "$ref": "#/$defs/ClaimKind",
+          "description": "What sort of property it asserts."
+        },
+        "level": {
+          "$ref": "#/$defs/ClaimLevel",
+          "description": "Position in the requirements hierarchy."
+        },
+        "seal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Seal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Integrity seal over the claim's own fields, its evidence ids, and its latest verdict."
+        },
+        "source": {
+          "description": "Where the claim came from (prompt, spec section, ticket).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_anchor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FileAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Commit-pinned location of the text that makes the claim, such as a README line."
+        },
+        "statement": {
+          "description": "The assertion itself.",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ClaimStatus",
+          "description": "Active or retired."
+        },
+        "tags": {
+          "default": [],
+          "description": "Free-form labels for filtering.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updated_at": {
+          "description": "When the claim last changed in any way.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "verdicts": {
+          "default": [],
+          "description": "Append-only verdict history; the last entry is current.",
+          "items": {
+            "$ref": "#/$defs/VerdictRecord"
+          },
+          "type": "array"
+        },
+        "verification_method": {
+          "$ref": "#/$defs/VerificationMethod",
+          "description": "Intended verification method."
+        }
+      },
+      "required": [
+        "id",
+        "statement",
+        "kind",
+        "level",
+        "verification_method",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    "ClaimKind": {
+      "description": "What sort of property a claim asserts.",
+      "oneOf": [
+        {
+          "const": "functional",
+          "description": "Observable behavior or output.",
+          "type": "string"
+        },
+        {
+          "const": "non_functional",
+          "description": "Quality attribute such as usability or maintainability.",
+          "type": "string"
+        },
+        {
+          "const": "interface",
+          "description": "Contract with another component, API, or user.",
+          "type": "string"
+        },
+        {
+          "const": "performance",
+          "description": "Latency, throughput, or resource bound.",
+          "type": "string"
+        },
+        {
+          "const": "safety",
+          "description": "Protection against harm to people or property.",
+          "type": "string"
+        },
+        {
+          "const": "security",
+          "description": "Confidentiality, integrity, or availability property.",
+          "type": "string"
+        },
+        {
+          "const": "documentation",
+          "description": "Statement about documentation content.",
+          "type": "string"
+        },
+        {
+          "const": "constraint",
+          "description": "Imposed limitation such as a language, license, or dependency rule.",
+          "type": "string"
+        }
+      ]
+    },
+    "ClaimLevel": {
+      "description": "Position of a claim in the requirements hierarchy, from broadest to narrowest.",
+      "oneOf": [
+        {
+          "const": "system",
+          "description": "Whole-system requirement or top-level task instruction.",
+          "type": "string"
+        },
+        {
+          "const": "software",
+          "description": "Software-level requirement.",
+          "type": "string"
+        },
+        {
+          "const": "component",
+          "description": "Requirement on one component or module.",
+          "type": "string"
+        },
+        {
+          "const": "unit",
+          "description": "Requirement on one function or type.",
+          "type": "string"
+        },
+        {
+          "const": "artifact",
+          "description": "Assertion about a concrete produced artifact.",
+          "type": "string"
+        }
+      ]
+    },
+    "ClaimStatus": {
+      "description": "Lifecycle state of a claim. Claims are retired instead of deleted.\n\nRust note: `tag = \"state\"` writes the variant name into a `state` field, giving\n`{\"state\":\"active\"}` or `{\"state\":\"retired\",\"reason\":...,\"retired_at\":...}`.",
+      "oneOf": [
+        {
+          "description": "The claim is in force.",
+          "properties": {
+            "state": {
+              "const": "active",
+              "type": "string"
+            }
+          },
+          "required": [
+            "state"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "The claim was withdrawn; it stays in the file so trace links remain valid.",
+          "properties": {
+            "reason": {
+              "description": "Why the claim was retired.",
+              "type": "string"
+            },
+            "retired_at": {
+              "description": "When it was retired.",
+              "format": "date-time",
+              "type": "string"
+            },
+            "state": {
+              "const": "retired",
+              "type": "string"
+            }
+          },
+          "required": [
+            "state",
+            "reason",
+            "retired_at"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Evidence": {
+      "description": "One piece of evidence attached to a claim.",
+      "properties": {
+        "anchor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Anchor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Commit-pinned location that `recheck` can verify; absent for free-text-only evidence."
+        },
+        "id": {
+          "description": "Catalog-wide unique id.",
+          "pattern": "^[Ee][Vv][Dd]-[0-9]+$",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/EvidenceKind",
+          "description": "Form of the evidence."
+        },
+        "locator": {
+          "description": "Where to find it: `path:line`, test name, command, or URL.",
+          "type": "string"
+        },
+        "recorded_at": {
+          "description": "When it was recorded.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "seal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Seal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Integrity seal; `None` only in unsealed (schema v1) catalogs or after tampering."
+        },
+        "stance": {
+          "$ref": "#/$defs/Stance",
+          "description": "Whether it supports or refutes the claim."
+        },
+        "summary": {
+          "description": "What the evidence shows.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "locator",
+        "summary",
+        "stance",
+        "recorded_at"
+      ],
+      "type": "object"
+    },
+    "EvidenceKind": {
+      "description": "The form a piece of evidence takes.",
+      "oneOf": [
+        {
+          "const": "test",
+          "description": "Result of an executed test.",
+          "type": "string"
+        },
+        {
+          "const": "inspection",
+          "description": "Observation from reading an artifact.",
+          "type": "string"
+        },
+        {
+          "const": "analysis",
+          "description": "Result of reasoning or static analysis.",
+          "type": "string"
+        },
+        {
+          "const": "demonstration",
+          "description": "Observation from running the system.",
+          "type": "string"
+        },
+        {
+          "const": "proof",
+          "description": "Proof artifact or proof-checker output.",
+          "type": "string"
+        },
+        {
+          "const": "log",
+          "description": "Captured log or command output.",
+          "type": "string"
+        },
+        {
+          "const": "other",
+          "description": "Anything else.",
+          "type": "string"
+        }
+      ]
+    },
+    "FileAnchor": {
+      "description": "A file, or lines in it, at the commit that was checked out when the anchor was recorded.",
+      "properties": {
+        "commit": {
+          "description": "Full commit id of `HEAD` when the anchor was recorded.",
+          "type": "string"
+        },
+        "dirty": {
+          "description": "`true` if the file had uncommitted changes then, so `commit` may not show what was seen.",
+          "type": "boolean"
+        },
+        "lines": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LineRange"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The anchored lines; the whole file when absent."
+        },
+        "path": {
+          "description": "Path relative to the repository root.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "commit"
+      ],
+      "type": "object"
+    },
+    "IntegrityLevel": {
+      "description": "IEEE 1012 integrity level: 4 safety/security/data loss, 3 core function, 2 degraded function, 1 cosmetic or docs",
+      "maximum": 4,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "LineRange": {
+      "description": "An inclusive, 1-based range of lines in a file.",
+      "properties": {
+        "end": {
+          "description": "Last line, at least `start`.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start": {
+          "description": "First line, counting from 1.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "type": "object"
+    },
+    "Seal": {
+      "description": "Integrity seal on a catalog record: an HMAC over the record's content and its position in\nthe catalog (see `src/seal.rs`). The origin is covered by the MAC, so relabeling an adopted\nrecord as server-sealed invalidates it.",
+      "properties": {
+        "by": {
+          "$ref": "#/$defs/SealOrigin",
+          "description": "Who sealed the record."
+        },
+        "mac": {
+          "description": "Lower-case hex HMAC-SHA256.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "by",
+        "mac"
+      ],
+      "type": "object"
+    },
+    "SealOrigin": {
+      "description": "Who produced a [`Seal`].",
+      "oneOf": [
+        {
+          "const": "server",
+          "description": "The server sealed the record when a tool created or changed it.",
+          "type": "string"
+        },
+        {
+          "const": "adopt",
+          "description": "`claims-mcp seal --adopt` sealed a record that had no seal (catalog migration).",
+          "type": "string"
+        }
+      ]
+    },
+    "SearchAnchor": {
+      "description": "A `git grep -E` search and how many lines it matched at the pinned commit. With zero hits\nit shows that something does not exist, such as a feature a document promises.",
+      "properties": {
+        "case_insensitive": {
+          "description": "Whether the search ignores case (`git grep -i`).",
+          "type": "boolean"
+        },
+        "commit": {
+          "description": "Full commit id of `HEAD` when the search was recorded.",
+          "type": "string"
+        },
+        "dirty": {
+          "description": "`true` if a scope path had uncommitted changes then.",
+          "type": "boolean"
+        },
+        "hits": {
+          "description": "Matching lines at `commit`, counted by the server.",
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "pattern": {
+          "description": "POSIX extended regular expression, as `git grep -E` reads it.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Paths searched, relative to the repository root (`.` is the whole repository).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pattern",
+        "scope",
+        "hits",
+        "commit"
+      ],
+      "type": "object"
+    },
+    "Stance": {
+      "description": "Whether a piece of evidence supports or refutes its claim (FEVER terminology).",
+      "oneOf": [
+        {
+          "const": "supports",
+          "description": "The evidence shows the claim holds.",
+          "type": "string"
+        },
+        {
+          "const": "refutes",
+          "description": "The evidence shows the claim does not hold.",
+          "type": "string"
+        },
+        {
+          "const": "neutral",
+          "description": "The evidence is relevant but decides nothing.",
+          "type": "string"
+        }
+      ]
+    },
+    "Verdict": {
+      "description": "A FEVER verdict an auditor can record.",
+      "oneOf": [
+        {
+          "const": "supported",
+          "description": "Cited evidence shows the claim holds.",
+          "type": "string"
+        },
+        {
+          "const": "refuted",
+          "description": "Cited evidence shows the claim does not hold.",
+          "type": "string"
+        },
+        {
+          "const": "not_enough_info",
+          "description": "The available evidence cannot decide the claim.",
+          "type": "string"
+        }
+      ]
+    },
+    "VerdictRecord": {
+      "description": "One entry in a claim's append-only verdict history.",
+      "properties": {
+        "auditor": {
+          "description": "Who or what recorded it (a person or a model id).",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "description": "Evidence on the same claim that the verdict relies on.",
+          "items": {
+            "pattern": "^[Ee][Vv][Dd]-[0-9]+$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "rationale": {
+          "description": "Why the auditor reached it.",
+          "type": "string"
+        },
+        "recorded_at": {
+          "description": "When it was recorded.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "seal": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Seal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Integrity seal; also chains to the previous verdict's seal."
+        },
+        "verdict": {
+          "$ref": "#/$defs/Verdict",
+          "description": "The verdict reached."
+        }
+      },
+      "required": [
+        "verdict",
+        "rationale",
+        "auditor",
+        "evidence_ids",
+        "recorded_at"
+      ],
+      "type": "object"
+    },
+    "VerificationMethod": {
+      "description": "How a claim is meant to be verified (IEEE 1012 / INCOSE methods plus formal proof).",
+      "oneOf": [
+        {
+          "const": "inspection",
+          "description": "Reading code, documents, or output.",
+          "type": "string"
+        },
+        {
+          "const": "analysis",
+          "description": "Reasoning, calculation, or static analysis.",
+          "type": "string"
+        },
+        {
+          "const": "demonstration",
+          "description": "Running the system and observing behavior without instrumentation.",
+          "type": "string"
+        },
+        {
+          "const": "test",
+          "description": "Executing a defined test with pass/fail criteria.",
+          "type": "string"
+        },
+        {
+          "const": "formal_proof",
+          "description": "Machine-checked or rigorous mathematical proof.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$id": "https://hypotheosis.github.io/claims-mcp/schema/claims.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "The whole catalog document.\n\nClaims are kept sorted by id; because ids only grow, appending preserves the order and\nlookups are a binary search (O(log n)).",
+  "properties": {
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "type": "array"
+    },
+    "next_claim_seq": {
+      "description": "Next never-used claim sequence number.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "next_claim_seq_seal": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Seal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Integrity seal over `schema_version` and `next_claim_seq` (see `src/seal.rs`). Each\ncounter has its own seal, next to it, so branches that advanced different counters\nmerge without touching each other's seal."
+    },
+    "next_evidence_seq": {
+      "description": "Next never-used, catalog-wide evidence sequence number.",
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "next_evidence_seq_seal": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Seal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Integrity seal over `schema_version` and `next_evidence_seq`."
+    },
+    "schema_version": {
+      "description": "Catalog format version. This schema describes version 2.",
+      "format": "uint32",
+      "maximum": 2,
+      "minimum": 2,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "next_claim_seq",
+    "next_evidence_seq",
+    "claims"
+  ],
+  "title": "claims-mcp catalog",
+  "type": "object",
+  "x-schema-version": 2
+}

@@ -6,6 +6,7 @@ mod error;
 mod model;
 mod recheck;
 mod report;
+mod schema;
 mod seal;
 mod server;
 mod store;
@@ -55,6 +56,8 @@ struct Cli {
 /// Maintenance subcommands. None of them is exposed as an MCP tool.
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Print the claims.json schema as JSON Schema 2020-12.
+    Schema,
     /// Check every integrity seal in the catalog; exits 1 if any check fails.
     Verify {
         /// Print the result as JSON (the `integrity` input of report/claims-report.typ).
@@ -114,9 +117,26 @@ async fn main() -> ExitCode {
     let _ = dotenvy::dotenv();
     init_tracing();
     let cli = Cli::parse();
-    let store = CatalogStore::new(cli.catalog);
     let outcome = match cli.command {
+        Some(Command::Schema) => schema::write(std::io::stdout().lock())
+            .map(|()| ExitCode::SUCCESS)
+            .context("failed to write the catalog schema"),
+        command => run_catalog_command(CatalogStore::new(cli.catalog), command).await,
+    };
+    outcome.unwrap_or_else(|error| {
+        // `{:#}` prints the whole anyhow context chain on one line.
+        tracing::error!("{error:#}");
+        ExitCode::FAILURE
+    })
+}
+
+async fn run_catalog_command(
+    store: CatalogStore,
+    command: Option<Command>,
+) -> anyhow::Result<ExitCode> {
+    match command {
         None => serve(store).await.map(|()| ExitCode::SUCCESS),
+        Some(Command::Schema) => unreachable!("schema is handled before opening a catalog"),
         Some(Command::Verify { json }) => verify(&store, json).await,
         Some(Command::Tldr { limit, json }) => {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
@@ -126,12 +146,7 @@ async fn main() -> ExitCode {
         Some(Command::Report {
             action: ReportCommand::Init { dir },
         }) => report_init(&dir).map(|()| ExitCode::SUCCESS),
-    };
-    outcome.unwrap_or_else(|error| {
-        // `{:#}` prints the whole anyhow context chain on one line.
-        tracing::error!("{error:#}");
-        ExitCode::FAILURE
-    })
+    }
 }
 
 /// Logs go to stderr because stdout carries the MCP protocol. Level comes from `RUST_LOG`

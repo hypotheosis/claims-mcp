@@ -13,6 +13,12 @@ clippy:
 test:
     cargo test
 
+# Regenerate the latest and format-version-pinned catalog schemas.
+schema:
+    mkdir -p docs/site/src/schema/v2
+    cargo run --quiet -- schema > docs/site/src/schema/claims.schema.json
+    cp docs/site/src/schema/claims.schema.json docs/site/src/schema/v2/claims.schema.json
+
 # Render the catalog as a PDF audit report (requires the Typst CLI): `just report` for the
 # summary (audit.pdf), `just report full` for every record (audit-full.pdf). The integrity
 # check and the anchor recheck run first; their findings are shown in the report, so their

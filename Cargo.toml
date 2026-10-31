@@ -34,6 +34,8 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
 
 [dev-dependencies]
+# Validate the generated catalog schema and the repository's own catalog in tests.
+jsonschema = { version = "0.30", default-features = false }
 # MCP client side, to list and read the server's resources over an in-memory pipe in tests.
 rmcp = { version = "3.7.0", features = ["client"] }
 # Isolated temp directories for store and server tests.

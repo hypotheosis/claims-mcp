@@ -182,15 +182,19 @@ pub struct ClaimDetail {
 ///
 /// Claims are kept sorted by id; because ids only grow, appending preserves the order and
 /// lookups are a binary search (O(log n)).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Catalog {
+    /// Catalog format version. This schema describes version 2.
+    #[schemars(range(equal = 2))]
     schema_version: u32,
+    /// Next never-used claim sequence number.
     next_claim_seq: u32,
     /// Integrity seal over `schema_version` and `next_claim_seq` (see `src/seal.rs`). Each
     /// counter has its own seal, next to it, so branches that advanced different counters
     /// merge without touching each other's seal.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     next_claim_seq_seal: Option<Seal>,
+    /// Next never-used, catalog-wide evidence sequence number.
     next_evidence_seq: u32,
     /// Integrity seal over `schema_version` and `next_evidence_seq`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
