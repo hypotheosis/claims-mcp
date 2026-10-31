@@ -45,3 +45,11 @@ its `recheck` input.
 A `moved` anchor still holds; re-record it if you want current line numbers. Anything
 `changed`, `overturned`, `missing` or `commit_missing` means the evidence no longer describes the
 code, so re-audit that claim.
+
+## Anchors recorded on a branch
+
+An anchor pins whatever commit is checked out, so an audit run on a feature branch pins
+branch commits. A true merge commit keeps them reachable from the main branch. A squash or
+rebase merge rewrites them, and once the branch is deleted, fresh clones report every such
+anchor as `commit_missing`. Either merge pull requests that carry anchored evidence with a
+merge commit, or re-record the evidence on the main branch after merging.

@@ -62,3 +62,11 @@ pull request that changes `release.yml` runs the builds as a dry run without pub
 Release tags (`v*`) can't be moved or deleted once pushed, so a bad release is fixed with a new
 version. That includes a tag that fails the release checks: its version number is used up even
 though nothing was published.
+
+## Merging pull requests
+
+Merge pull requests with a **merge commit**, not a squash or rebase merge. The anchors in
+`claims.json` pin the commits they were recorded on, which for a pull request are branch commits.
+A squash or rebase merge rewrites them, and `recheck` would then report those anchors as
+`commit_missing`; see
+[Anchors recorded on a branch](concepts/anchors.md#anchors-recorded-on-a-branch).
