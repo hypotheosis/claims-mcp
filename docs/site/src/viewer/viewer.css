@@ -5,7 +5,11 @@
   --pico-font-family-monospace: "IBM Plex Mono", ui-monospace, monospace;
   --pico-border-radius: 0.6rem;
   --heading-font: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+}
 
+/* Light palette. The selector matches Pico's own light-theme selector, so it wins over it. */
+:root:not([data-theme="dark"]),
+[data-theme="light"] {
   --pico-primary: #0f6e6a;
   --pico-primary-background: #0f6e6a;
   --pico-primary-border: #0f6e6a;
@@ -63,7 +67,8 @@
   --fix-line: #a37b22;
 }
 
-body { background: var(--surface); }
+html, body { background: var(--surface); }
+body { min-height: 100vh; }
 h1, h2, h3, h4, .brand { font-family: var(--heading-font); letter-spacing: -0.01em; }
 main.container { max-width: 72rem; padding-top: 1.5rem; }
 article { background: var(--card); }
@@ -116,7 +121,7 @@ button.small { padding: 0.3rem 0.8rem; font-size: 0.85rem; margin: 0; width: aut
 .headline { font-family: var(--heading-font); font-size: 2.2rem; font-weight: 700; margin: 0; }
 .overview-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); }
 .area-row { display: block; text-decoration: none; color: inherit; }
-.area-row div { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; }
+.area-head { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.9rem; }
 
 /* Lists */
 .rows { list-style: none; padding: 0; margin: 0; }
@@ -144,7 +149,6 @@ button.small { padding: 0.3rem 0.8rem; font-size: 0.85rem; margin: 0; width: aut
 .banner { padding: 0.6rem 0.9rem; border-left: 4px solid var(--v-unverified); background: var(--surface); margin-bottom: 1rem; }
 .history > li, .evidence > li { list-style: none; border: 1px solid var(--muted-line); border-radius: var(--pico-border-radius); padding: 0.8rem 1rem; margin-bottom: 0.6rem; }
 .history, .evidence { padding: 0; }
-.evidence > li:target { outline: 2px solid var(--pico-primary); }
 .fix { background: var(--fix-bg); border-left: 4px solid var(--fix-line); padding: 0.5rem 0.8rem; margin: 0.5rem 0; }
 .locator { font-family: var(--pico-font-family-monospace); font-size: 0.8rem; overflow-wrap: anywhere; }
 .anchor { font-size: 0.8rem; overflow-wrap: anywhere; }
@@ -163,3 +167,6 @@ button.small { padding: 0.3rem 0.8rem; font-size: 0.85rem; margin: 0; width: aut
   body:not(.has-selection) #claim-detail { display: none; }
   .back-link { display: inline-block; margin-bottom: 0.75rem; }
 }
+
+@keyframes flash { from { outline-color: var(--pico-primary); } to { outline-color: transparent; } }
+.evidence > li.flash { outline: 2px solid transparent; animation: flash 1.6s ease-out; }

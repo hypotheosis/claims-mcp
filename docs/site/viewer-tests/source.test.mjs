@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SourceError, parseRepoInput, rawUrl, fetchFromGithub } from '../src/viewer/source.js';
+import { SourceError, parseRepoInput, rawUrl, fetchFromGithub, readFile } from '../src/viewer/source.js';
 
 test('parseRepoInput accepts owner/name and GitHub URLs', () => {
   assert.deepEqual(parseRepoInput('acme/widget'), { owner: 'acme', name: 'widget' });
@@ -32,4 +32,14 @@ test('fetchFromGithub explains failures', async () => {
   await assert.rejects(fetchFromGithub({ owner: 'a', name: 'b' }, fakeFetch(500)), /500/);
   await assert.rejects(fetchFromGithub({ owner: 'a', name: 'b' }, async () => { throw new TypeError('x'); }),
     /reach GitHub/);
+});
+
+test('readFile returns the text and the file name', async () => {
+  const got = await readFile(new File(['{"claims":[]}'], 'claims.json'));
+  assert.deepEqual(got, { text: '{"claims":[]}', source: { kind: 'file', name: 'claims.json' } });
+});
+
+test('readFile explains an unreadable file', async () => {
+  const broken = { name: 'x.json', text: async () => { throw new Error('gone'); } };
+  await assert.rejects(readFile(broken), (e) => e instanceof SourceError && /x\.json/.test(e.message));
 });
