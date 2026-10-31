@@ -45,18 +45,31 @@ mod tests {
     const COMMITTED: &str = include_str!("../docs/site/src/schema/claims.schema.json");
     const CATALOG: &str = include_str!("../claims.json");
 
+    fn normalize_newlines(text: &str) -> String {
+        text.replace("\r\n", "\n")
+    }
+
     #[test]
     fn committed_schemas_match_generated_output() {
         let mut generated = Vec::new();
         write(&mut generated, false).expect("generate latest schema");
         let generated = String::from_utf8(generated).expect("schema is UTF-8");
-        assert_eq!(COMMITTED, generated, "run `just schema`");
+        assert_eq!(
+            normalize_newlines(COMMITTED),
+            generated,
+            "run `just schema`"
+        );
 
         let path = format!("docs/site/src/schema/v{SCHEMA_VERSION}/claims.schema.json");
         let committed = std::fs::read_to_string(path).expect("read current versioned schema");
         let mut generated = Vec::new();
         write(&mut generated, true).expect("generate versioned schema");
-        assert_eq!(committed.as_bytes(), generated, "run `just schema`");
+        let generated = String::from_utf8(generated).expect("schema is UTF-8");
+        assert_eq!(
+            normalize_newlines(&committed),
+            generated,
+            "run `just schema`"
+        );
     }
 
     #[test]
