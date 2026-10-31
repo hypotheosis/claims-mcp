@@ -106,8 +106,15 @@ The evidence for each:
 - **No escape hatches**: a `search` anchor, recorded with zero hits:
 
   ```json
-  {"search": {"pattern": "\\bsorry\\b|\\badmit\\b|^axiom |native_decide", "scope": ["proofs"]}}
+  {"search": {
+    "pattern": "(^|[^[:alnum:]_])(sorry|admit)([^[:alnum:]_]|$)|^[[:space:]]*((private|protected)[[:space:]]+)?axiom[[:space:]]|native_decide",
+    "scope": ["proofs"]
+  }}
   ```
+
+  The pattern sticks to POSIX character classes rather than `\b`, because `git grep -E` uses the
+  platform's regex library and not every platform supports `\b`. It also catches `private` and
+  `protected` axioms.
 
 - **Model fidelity**: the differential-testing run, as test evidence.
 - **Spec fidelity**: an inspection comparing the spec with the requirement, recorded by a
