@@ -17,3 +17,22 @@
 - [Traceability](concepts/traceability.md)
 - [Integrity seals](concepts/seals.md)
 - [Anchors and recheck](concepts/anchors.md)
+
+# Guides
+
+- [Install](guides/install.md)
+- [Your first audit](guides/first-audit.md)
+- [Checking in CI](guides/ci.md)
+- [PDF reports](guides/reports.md)
+- [Migrating with seal --adopt](guides/migrating.md)
+
+# Reference
+
+- [MCP tools](reference/tools.md)
+- [Command line](reference/cli.md)
+- [Catalog format](reference/catalog-format.md)
+- [Security](reference/security.md)
+
+---
+
+[Development](development.md)

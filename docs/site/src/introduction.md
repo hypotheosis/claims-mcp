@@ -31,7 +31,7 @@ An agent auditing a project registers a claim, pointing at the text that makes i
   "statement": "claims-mcp verify exits 1 when any integrity seal check fails",
   "kind": "functional", "level": "software", "integrity_level": 3,
   "verification_method": "test",
-  "source_anchor": {"path": "docs/site/src/reference/cli.md", "lines": {"start": 20, "end": 20}}
+  "source_anchor": {"path": "docs/site/src/reference/cli.md", "lines": {"start": 26, "end": 26}}
 }}
 ```
 
