@@ -36,3 +36,9 @@ docs:
 # Serve the documentation site with live reload at http://localhost:3000.
 docs-serve:
     mdbook serve docs/site
+
+# Run the claims viewer's unit tests, including the check against this repository's own catalog.
+viewer-test:
+    mkdir -p target
+    cargo run --release --quiet -- --catalog claims.json tldr --json > target/tldr.json
+    CLAIMS_TLDR_JSON=target/tldr.json node --test 'docs/site/viewer-tests/*.test.mjs'

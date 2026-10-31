@@ -50,6 +50,15 @@ jobs:
       # Fails when claims.json was edited outside claims-mcp (issue #9).
       - name: verify catalog integrity seals
         run: cargo run --locked --quiet -- verify
+      # The docs site's claims viewer: unit tests, plus a check that it counts this repository's
+      # active claims the same way claims-mcp does.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: claims viewer tests
+        run: |
+          cargo run --locked --quiet -- tldr --json > target/tldr.json
+          CLAIMS_TLDR_JSON=target/tldr.json node --test 'docs/site/viewer-tests/*.test.mjs'
 
   test:
     name: test (${{ matrix.os }})

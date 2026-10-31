@@ -26,6 +26,10 @@
 - [PDF reports](guides/reports.md)
 - [Migrating with seal --adopt](guides/migrating.md)
 
+# Tools
+
+- [Claims viewer](viewer.md)
+
 # Reference
 
 - [MCP tools](reference/tools.md)
