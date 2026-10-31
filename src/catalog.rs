@@ -184,8 +184,8 @@ pub struct ClaimDetail {
 /// lookups are a binary search (O(log n)).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Catalog {
-    /// Catalog format version. This schema describes version 2.
-    #[schemars(range(equal = 2))]
+    /// Catalog format version described by this schema.
+    #[schemars(range(equal = SCHEMA_VERSION))]
     schema_version: u32,
     /// Next never-used claim sequence number.
     next_claim_seq: u32,

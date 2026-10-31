@@ -304,7 +304,7 @@ impl JsonSchema for IntegrityLevel {
     }
 
     fn inline_schema() -> bool {
-        false
+        true
     }
 
     fn json_schema(_generator: &mut SchemaGenerator) -> Schema {

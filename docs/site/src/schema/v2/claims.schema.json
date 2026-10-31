@@ -70,15 +70,13 @@
           "type": "string"
         },
         "integrity_level": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/IntegrityLevel"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "description": "IEEE 1012 integrity level, if assigned."
+          "description": "IEEE 1012 integrity level, if assigned.",
+          "maximum": 4,
+          "minimum": 1,
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "kind": {
           "$ref": "#/$defs/ClaimKind",
@@ -415,12 +413,6 @@
       ],
       "type": "object"
     },
-    "IntegrityLevel": {
-      "description": "IEEE 1012 integrity level: 4 safety/security/data loss, 3 core function, 2 degraded function, 1 cosmetic or docs",
-      "maximum": 4,
-      "minimum": 1,
-      "type": "integer"
-    },
     "LineRange": {
       "description": "An inclusive, 1-based range of lines in a file.",
       "properties": {
@@ -637,7 +629,7 @@
       ]
     }
   },
-  "$id": "https://hypotheosis.github.io/claims-mcp/schema/claims.schema.json",
+  "$id": "https://hypotheosis.github.io/claims-mcp/schema/v2/claims.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "The whole catalog document.\n\nClaims are kept sorted by id; because ids only grow, appending preserves the order and\nlookups are a binary search (O(log n)).",
   "properties": {
@@ -682,7 +674,7 @@
       "description": "Integrity seal over `schema_version` and `next_evidence_seq`."
     },
     "schema_version": {
-      "description": "Catalog format version. This schema describes version 2.",
+      "description": "Catalog format version described by this schema.",
       "format": "uint32",
       "maximum": 2,
       "minimum": 2,

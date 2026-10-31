@@ -23,11 +23,11 @@ The subcommands are for people and CI; agents use the [MCP tools](tools.md).
 | Subcommand | Purpose | Exit code |
 |---|---|---|
 | *(none)* | Run the MCP server on stdio | |
-| `schema` | Print the [catalog JSON Schema](catalog-schema.md) to stdout | |
 | `verify [--json]` | Check every [integrity seal](../concepts/seals.md) | 1 if any check fails |
 | `tldr [--limit N] [--json]` | Print the [ranked next steps](../guides/first-audit.md#the-ranked-to-do-list); `--json` matches the `next_steps` tool | 0 whenever the catalog can be read |
 | `recheck [--json]` | Compare every anchor with `HEAD`; `--json` matches the `recheck` tool. See [Recheck](../concepts/anchors.md#recheck) | 1 if any anchor is not current |
 | `seal --adopt` | Seal unsealed records once, to [migrate a catalog](../guides/migrating.md); maintainers only | |
 | `report init [DIR]` | Write the [PDF report](../guides/reports.md) template and a notes file to `DIR` (default `report`) | |
+| `schema [--versioned]` | Print the [catalog JSON Schema](catalog-schema.md); `--versioned` uses its pinned URL as `$id` | |
 
 `--catalog` is global, so it can go before or after the subcommand.

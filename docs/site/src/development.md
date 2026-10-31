@@ -7,7 +7,6 @@ claims-mcp is a Rust crate (minimum Rust version in `Cargo.toml`'s `rust-version
 just fmt          # cargo fmt
 just clippy       # cargo clippy --all-targets -- -D warnings
 just test         # cargo test
-just schema       # regenerate the committed catalog JSON Schema
 just report       # render audit.pdf from the repository's own claims.json
 just report full  # render audit-full.pdf, every record
 just docs         # build this site into docs/site/book
@@ -46,8 +45,7 @@ that touch `docs/site/`, and deploys it to GitHub Pages from `main`.
 
 1. In a pull request, set `version` in `Cargo.toml` to the new version, update
    `report/audit-notes.toml` to match, and merge. `main` only accepts changes through pull
-   requests that pass CI and are up to date with `main`. If the catalog format changed, bump
-   `SCHEMA_VERSION` in `src/catalog.rs` and run `just schema` in the same pull request.
+   requests that pass CI and are up to date with `main`.
 2. Tag the merge commit and push the tag:
 
    ```bash
@@ -58,13 +56,17 @@ that touch `docs/site/`, and deploys it to GitHub Pages from `main`.
 `.github/workflows/release.yml` checks that the tag equals `v` plus the `Cargo.toml` version and
 points at a commit on `main` (and fails without publishing otherwise). It reruns CI on the tagged
 commit, builds the five archives listed under [Install](guides/install.md#download-a-release),
-and publishes a GitHub release with the archives, their `.sha256` files, the catalog schema and
-the audit report. A
+and publishes a GitHub release with the archives, their `.sha256` files and the audit report. A
 pull request that changes `release.yml` runs the builds as a dry run without publishing.
 
 Release tags (`v*`) can't be moved or deleted once pushed, so a bad release is fixed with a new
 version. That includes a tag that fails the release checks: its version number is used up even
 though nothing was published.
+
+The release also includes `claims.schema.json`. If the catalog format changes, bump
+`SCHEMA_VERSION` in `src/catalog.rs` and run `just schema` in the same pull request. That command
+regenerates the latest schema and creates the current format-version-pinned copy without changing
+older pins.
 
 ## Merging pull requests
 

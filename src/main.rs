@@ -57,7 +57,11 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum Command {
     /// Print the claims.json schema as JSON Schema 2020-12.
-    Schema,
+    Schema {
+        /// Use the format-version-pinned URL as the schema's `$id`.
+        #[arg(long)]
+        versioned: bool,
+    },
     /// Check every integrity seal in the catalog; exits 1 if any check fails.
     Verify {
         /// Print the result as JSON (the `integrity` input of report/claims-report.typ).
@@ -117,26 +121,12 @@ async fn main() -> ExitCode {
     let _ = dotenvy::dotenv();
     init_tracing();
     let cli = Cli::parse();
+    let store = CatalogStore::new(cli.catalog);
     let outcome = match cli.command {
-        Some(Command::Schema) => schema::write(std::io::stdout().lock())
+        None => serve(store).await.map(|()| ExitCode::SUCCESS),
+        Some(Command::Schema { versioned }) => schema::write(std::io::stdout().lock(), versioned)
             .map(|()| ExitCode::SUCCESS)
             .context("failed to write the catalog schema"),
-        command => run_catalog_command(CatalogStore::new(cli.catalog), command).await,
-    };
-    outcome.unwrap_or_else(|error| {
-        // `{:#}` prints the whole anyhow context chain on one line.
-        tracing::error!("{error:#}");
-        ExitCode::FAILURE
-    })
-}
-
-async fn run_catalog_command(
-    store: CatalogStore,
-    command: Option<Command>,
-) -> anyhow::Result<ExitCode> {
-    match command {
-        None => serve(store).await.map(|()| ExitCode::SUCCESS),
-        Some(Command::Schema) => unreachable!("schema is handled before opening a catalog"),
         Some(Command::Verify { json }) => verify(&store, json).await,
         Some(Command::Tldr { limit, json }) => {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
@@ -146,7 +136,12 @@ async fn run_catalog_command(
         Some(Command::Report {
             action: ReportCommand::Init { dir },
         }) => report_init(&dir).map(|()| ExitCode::SUCCESS),
-    }
+    };
+    outcome.unwrap_or_else(|error| {
+        // `{:#}` prints the whole anyhow context chain on one line.
+        tracing::error!("{error:#}");
+        ExitCode::FAILURE
+    })
 }
 
 /// Logs go to stderr because stdout carries the MCP protocol. Level comes from `RUST_LOG`
