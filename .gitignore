@@ -4,3 +4,6 @@
 .env
 /audit.pdf
 /audit-full.pdf
+
+# mdBook output
+/docs/site/book/
