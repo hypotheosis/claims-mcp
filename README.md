@@ -42,6 +42,7 @@ can hold the proof as its strongest evidence. See
    ```bash
    sha256sum -c claims-mcp-<version>-<target>.tar.gz.sha256   # macOS: shasum -a 256 -c
    tar -xzf claims-mcp-<version>-<target>.tar.gz
+   mkdir -p ~/.local/bin
    install -m 755 claims-mcp-<version>-<target>/claims-mcp ~/.local/bin/
    ```
 
