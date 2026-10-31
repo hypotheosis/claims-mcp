@@ -35,6 +35,7 @@
 - [MCP tools](reference/tools.md)
 - [Command line](reference/cli.md)
 - [Catalog format](reference/catalog-format.md)
+- [Catalog JSON Schema](reference/catalog-schema.md)
 - [Security](reference/security.md)
 
 ---

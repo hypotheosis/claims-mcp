@@ -63,6 +63,11 @@ Release tags (`v*`) can't be moved or deleted once pushed, so a bad release is f
 version. That includes a tag that fails the release checks: its version number is used up even
 though nothing was published.
 
+The release also includes `claims.schema.json`. If the catalog format changes, bump
+`SCHEMA_VERSION` in `src/catalog.rs` and run `just schema` in the same pull request. That command
+regenerates the latest schema and creates the current format-version-pinned copy without changing
+older pins.
+
 ## Merging pull requests
 
 Merge pull requests with a **merge commit**, not a squash or rebase merge. The anchors in

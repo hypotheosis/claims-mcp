@@ -322,7 +322,7 @@ impl JsonSchema for IntegrityLevel {
 ///
 /// Rust note: `tag = "state"` writes the variant name into a `state` field, giving
 /// `{"state":"active"}` or `{"state":"retired","reason":...,"retired_at":...}`.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "state", rename_all = "snake_case")]
 pub enum ClaimStatus {
     /// The claim is in force.
@@ -337,7 +337,7 @@ pub enum ClaimStatus {
 }
 
 /// Who produced a [`Seal`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum SealOrigin {
     /// The server sealed the record when a tool created or changed it.
@@ -349,7 +349,7 @@ pub enum SealOrigin {
 /// Integrity seal on a catalog record: an HMAC over the record's content and its position in
 /// the catalog (see `src/seal.rs`). The origin is covered by the MAC, so relabeling an adopted
 /// record as server-sealed invalidates it.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Seal {
     /// Who sealed the record.
     pub by: SealOrigin,
@@ -384,7 +384,7 @@ impl fmt::Display for LineRange {
 }
 
 /// A file, or lines in it, at the commit that was checked out when the anchor was recorded.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct FileAnchor {
     /// Path relative to the repository root.
     pub path: String,
@@ -400,7 +400,7 @@ pub struct FileAnchor {
 
 /// A `git grep -E` search and how many lines it matched at the pinned commit. With zero hits
 /// it shows that something does not exist, such as a feature a document promises.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct SearchAnchor {
     /// POSIX extended regular expression, as `git grep -E` reads it.
     pub pattern: String,
@@ -423,7 +423,7 @@ pub struct SearchAnchor {
 ///
 /// Rust note: serde's default enum form is "externally tagged": `{"file": {...}}` or
 /// `{"search": {...}}`, like a one-key dict whose key names the variant.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum Anchor {
     /// A file or line range.
@@ -511,7 +511,7 @@ pub fn short_commit(commit: &str) -> &str {
 }
 
 /// One piece of evidence attached to a claim.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Evidence {
     /// Catalog-wide unique id.
     pub id: EvidenceId,
@@ -528,13 +528,13 @@ pub struct Evidence {
     pub anchor: Option<Anchor>,
     /// When it was recorded.
     pub recorded_at: DateTime<Utc>,
-    /// Integrity seal; `None` only in unsealed (schema v1) catalogs or after tampering.
+    /// Integrity seal; absent only in an unsealed catalog or after tampering.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub seal: Option<Seal>,
 }
 
 /// One entry in a claim's append-only verdict history.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct VerdictRecord {
     /// The verdict reached.
     pub verdict: Verdict,
@@ -552,7 +552,7 @@ pub struct VerdictRecord {
 }
 
 /// A single atomic, falsifiable assertion and everything recorded about it.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Claim {
     /// Unique, never-reused id.
     pub id: ClaimId,

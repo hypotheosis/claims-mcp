@@ -65,5 +65,6 @@ code. Change it only through the tools: hand edits break its [seals](../concepts
   won't write to it until it is [migrated](../guides/migrating.md). Any other value is an error,
   and the file is not touched.
 
-The full schema, with the invariants the server enforces, is in section 3 of the
-[design spec](https://github.com/hypotheosis/claims-mcp/blob/main/docs/superpowers/specs/2026-10-23-claims-mcp-design.md).
+The machine-readable [catalog schema](catalog-schema.md) documents every field and enum. The
+design spec's [section 3](https://github.com/hypotheosis/claims-mcp/blob/main/docs/superpowers/specs/2026-10-23-claims-mcp-design.md)
+provides additional background.

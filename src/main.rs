@@ -6,6 +6,7 @@ mod error;
 mod model;
 mod recheck;
 mod report;
+mod schema;
 mod seal;
 mod server;
 mod store;
@@ -55,6 +56,12 @@ struct Cli {
 /// Maintenance subcommands. None of them is exposed as an MCP tool.
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Print the claims.json schema as JSON Schema 2020-12.
+    Schema {
+        /// Use the format-version-pinned URL as the schema's `$id`.
+        #[arg(long)]
+        versioned: bool,
+    },
     /// Check every integrity seal in the catalog; exits 1 if any check fails.
     Verify {
         /// Print the result as JSON (the `integrity` input of report/claims-report.typ).
@@ -117,6 +124,9 @@ async fn main() -> ExitCode {
     let store = CatalogStore::new(cli.catalog);
     let outcome = match cli.command {
         None => serve(store).await.map(|()| ExitCode::SUCCESS),
+        Some(Command::Schema { versioned }) => schema::write(std::io::stdout().lock(), versioned)
+            .map(|()| ExitCode::SUCCESS)
+            .context("failed to write the catalog schema"),
         Some(Command::Verify { json }) => verify(&store, json).await,
         Some(Command::Tldr { limit, json }) => {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
