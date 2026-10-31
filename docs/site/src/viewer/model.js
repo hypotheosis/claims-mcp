@@ -121,8 +121,124 @@ export function parseCatalog(source) {
   return { schemaVersion, claims, byId };
 }
 
-export const countVerdicts = () => {}; export const needsAttention = () => {};
-export const areaSummary = () => {}; export const filterClaims = () => {};
-export const facetValues = () => {}; export const parseRoute = () => {};
-export const formatRoute = () => {}; export const fileAnchorUrl = () => {};
-export const searchCommand = () => {};
+export const ATTENTION = ['refuted', 'not_enough_info', 'unverified'];
+
+const byIntegrityThenId = (a, b) =>
+  (b.integrityLevel ?? 0) - (a.integrityLevel ?? 0) || a.id.localeCompare(b.id);
+const active = (claims) => claims.filter((c) => !c.retired);
+
+/** Counts active claims by current verdict. */
+export function countVerdicts(claims) {
+  const counts = { total: 0, supported: 0, refuted: 0, not_enough_info: 0, unverified: 0 };
+  for (const c of active(claims)) {
+    counts.total += 1;
+    counts[c.current] += 1;
+  }
+  return counts;
+}
+
+/** Active claims that are refuted, undecided or unjudged, worst first. */
+export function needsAttention(claims) {
+  return active(claims)
+    .filter((c) => ATTENTION.includes(c.current))
+    .sort((a, b) =>
+      ATTENTION.indexOf(a.current) - ATTENTION.indexOf(b.current) || byIntegrityThenId(a, b));
+}
+
+const sortAreas = (a, b) => (a === 'Unassigned') - (b === 'Unassigned') || a.localeCompare(b);
+
+/** Verdict counts per area tag, areas sorted by name with Unassigned last. */
+export function areaSummary(claims) {
+  const groups = new Map();
+  for (const c of active(claims)) {
+    for (const area of c.areas) {
+      if (!groups.has(area)) groups.set(area, []);
+      groups.get(area).push(c);
+    }
+  }
+  return [...groups.keys()]
+    .sort(sortAreas)
+    .map((area) => ({ area, counts: countVerdicts(groups.get(area)) }));
+}
+
+/**
+ * Claims matching every set filter. `filter` fields: text, verdict, kind, level, integrity (a
+ * string, as in the URL), area, includeRetired.
+ */
+export function filterClaims(claims, filter) {
+  const needle = (filter.text ?? '').trim().toLowerCase();
+  return claims.filter((c) =>
+    (filter.includeRetired || !c.retired)
+    && (!needle || [c.id, c.statement, ...c.tags].some((s) => s.toLowerCase().includes(needle)))
+    && (!filter.verdict || c.current === filter.verdict)
+    && (!filter.kind || c.kind === filter.kind)
+    && (!filter.level || c.level === filter.level)
+    && (!filter.integrity || String(c.integrityLevel ?? '') === filter.integrity)
+    && (!filter.area || c.areas.includes(filter.area)));
+}
+
+/** The distinct filter values present in a catalog. */
+export function facetValues(claims) {
+  const distinct = (pick) =>
+    [...new Set(claims.flatMap(pick).filter((v) => v !== '' && v !== null))];
+  return {
+    kinds: distinct((c) => [c.kind]).sort(),
+    levels: distinct((c) => [c.level]).sort(),
+    integrityLevels: distinct((c) => [c.integrityLevel]).sort((a, b) => b - a),
+    areas: distinct((c) => c.areas).sort(sortAreas),
+  };
+}
+
+const FILTER_KEYS = ['text', 'verdict', 'kind', 'level', 'integrity', 'area', 'includeRetired'];
+
+/** Reads the view and selection from a URL hash. */
+export function parseRoute(hash) {
+  const raw = hash.replace(/^#/, '');
+  if (/^CLM-\d+$/i.test(raw)) return { view: 'claim', id: raw.toUpperCase() };
+  if (raw === 'claims' || raw.startsWith('claims?')) {
+    const params = new URLSearchParams(raw.slice('claims'.length).replace(/^\?/, ''));
+    const filter = {};
+    for (const key of FILTER_KEYS) {
+      const value = params.get(key);
+      if (value) filter[key] = key === 'includeRetired' ? value === 'true' : value;
+    }
+    return { view: 'claims', filter };
+  }
+  return { view: 'overview' };
+}
+
+/** Writes a route as a URL hash; empty filter values are dropped. */
+export function formatRoute(route) {
+  if (route.view === 'claim') return `#${route.id}`;
+  if (route.view !== 'claims') return '#overview';
+  const params = new URLSearchParams();
+  for (const key of FILTER_KEYS) {
+    const value = route.filter?.[key];
+    if (value) params.set(key, String(value));
+  }
+  const query = params.toString();
+  return query ? `#claims?${query}` : '#claims';
+}
+
+/** GitHub link for a file anchor at its pinned commit, or null without a repo or valid commit. */
+export function fileAnchorUrl(repo, anchor) {
+  if (!repo || !anchor || anchor.type !== 'file' || !/^[0-9a-f]{7,40}$/i.test(anchor.commit)) {
+    return null;
+  }
+  const path = anchor.path.split('/').map(encodeURIComponent).join('/');
+  const owner = encodeURIComponent(repo.owner);
+  const name = encodeURIComponent(repo.name);
+  const base = `https://github.com/${owner}/${name}/blob/${anchor.commit}/${path}`;
+  if (!anchor.lines) return base;
+  const { start, end } = anchor.lines;
+  return start === end ? `${base}#L${start}` : `${base}#L${start}-L${end}`;
+}
+
+const shellQuote = (s) => `'${s.replace(/'/g, "'\\''")}'`;
+const shellWord = (s) => (/^[A-Za-z0-9_./-]+$/.test(s) ? s : shellQuote(s));
+
+/** The git grep command a search anchor recorded. */
+export function searchCommand(anchor) {
+  const flags = anchor.caseInsensitive ? '-iE' : '-E';
+  return `git grep ${flags} ${shellQuote(anchor.pattern)} -- ${anchor.scope.map(shellWord).join(' ')}`;
+}

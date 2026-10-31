@@ -84,3 +84,79 @@ test('splitFix takes the text after the last Fix:', () => {
   assert.deepEqual(splitFix('Bad. Fix: one. Fix: two'), { body: 'Bad. Fix: one.', fix: 'two' });
   assert.deepEqual(splitFix('Fine.'), { body: 'Fine.', fix: null });
 });
+
+const sample = () => parseCatalog(doc([
+  claim({ id: 'CLM-0001', tags: ['area:docs'], integrity_level: 2, kind: 'documentation', level: 'artifact',
+    verdicts: [{ verdict: 'supported', rationale: 'ok', auditor: 'm', evidence_ids: [] }] }),
+  claim({ id: 'CLM-0002', statement: 'Seals refuse writes', tags: ['area:seals'], integrity_level: 4, kind: 'security', level: 'unit',
+    verdicts: [{ verdict: 'refuted', rationale: 'no', auditor: 'm', evidence_ids: [] }] }),
+  claim({ id: 'CLM-0003', tags: ['area:seals'], integrity_level: 2 }),
+  claim({ id: 'CLM-0004', integrity_level: 3, verdicts: [{ verdict: 'not_enough_info', rationale: '?', auditor: 'm' }] }),
+  claim({ id: 'CLM-0005', status: { state: 'retired', reason: 'gone' } }),
+])).claims;
+
+test('countVerdicts counts active claims by current verdict', () => {
+  assert.deepEqual(countVerdicts(sample()), { total: 4, supported: 1, refuted: 1, not_enough_info: 1, unverified: 1 });
+});
+
+test('needsAttention orders refuted, not_enough_info, unverified, then integrity desc, then id', () => {
+  assert.deepEqual(needsAttention(sample()).map((c) => c.id), ['CLM-0002', 'CLM-0004', 'CLM-0003']);
+});
+
+test('areaSummary groups active claims by area, sorted by name', () => {
+  const rows = areaSummary(sample());
+  assert.deepEqual(rows.map((r) => [r.area, r.counts.total, r.counts.supported]), [['docs', 1, 1], ['seals', 2, 0], ['Unassigned', 1, 0]]);
+});
+
+test('filterClaims applies text, facets and the retired toggle', () => {
+  const all = sample();
+  assert.deepEqual(filterClaims(all, {}).map((c) => c.id), ['CLM-0001', 'CLM-0002', 'CLM-0003', 'CLM-0004']);
+  assert.equal(filterClaims(all, { includeRetired: true }).length, 5);
+  assert.deepEqual(filterClaims(all, { text: 'SEALS' }).map((c) => c.id), ['CLM-0002', 'CLM-0003']);
+  assert.deepEqual(filterClaims(all, { verdict: 'unverified' }).map((c) => c.id), ['CLM-0003']);
+  assert.deepEqual(filterClaims(all, { area: 'seals', integrity: '4' }).map((c) => c.id), ['CLM-0002']);
+  assert.deepEqual(filterClaims(all, { kind: 'documentation', level: 'artifact' }).map((c) => c.id), ['CLM-0001']);
+});
+
+test('facetValues lists the values present, sorted', () => {
+  const f = facetValues(sample());
+  assert.deepEqual(f.kinds, ['documentation', 'security']);
+  assert.deepEqual(f.integrityLevels, [4, 3, 2]);
+  assert.deepEqual(f.areas, ['docs', 'seals', 'Unassigned']);
+});
+
+test('routes round-trip through the URL hash', () => {
+  assert.deepEqual(parseRoute(''), { view: 'overview' });
+  assert.deepEqual(parseRoute('#overview'), { view: 'overview' });
+  assert.deepEqual(parseRoute('#CLM-0072'), { view: 'claim', id: 'CLM-0072' });
+  assert.deepEqual(parseRoute('#claims?verdict=refuted&area=docs'), { view: 'claims', filter: { verdict: 'refuted', area: 'docs' } });
+  assert.equal(formatRoute({ view: 'claims', filter: { verdict: 'refuted', text: '' } }), '#claims?verdict=refuted');
+  assert.equal(formatRoute({ view: 'claim', id: 'CLM-0072' }), '#CLM-0072');
+  assert.equal(formatRoute({ view: 'overview' }), '#overview');
+});
+
+test('fileAnchorUrl links to the pinned commit on GitHub', () => {
+  const repo = { owner: 'acme', name: 'widget' };
+  const a = { type: 'file', path: 'src/a b.rs', lines: { start: 3, end: 9 }, commit: '0123abcd', dirty: false };
+  assert.equal(fileAnchorUrl(repo, a), 'https://github.com/acme/widget/blob/0123abcd/src/a%20b.rs#L3-L9');
+  assert.equal(fileAnchorUrl(repo, { ...a, lines: { start: 3, end: 3 } }), 'https://github.com/acme/widget/blob/0123abcd/src/a%20b.rs#L3');
+  assert.equal(fileAnchorUrl(repo, { ...a, lines: null }), 'https://github.com/acme/widget/blob/0123abcd/src/a%20b.rs');
+  assert.equal(fileAnchorUrl(null, a), null);
+  assert.equal(fileAnchorUrl(repo, { ...a, commit: 'not-a-sha' }), null);
+});
+
+test('searchCommand renders the git grep a search anchor ran', () => {
+  const s = { type: 'search', pattern: "it's|b", caseInsensitive: true, scope: ['src', 'my dir'], hits: 0, commit: 'abc', dirty: false };
+  assert.equal(searchCommand(s), "git grep -iE 'it'\\''s|b' -- src 'my dir'");
+});
+
+test('smoke: parses this repository\'s own claims.json', (t) => {
+  const tldrPath = process.env.CLAIMS_TLDR_JSON;
+  if (!tldrPath) {
+    t.skip('CLAIMS_TLDR_JSON is not set; run `just viewer-test` to include this check');
+    return;
+  }
+  const catalog = parseCatalog(readFileSync(new URL('../../../claims.json', import.meta.url), 'utf8'));
+  const tldr = JSON.parse(readFileSync(tldrPath, 'utf8'));
+  assert.equal(countVerdicts(catalog.claims).total, tldr.summary.active_claims);
+});
