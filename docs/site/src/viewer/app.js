@@ -266,7 +266,7 @@ function renderOverview() {
 function claimRow(claim, selected) {
   return h('a', {
     class: `list-row${claim.retired ? ' retired' : ''}`,
-    href: `#${claim.id}`,
+    href: formatRoute({ view: 'claim', id: claim.id }),
     'aria-current': selected ? 'true' : null,
   },
   h('span', { class: 'id' }, claim.id, claim.retired ? ' · retired' : ''),
@@ -349,7 +349,7 @@ function anchorNode(anchor) {
 
 function claimLink(id) {
   return state.catalog.byId.has(id)
-    ? h('a', { href: `#${id}` }, id)
+    ? h('a', { href: formatRoute({ view: 'claim', id }) }, id)
     : h('span', {}, id, h('em', { class: 'hint' }, ' (not in catalog)'));
 }
 
@@ -386,7 +386,7 @@ function verdictItem(claim, record) {
     record.evidenceIds.length
       ? h('small', {}, 'Cites ', record.evidenceIds.flatMap((id, i) => [
         i ? ', ' : '',
-        h('a', { href: `#${claim.id}`, onclick: (e) => scrollToEvidence(e, id) }, id),
+        h('a', { href: formatRoute({ view: 'claim', id: claim.id }), onclick: (e) => scrollToEvidence(e, id) }, id),
       ]))
       : null);
 }

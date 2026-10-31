@@ -191,10 +191,13 @@ export function facetValues(claims) {
 
 const FILTER_KEYS = ['text', 'verdict', 'kind', 'level', 'integrity', 'area', 'includeRetired'];
 
-/** Reads the view and selection from a URL hash. */
+/**
+ * Reads the view and selection from a URL hash: `#overview` (or empty), `#claims?<filters>`, or
+ * any other value as a URL-encoded claim id, so catalogs with ids other than `CLM-NNNN` work.
+ */
 export function parseRoute(hash) {
   const raw = hash.replace(/^#/, '');
-  if (/^CLM-\d+$/i.test(raw)) return { view: 'claim', id: raw.toUpperCase() };
+  if (raw === '' || raw === 'overview') return { view: 'overview' };
   if (raw === 'claims' || raw.startsWith('claims?')) {
     const params = new URLSearchParams(raw.slice('claims'.length).replace(/^\?/, ''));
     const filter = {};
@@ -204,12 +207,16 @@ export function parseRoute(hash) {
     }
     return { view: 'claims', filter };
   }
-  return { view: 'overview' };
+  try {
+    return { view: 'claim', id: decodeURIComponent(raw) };
+  } catch {
+    return { view: 'overview' };
+  }
 }
 
 /** Writes a route as a URL hash; empty filter values are dropped. */
 export function formatRoute(route) {
-  if (route.view === 'claim') return `#${route.id}`;
+  if (route.view === 'claim') return `#${encodeURIComponent(route.id)}`;
   if (route.view !== 'claims') return '#overview';
   const params = new URLSearchParams();
   for (const key of FILTER_KEYS) {

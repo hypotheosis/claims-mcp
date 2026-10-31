@@ -135,6 +135,14 @@ test('routes round-trip through the URL hash', () => {
   assert.equal(formatRoute({ view: 'overview' }), '#overview');
 });
 
+test('routes accept any claim id, not only CLM-NNNN', () => {
+  assert.deepEqual(parseRoute('#REQ-7'), { view: 'claim', id: 'REQ-7' });
+  assert.deepEqual(parseRoute('#clm-0001'), { view: 'claim', id: 'clm-0001' });
+  assert.deepEqual(parseRoute('#a%20b%3Fc'), { view: 'claim', id: 'a b?c' });
+  assert.equal(formatRoute({ view: 'claim', id: 'a b?c' }), '#a%20b%3Fc');
+  assert.deepEqual(parseRoute('#%E0%A4'), { view: 'overview' });
+});
+
 test('fileAnchorUrl links to the pinned commit on GitHub', () => {
   const repo = { owner: 'acme', name: 'widget' };
   const a = { type: 'file', path: 'src/a b.rs', lines: { start: 3, end: 9 }, commit: '0123abcd', dirty: false };
