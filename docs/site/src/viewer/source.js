@@ -29,6 +29,13 @@ export async function fetchFromGithub(
   { owner, name, ref = 'HEAD', path = 'claims.json' },
   fetchImpl = fetch,
 ) {
+  // Empty, `.` and `..` segments would let the URL resolve to another repository's file while
+  // the page still names this one.
+  for (const [label, value] of [['branch, tag or commit', ref], ['catalog path', path]]) {
+    if (value.split('/').some((segment) => segment === '' || segment === '.' || segment === '..')) {
+      throw new SourceError(`"${value}" isn't a valid ${label}.`);
+    }
+  }
   const source = { kind: 'github', owner, name, ref, path };
   let response;
   try {

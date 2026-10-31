@@ -43,3 +43,13 @@ test('readFile explains an unreadable file', async () => {
   const broken = { name: 'x.json', text: async () => { throw new Error('gone'); } };
   await assert.rejects(readFile(broken), (e) => e instanceof SourceError && /x\.json/.test(e.message));
 });
+
+test('fetchFromGithub rejects ref and path segments that could leave the repository', async () => {
+  const neverCalled = async () => { throw new Error('fetch must not be called'); };
+  for (const bad of [{ ref: '../../c/d/main' }, { ref: 'a/./b' }, { ref: 'a//b' }, { path: '../x.json' }, { path: '/claims.json' }, { path: 'docs/' }]) {
+    await assert.rejects(fetchFromGithub({ owner: 'a', name: 'b', ...bad }, neverCalled),
+      (e) => e instanceof SourceError && /isn't a valid/.test(e.message), JSON.stringify(bad));
+  }
+  const ok = await fetchFromGithub({ owner: 'a', name: 'b', ref: 'release/1.2', path: 'audit/claims.json' }, fakeFetch(200, '{}'));
+  assert.equal(ok.source.ref, 'release/1.2');
+});
