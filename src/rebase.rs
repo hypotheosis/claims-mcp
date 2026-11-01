@@ -117,7 +117,15 @@ pub fn rebase(base: &Catalog, branch: &Catalog, onto: &Catalog) -> Result<(Catal
     let mut relinked = Vec::new();
     for claim in branch.claims() {
         if claim.id < first_new_claim {
-            let base_claim = base.get(claim.id)?;
+            // A verified `base` has no gaps below its counter, so this only fails for inputs
+            // that verification would already have rejected; it still gets the rebase's advice.
+            let base_claim = base.get(claim.id).map_err(|_| {
+                refused(format!(
+                    "{} is below --base's claim counter but missing from --base, so the branch \
+                     does not descend from --base",
+                    claim.id
+                ))
+            })?;
             if replay_onto_existing(base_claim, claim, &mut rebased, &mapping)? {
                 relinked.push(claim.id);
             }
