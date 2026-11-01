@@ -4,13 +4,13 @@
 # report/audit-notes.example.toml instead of copying this file.
 #
 # SNAPSHOT: these notes record the auditor's judgment on the first self-audit of claims-mcp
-# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 through 0.2.4 with notes saying so.
+# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 through 0.2.5 with notes saying so.
 # They are not a default. Rewrite the assessment and points whenever the catalog is re-audited.
 # Counts, verdicts, and gaps are deliberately left out: the report computes those from the
 # catalog, so prose here cannot contradict them.
 
 artifact = "claims-mcp"
-version = "0.2.4"
+version = "0.2.5"
 repository = "https://github.com/hypotheosis/claims-mcp"
 method = "skills/claims-audit"
 
@@ -36,19 +36,31 @@ Version 0.2.3 adds commit-pinned anchors on evidence and claim sources, absence 
 the recheck command and tool (PR #22, issue #21). These were not audited as claims.
 
 After 0.2.3, the detailed documentation moved from the README to a documentation site. Claims \
-CLM-0067 to CLM-0077 check the site against the code, and theirs is the only evidence in this \
-catalog with anchors, so the anchor recheck covers only the documentation claims.
+CLM-0067 to CLM-0077 check the site against the code. Anchored evidence exists only for them, \
+for the 0.2.5 claims below, and for one later check of CLM-0004 (EVD-0176), so the anchor \
+recheck covers only those.
 
 Version 0.2.4 adds the generated claims.json JSON Schema, its CLI command, stable and \
 format-version-pinned documentation URLs, and the release artifact (PR #28, issue #26). These \
 were not audited as claims.
+
+Version 0.2.5 adds the per-call catalog argument on every tool (PR #34, issue #31) and the rebase \
+command, which replays a branch's ledger records onto main's (PR #35, issue #32). Unlike the \
+earlier additions, both were audited as claims by an independent auditor on a different model: \
+CLM-0078 to CLM-0104 and CLM-0105 to CLM-0130. Also in 0.2.5, the claims-audit skill's \
+pull-request mode and its claims_call.py helper (PR #33), and a viewer layout fix (PR #30), were \
+not audited as claims.
 """
 
 [[points]]
 title = "Independence"
 body = """
-The audit was not independent: the model that produced claims-mcp also audited it. Weigh the \
-verdicts accordingly and spot-check the evidence locators, starting with integrity level 4.
+The original audit (claims through CLM-0077) was not independent: the model that produced \
+claims-mcp also audited it. Weigh those verdicts accordingly and spot-check their evidence \
+locators, starting with integrity level 4. The 0.2.5 claims (CLM-0078 to CLM-0130) were \
+recorded by an auditor subagent on a different model, given the issue, the PR description and \
+the diff but not the producer's account. It is still a model of the same family, so the same \
+spot checks apply.
 """
 
 [[points]]
