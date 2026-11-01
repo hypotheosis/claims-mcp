@@ -838,11 +838,15 @@ mod tests {
         let base = main_with_two_claims();
         let mut main = base.clone();
         write(&mut main, |catalog| {
-            catalog.add_claim(new_claim("main three"), at(5)).expect("add");
+            catalog
+                .add_claim(new_claim("main three"), at(5))
+                .expect("add");
         });
         let mut branch = base.clone();
         write(&mut branch, |catalog| {
-            catalog.add_claim(new_claim("branch three"), at(6)).expect("add");
+            catalog
+                .add_claim(new_claim("branch three"), at(6))
+                .expect("add");
             let update = ClaimUpdate {
                 derived_from: Some(vec![ClaimId::new(3)]),
                 ..ClaimUpdate::default()
