@@ -276,9 +276,10 @@ The call then reads or writes that ledger and pins anchors to `HEAD` of the repo
 holds it. A call that leaves `catalog` out goes to the session's ledger, so one forgotten
 argument writes the wrong file; check with `git status` in both checkouts before committing.
 
-If the connected server is claims-mcp 0.2.4 or earlier, its tools have no `catalog` parameter
-(it is missing from their input schema) and silently ignore the argument. Then make every call
-through `scripts/claims_call.py`, which starts its own server for the ledger you name:
+Check the tools' input schemas first: if they have no `catalog` property, the connected server
+predates the argument and silently ignores it, so a call would write the session's ledger. (The
+released 0.2.4 and earlier lack it, but the version alone doesn't tell you, since unreleased
+builds report the last version.) Then make every call through `scripts/claims_call.py`, which starts its own server for the ledger you name:
 
 ```bash
 python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json list_claims '{"tag": "from-issue:42"}'
