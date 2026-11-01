@@ -287,13 +287,20 @@ in a directory that does not exist:
 list_claims {"catalog": "/nonexistent-claims-probe/claims.json"}
 ```
 
-A server that supports `catalog` tries to open that ledger and fails with an error ("catalog I/O
-error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory"). That error means
-you can go ahead. (Don't probe with an empty string: some clients drop an empty argument value
-before the call is sent.) If the call **succeeds**, the server ignored the argument: **stop**, make no further claims-mcp calls,
-and ask the user to upgrade claims-mcp and restart the session or reconnect the server (`/mcp`
-in Claude Code). Delete the `.claims.json.lock` that call may have left in the session's
-directory.
+A server that supports `catalog` tries to open that ledger and fails with an error naming it
+("catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory").
+Go ahead **only if the error names `/nonexistent-claims-probe/`**. (Don't probe with an empty
+string: some clients drop an empty argument value before the call is sent.)
+
+Any other outcome means **stop**: make no further claims-mcp calls, and ask the user to upgrade
+claims-mcp and restart the session or reconnect the server (`/mcp` in Claude Code).
+
+- If the call **succeeds**, the server ignored the argument.
+- If it fails with an error that does not name the probe path, the result is inconclusive. An
+  older server ignores `catalog` and reads the session's ledger, and that read can fail for its
+  own reasons: a broken seal, an unsupported schema, or a lock or I/O problem.
+
+Either way, delete any `.claims.json.lock` the call left in the session's directory.
 
 ### Before the audit
 
