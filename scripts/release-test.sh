@@ -85,11 +85,18 @@ create_repository() {
     printf '%s\n' "${work}"
 }
 
+# Sets Cargo.toml's version to 1.2.3 in the current directory. Not `sed -i`, whose argument
+# syntax differs between GNU and BSD (macOS) sed.
+bump_version_to_1_2_3() {
+    sed 's/^version = "1.2.2"$/version = "1.2.3"/' Cargo.toml >Cargo.toml.new
+    mv Cargo.toml.new Cargo.toml
+}
+
 # Commits the version bump and tags it, as release-prepare's cargo-release run would.
 prepare_release() {
     (
         cd "$1"
-        sed -i 's/^version = "1.2.2"$/version = "1.2.3"/' Cargo.toml
+        bump_version_to_1_2_3
         git commit --quiet -am 'chore: Release v1.2.3'
         git tag -a v1.2.3 -m 'Release v1.2.3'
     )
@@ -441,7 +448,7 @@ test_ship_refuses_merge_head() {
     work="$(create_repository ship-merge-head)"
     (
         cd "${work}"
-        sed -i 's/^version = "1.2.2"$/version = "1.2.3"/' Cargo.toml
+        bump_version_to_1_2_3
         git commit --quiet -am 'chore: Release v1.2.3'
         git checkout --quiet -b side HEAD^
         git commit --quiet --allow-empty -m side
