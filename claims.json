@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 162,
+  "next_claim_seq": 163,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "f5151560662cc983176eb0f3f502102c79aaec8e996120852b5691be378e420b"
+    "mac": "91d2aae70a26777e1dd9ec5935d64399a49e0d0abe1457862087cdef8ba68eec"
   },
-  "next_evidence_seq": 286,
+  "next_evidence_seq": 292,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "88cc2a2510d4d151b13d52459988474e0e3c77e5a98ea1effb0c03ea3ea9c712"
+    "mac": "9b41840a79b022edd9d66c4c471b62b5f7349cdf154a5e226a1fd435d367544f"
   },
   "claims": [
     {
@@ -101,6 +101,18 @@
             "by": "server",
             "mac": "55d1641207f3a59f958603b300d5679b38248d34147bef9d44c7c375e7866a30"
           }
+        },
+        {
+          "id": "EVD-0291",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0285, which named the now-retired CLM-0015. Its replacement CLM-0162 (count-free, supported) covers the V&V gap-report element of concept.md. trace down at b163c55 shows every active child supported: 0002, 0003, 0010, 0012, 0014, 0017, 0019, 0037, 0152, 0154, 0157, 0162. Concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:20:45.530942709Z",
+          "seal": {
+            "by": "server",
+            "mac": "5af264a0ba3e2f6a44e3b5e62cbcd236b585bc0d9fa1709b40d8bcdb06f4fa20"
+          }
         }
       ],
       "verdicts": [
@@ -181,13 +193,26 @@
             "by": "server",
             "mac": "0bab53c8a8a8e08ef36f8b5d4cadbf90d2dfce512ca65dcc45db8966a9fb840f"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0015, now retired and replaced by CLM-0162; all active children are supported (EVD-0291).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0291"
+          ],
+          "recorded_at": "2026-11-01T22:20:49.930307768Z",
+          "seal": {
+            "by": "server",
+            "mac": "3f193a0c61e291733c299c0a4ffa4a5d603b04d7141e0df18678980ccc8e8a09"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-11-01T22:18:53.943924548Z",
+      "updated_at": "2026-11-01T22:20:49.930307768Z",
       "seal": {
         "by": "server",
-        "mac": "d5e7b3e7dbac6397445d17494095f62bbb0e7d070d8daa2f001ed5b2605f74f7"
+        "mac": "d74b94cf13595eb4fc836a91267a461b7414b4e92d5713d6dd5485d7d0c22b81"
       }
     },
     {
@@ -1348,7 +1373,9 @@
         "report"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: stated 'all eight gap categories' with an eight-name list; the report has nine (refuted_without_source_anchor), and spec 4.1 states no count. Replaced by a count-free claim.",
+        "retired_at": "2026-11-01T22:20:29.072910389Z"
       },
       "evidence": [
         {
@@ -1373,6 +1400,62 @@
           "seal": {
             "by": "server",
             "mac": "8c1ac2dd52e3b555dacad4078dd35584dc9a663b94ccf0d0f943d6e402852e27"
+          }
+        },
+        {
+          "id": "EVD-0286",
+          "kind": "inspection",
+          "locator": "src/report.rs:37-58 (struct Gaps)",
+          "summary": "At b163c55 Gaps has nine Vec<ClaimId> fields: the eight names in the statement plus refuted_without_source_anchor. The statement's \"all eight\" with its eight-name list therefore omits a category the report returns.",
+          "stance": "refutes",
+          "anchor": {
+            "file": {
+              "path": "src/report.rs",
+              "lines": {
+                "start": 37,
+                "end": 58
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:19.858289600Z",
+          "seal": {
+            "by": "server",
+            "mac": "4d4696a78e14c2c484760c860428e71cf4ff797c879ca5b5cf1a988e6cbb2f87"
+          }
+        },
+        {
+          "id": "EVD-0287",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:203-217 (spec 4.1 gaps list)",
+          "summary": "Spec 4.1, the claim's source, lists nine gap names under `gaps`, ending with refuted_without_source_anchor, and states no count. The statement's eight-name list is missing that name.",
+          "stance": "refutes",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 203,
+                "end": 217
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:19.885266302Z",
+          "seal": {
+            "by": "server",
+            "mac": "7a951f4df97a504f9f8e8056b2107fbee6a7461d52b228a4371da626b8500ba4"
+          }
+        },
+        {
+          "id": "EVD-0288",
+          "kind": "demonstration",
+          "locator": "mcp audit_report (catalog=/home/pgrace/repos/claims-mcp/.worktrees/issue-40/claims.json, include_matrix false) at b163c55; and python3 .../scratchpad/demo40/keys.py (stdio, copy of the ledger, include_matrix true)",
+          "summary": "The live report's gaps keys are no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links and refuted_without_source_anchor: nine keys. The script compared the sets and found spec 4.1 names == Gaps fields == live gaps keys. The statement's list lacks refuted_without_source_anchor. Top-level keys were gaps, integrity, matrix, totals; the matrix had one row per active claim.",
+          "stance": "refutes",
+          "recorded_at": "2026-11-01T22:20:19.897641565Z",
+          "seal": {
+            "by": "server",
+            "mac": "047e580bc498f3afb18e15d51709ff029ec8f8500186ed025d3123d4ac23e289"
           }
         }
       ],
@@ -1402,13 +1485,28 @@
             "by": "server",
             "mac": "3ffb3cf8580799b5f15fad5912e78bf90cf00c75419bd4fdcf5564b90f8fe6cb"
           }
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "The statement says audit_report returns \"all eight gap categories\" and lists eight names, but the Gaps struct, spec 4.1 and the live report all have nine; refuted_without_source_anchor is missing from the statement (EVD-0286, EVD-0287, EVD-0288). Earlier supported verdicts were true when recorded and went stale when that category was added. Fix: retire this claim and replace it with a count-free claim that audit_report returns every gap category listed in spec 4.1 and a traceability matrix.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0286",
+            "EVD-0287",
+            "EVD-0288"
+          ],
+          "recorded_at": "2026-11-01T22:20:24.033261065Z",
+          "seal": {
+            "by": "server",
+            "mac": "82c9556ce958b52150d57e46f6314e8aa14788eb384427ec14920119fc7a9cdc"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:51:51.068635941Z",
+      "updated_at": "2026-11-01T22:20:29.072910389Z",
       "seal": {
         "by": "server",
-        "mac": "72a0518621cac417204e958f5a3d849a9de1c2ca99ac69da19d6be9120d7291a"
+        "mac": "96319cddbc3110333d88ffa5a5e105450702c48d9750837e5d732957b4cc25fb"
       }
     },
     {
@@ -12965,6 +13063,94 @@
       "seal": {
         "by": "server",
         "mac": "daa4a0b99ec97b79a8899b10e78b5ba04d4727cbf687d2edac134fd6109a548c"
+      }
+    },
+    {
+      "id": "CLM-0162",
+      "statement": "audit_report returns every gap category listed in spec 4.1 and a traceability matrix",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "spec 4.1",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 203,
+          "end": 217
+        },
+        "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/report.rs"
+      ],
+      "tags": [
+        "report",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0289",
+          "kind": "demonstration",
+          "locator": "mcp audit_report (catalog=.../issue-40/claims.json) at b163c55, and python3 /tmp/claude-1000/-home-pgrace--agents-skills/73799e8a-72f7-4e14-aa98-aa95ddeeba71/scratchpad/demo40/keys.py (stdio, include_matrix true, ledger copy)",
+          "summary": "The script extracted the names from spec 4.1's gaps list, the Gaps struct fields in src/report.rs, and the live gaps keys, and asserted the three sets are equal (True). The live response also had a matrix with one row per active claim, as spec 4.1 describes. No set difference in either direction.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:20:34.982235297Z",
+          "seal": {
+            "by": "server",
+            "mac": "4ecf0fb74cda855983d1c7bd463739c65a6a237e9548cb94fa056c2298de4699"
+          }
+        },
+        {
+          "id": "EVD-0290",
+          "kind": "inspection",
+          "locator": "src/report.rs:37-58 (struct Gaps); docs/superpowers/specs/2026-10-23-claims-mcp-design.md:203-217",
+          "summary": "Gaps fields: no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links, refuted_without_source_anchor. Spec 4.1 lists the same names, and the matrix bullet follows at line 217.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/report.rs",
+              "lines": {
+                "start": 37,
+                "end": 58
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:35.000644490Z",
+          "seal": {
+            "by": "server",
+            "mac": "ab409b89fca61c3e20f532a2c026844a0e096c9da057a100ecbac5fb04076b57"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Spec 4.1's gap names, the Gaps fields and the live report's gap keys are the same set, and the live report carried a matrix (EVD-0289, EVD-0290).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0289",
+            "EVD-0290"
+          ],
+          "recorded_at": "2026-11-01T22:20:39.069046969Z",
+          "seal": {
+            "by": "server",
+            "mac": "640f27ae596b8e4bd5982c5de72955baf4bc1f0e5ab0ce4ae9c73e1406799c17"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:20:29.091321122Z",
+      "updated_at": "2026-11-01T22:20:39.069046969Z",
+      "seal": {
+        "by": "server",
+        "mac": "ad6523799ba45c12e7f7b0b7b595631ed697a64e9a7b87f96c95a98cbca7f012"
       }
     }
   ]
