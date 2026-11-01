@@ -64,6 +64,14 @@ def main():
             calls = json.load(sys.stdin)
     except ValueError as error:
         parser.error(f"invalid JSON: {error}")
+    # Check every entry before starting the server, so a bad one cannot fail mid-batch.
+    if not isinstance(calls, list) or not all(
+        isinstance(call, dict)
+        and isinstance(call.get("tool"), str)
+        and isinstance(call.get("arguments", {}), dict)
+        for call in calls
+    ):
+        parser.error("input must be a JSON list of {\"tool\": str, \"arguments\": object}")
 
     # An absolute path, so the server's cwd cannot change which ledger it opens. The server
     # pins anchors to HEAD of the git repository that holds the ledger, not of the cwd.
@@ -116,7 +124,8 @@ def main():
             if not ok:
                 status = 1
                 break
-    except (RuntimeError, ValueError, KeyError) as error:
+    # OSError covers BrokenPipeError when the server exits early.
+    except (RuntimeError, ValueError, KeyError, TypeError, OSError) as error:
         print(f"claims_call.py: {error}", file=sys.stderr)
         status = 2
     finally:
