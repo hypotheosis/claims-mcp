@@ -30,4 +30,6 @@ The subcommands are for people and CI; agents use the [MCP tools](tools.md).
 | `report init [DIR]` | Write the [PDF report](../guides/reports.md) template and a notes file to `DIR` (default `report`) | |
 | `schema [--versioned]` | Print the [catalog JSON Schema](catalog-schema.md); `--versioned` uses its pinned URL as `$id` | |
 
-`--catalog` is global, so it can go before or after the subcommand.
+`--catalog` is global, so it can go before or after the subcommand. In the MCP server it is
+the default ledger: a tool call can name another with its
+[`catalog` parameter](tools.md#choosing-the-ledger).

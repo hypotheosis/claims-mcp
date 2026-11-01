@@ -20,6 +20,20 @@ fails, write tools refuse and read tools keep working.
 | [`next_steps`](#next_steps) | Ranked to-do list: open claims in tiers, each with one next step | no |
 | [`recheck`](#recheck) | Anchors that moved, changed or were overturned since they were recorded | no |
 
+## Choosing the ledger
+
+Every tool also takes an optional `catalog` parameter: the ledger file for that call only, as
+an absolute path or one relative to the server's working directory. The call reads or writes
+that file, and anchors are pinned to `HEAD` of the git repository that holds it. Without
+`catalog`, the call uses the server's own [`--catalog`](cli.md).
+
+An MCP client starts claims-mcp once per session, so its `--catalog` names the ledger of the
+checkout the session started in. Pass `catalog` on every call when you work in another
+checkout, such as a git worktree or a subagent's branch; otherwise the calls write the
+session's ledger and pin that repository's commit. Because the choice is made per call, not
+stored in the server, agents sharing one connection can each work on their own ledger at the
+same time.
+
 ## add_claim
 
 | Parameter | Required | Meaning |
@@ -113,7 +127,7 @@ matrix; see [Traceability](../concepts/traceability.md#the-audit-report).
 
 ## recheck
 
-No parameters. Returns `head`, `checked`, `current`, and `items` for every anchor on an active
+No parameters besides `catalog`. Returns `head`, `checked`, `current`, and `items` for every anchor on an active
 claim that is not current, each with `claim`, `role`, `evidence`, `stance`, `anchor`, `status` and
 `detail`. See [Recheck](../concepts/anchors.md#recheck).
 

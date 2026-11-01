@@ -265,8 +265,20 @@ producer's account, and the core rule forbids using them as evidence.
 **Which ledger the server writes.** An MCP client starts claims-mcp once, and a relative
 `--catalog` resolves against the directory the session started in. If that is not the checkout
 the PR is built in (a git worktree, another clone), the MCP tools would write the wrong file and
-pin the wrong commit. In that case make every call through `scripts/claims_call.py`, which
-starts its own server for the ledger you name:
+pin the wrong commit. In that case pass `catalog` with the ledger's absolute path on **every**
+call, reads included:
+
+```json
+{"catalog": "/abs/path/to/checkout/claims.json", "tag": "from-issue:42"}
+```
+
+The call then reads or writes that ledger and pins anchors to `HEAD` of the repository that
+holds it. A call that leaves `catalog` out goes to the session's ledger, so one forgotten
+argument writes the wrong file; check with `git status` in both checkouts before committing.
+
+If the connected server is claims-mcp 0.2.4 or earlier, its tools have no `catalog` parameter
+(it is missing from their input schema) and silently ignore the argument. Then make every call
+through `scripts/claims_call.py`, which starts its own server for the ledger you name:
 
 ```bash
 python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json list_claims '{"tag": "from-issue:42"}'
