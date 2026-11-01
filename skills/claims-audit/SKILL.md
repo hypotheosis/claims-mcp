@@ -276,18 +276,31 @@ The call then reads or writes that ledger and pins anchors to `HEAD` of the repo
 holds it. A call that leaves `catalog` out goes to the session's ledger, so one forgotten
 argument writes the wrong file; check with `git status` in both checkouts before committing.
 
-Check the tools' input schemas first: if they have no `catalog` property, the connected server
-predates the argument and silently ignores it, so a call would write the session's ledger. (The
-released 0.2.4 and earlier lack it, but the version alone doesn't tell you, since unreleased
-builds report the last version.) Then make every call through `scripts/claims_call.py`, which starts its own server for the ledger you name:
+**Check that the connected server honours `catalog` before the first call that names one.** A
+server older than 0.2.5 does not have the argument and silently ignores it, so every call would
+go to the session's ledger. Neither the version nor the tool schema you see settles it: an
+unreleased build reports the last released version, and a client can keep showing the schema it
+loaded before the server was upgraded or reconnected. Ask the server instead, naming a ledger
+in a directory that does not exist:
 
-```bash
-python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json list_claims '{"tag": "from-issue:42"}'
-python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json < calls.json
+```json
+list_claims {"catalog": "/nonexistent-claims-probe/claims.json"}
 ```
 
-`calls.json` is a JSON list of `{"tool", "arguments"}`; the calls run in order and stop at the
-first error. The server pins anchors to `HEAD` of the repository holding the ledger.
+A server that supports `catalog` tries to open that ledger and fails with an error naming it
+("catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory").
+Go ahead **only if the error names `/nonexistent-claims-probe/`**. (Don't probe with an empty
+string: some clients drop an empty argument value before the call is sent.)
+
+Any other outcome means **stop**: make no further claims-mcp calls, and ask the user to upgrade
+claims-mcp and restart the session or reconnect the server (`/mcp` in Claude Code).
+
+- If the call **succeeds**, the server ignored the argument.
+- If it fails with an error that does not name the probe path, the result is inconclusive. An
+  older server ignores `catalog` and reads the session's ledger, and that read can fail for its
+  own reasons: a broken seal, an unsupported schema, or a lock or I/O problem.
+
+Either way, delete any `.claims.json.lock` the call left in the session's directory.
 
 ### Before the audit
 

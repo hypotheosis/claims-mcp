@@ -34,6 +34,14 @@ session's ledger and pin that repository's commit. Because the choice is made pe
 stored in the server, agents sharing one connection can each work on their own ledger at the
 same time.
 
+Servers before 0.2.5 don't have `catalog` and ignore it without an error, writing the session's
+ledger instead. To check the server you're connected to, call a read tool with `catalog` set to a
+ledger in a directory that doesn't exist, such as `/nonexistent-claims-probe/claims.json`: a server
+that supports the parameter fails to open it, with an error that names that path, and an older one
+answers as if it weren't there. Treat an error that doesn't name the probe path as inconclusive: an
+older server reading its own ledger can fail for unrelated reasons. The tool schema your client
+shows isn't proof, because a client can keep the schema from before the server was upgraded.
+
 ## add_claim
 
 | Parameter | Required | Meaning |
