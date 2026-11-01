@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 145,
+  "next_claim_seq": 157,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "43af11dffd2ca2da443a5641a6d28a3e2d912026db23ee36b7532b6229444d03"
+    "mac": "1470611817038642beb3705576eeee350a211de41aca8ab25aef984b6c9b943a"
   },
-  "next_evidence_seq": 257,
+  "next_evidence_seq": 277,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "2e4f4c4272b1c4cca09d0648bc400e713171466fc56fd3569deb686a758645b3"
+    "mac": "2e22e9cc0d344aae1b54229e6fe49d9fe0552b11dbc16f6272e4e0c39a9b3fa6"
   },
   "claims": [
     {
@@ -53,6 +53,42 @@
             "by": "server",
             "mac": "5b56697f3f8ead2dcc310eca151325c856af79df38995c9973cf9e3547b060a8"
           }
+        },
+        {
+          "id": "EVD-0266",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0120, which still counted retired CLM-0004. CLM-0004 (stdio tool surface) is retired and replaced by CLM-0145 (12 tools, supported), and CLM-0146 (PR for the spec update) is a new child. Trace down shows every active child supported: stdio and tool surface (0002, 0145), rmcp (0003), trace/FEVER/IEEE levels/gap reports (0010, 0012, 0014, 0015), skill and wiring (0016, 0017), spec conformance (0019, 0146), sealed JSON catalog (0037). The concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:42:18.057954720Z",
+          "seal": {
+            "by": "server",
+            "mac": "15029c883f482264f4fa3a18c365f42deb7638af80b014d0a45d19459eff4732"
+          }
+        },
+        {
+          "id": "EVD-0272",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0266, which named CLM-0145 (now retired). The tool-surface element is covered by CLM-0152 (supported, count-free). Every active child is supported: 0002, 0003, 0010, 0012, 0014, 0015, 0016, 0017, 0019, 0037, 0146, 0152.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:53:01.564361574Z",
+          "seal": {
+            "by": "server",
+            "mac": "6cd7b66fbaa31aa0a598ca0ab55b1164522361aa2ec63567ec434ce16d5fe890"
+          }
+        },
+        {
+          "id": "EVD-0276",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0272, which named the now-retired CLM-0146. Tool surface is covered by CLM-0152 and the PR's changes by CLM-0154, both supported. Every active child is supported: 0002, 0003, 0010, 0012, 0014, 0015, 0016, 0017, 0019, 0037, 0152, 0154.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:55:00.122259790Z",
+          "seal": {
+            "by": "server",
+            "mac": "48c25ab6e1e838ff7aa427dd526291f7d420b72292d7f42c0e6420b2c6b400d9"
+          }
         }
       ],
       "verdicts": [
@@ -81,13 +117,52 @@
             "by": "server",
             "mac": "b3100d870c8255bfd37fa0f0c6d0f57b659e86422d00f308cd357b6b49e50337"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-adjudicated because a child was retired (CLM-0004) and two added (CLM-0145, CLM-0146); the earlier roll-up EVD-0120 named the retired child. All 12 active children are supported and the replacement covers the same concept element (EVD-0266).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0266"
+          ],
+          "recorded_at": "2026-11-01T21:42:23.422927464Z",
+          "seal": {
+            "by": "server",
+            "mac": "a4ed7694914087f8483afea8511aefd5e4e1b9d5de6f4f465893b01e76240d43"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0145, now retired and replaced by CLM-0152; all active children are supported (EVD-0272).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0272"
+          ],
+          "recorded_at": "2026-11-01T21:53:07.420452863Z",
+          "seal": {
+            "by": "server",
+            "mac": "6888da2822005edbe79aa9259dd798148da42d358fb98a19a2d21cbc2b7b733e"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled: the prior roll-up cited retired CLM-0146; all active children, including CLM-0152 and CLM-0154, are supported (EVD-0276).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0276"
+          ],
+          "recorded_at": "2026-11-01T21:55:05.339008147Z",
+          "seal": {
+            "by": "server",
+            "mac": "9d266d42d435ec6a5653602246f737c6a0e6fb72807716ec00d1b58b559a3f8d"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:57:39.152891879Z",
+      "updated_at": "2026-11-01T21:55:05.339008147Z",
       "seal": {
         "by": "server",
-        "mac": "45b7e326c485a6c873a69cbe5f42ffad01828d9a3be3966a305d408103dac76a"
+        "mac": "033824626333c21095a3d38b594d3850efc1d911f2b29251d53c77e261161816"
       }
     },
     {
@@ -310,7 +385,9 @@
         "tools"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Stale: next_steps (c517669) and recheck (f160302) were added after this claim was written, so the server registers 12 tools, not 10 (EVD-0176). Retired on branch claims-mcp/fix-clm-0004, which also adds the missing next_steps row to spec section 4. A replacement claim for the 12-tool surface is recorded in the audit of that change.",
+        "retired_at": "2026-11-01T21:39:11.489301582Z"
       },
       "evidence": [
         {
@@ -402,10 +479,10 @@
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-11-01T15:52:22.448956077Z",
+      "updated_at": "2026-11-01T21:39:11.489301582Z",
       "seal": {
         "by": "server",
-        "mac": "e7b377e30bf2f440790d3869dfefe75c7f1cdb646d542b007be017a1219c3fba"
+        "mac": "5b46d127971b0f26e0cd8b19f75380fbcef24b42e431958f133b7e719d6a1c5c"
       }
     },
     {
@@ -11529,6 +11606,914 @@
       "seal": {
         "by": "server",
         "mac": "556981d1060d9facd6d4125d3781984880ff9441b879fb29fcd04eecccfcbcbd"
+      }
+    },
+    {
+      "id": "CLM-0145",
+      "statement": "tools/list returns exactly the 12 tools of spec section 4: add_claim, add_claims, get_claim, list_claims, update_claim, retire_claim, add_evidence, record_verdict, trace, audit_report, next_steps, recheck",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "tools",
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a count. The maintainer decided on 2026-11-01 that a tool count is not a claim worth keeping, because it goes stale whenever a tool is added (issue #40). brooke-reviews also asked on PR #39 for source = \"spec section 4\". The replacement says tools/list returns exactly the tools listed in the spec's section 4 table.",
+        "retired_at": "2026-11-01T21:52:05.339119137Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0257",
+          "kind": "test",
+          "locator": "cargo test registers_all_twelve_tools (1 passed); src/server.rs:731-757",
+          "summary": "Ran at 4ed898f: 1 passed. Read the assertion: assert_eq! of the sorted names from tool_router.list_all() against the full 12-name vec (add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim), so no extra or missing tool.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 731,
+                "end": 757
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:18.814865087Z",
+          "seal": {
+            "by": "server",
+            "mac": "2e306240b82f850cd27042d548c64b5a6e50cd99034d73d52bfca97db785d87e"
+          }
+        },
+        {
+          "id": "EVD-0258",
+          "kind": "demonstration",
+          "locator": "cargo build; initialize + tools/list over stdio to target/debug/claims-mcp --catalog <tmp>/c.json at 4ed898f",
+          "summary": "Real tools/list response (id 2) held exactly 12 tools: add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim. No others.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:18.835434324Z",
+          "seal": {
+            "by": "server",
+            "mac": "e4501452fffba5fc296757d81d1abca49ac5afc6fde9258926b3d0e6410e5cfb"
+          }
+        },
+        {
+          "id": "EVD-0259",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:177-188",
+          "summary": "Section 4 table at HEAD has 12 rows, one per tool in the claim: add_claim through audit_report (10), then next_steps (187) and recheck (188). The name set equals the tools/list result.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:18.851765855Z",
+          "seal": {
+            "by": "server",
+            "mac": "47850a90b597d8d6885e480bcdbe23ba83c1928e4a4f157131d22b4e133d61b1"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test asserts the exact 12-name set (EVD-0257), the live stdio tools/list returned the same 12 (EVD-0258), and the spec table lists the same 12 (EVD-0259). No refuting evidence.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0257",
+            "EVD-0258",
+            "EVD-0259"
+          ],
+          "recorded_at": "2026-11-01T21:41:21.559875978Z",
+          "seal": {
+            "by": "server",
+            "mac": "e76f09b1194971e17f7587fb2e3b25f5cad423e4448f2f11db6f131086cd821f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:11.764741834Z",
+      "updated_at": "2026-11-01T21:52:05.339119137Z",
+      "seal": {
+        "by": "server",
+        "mac": "fd6b956a34b58dea818577d823bd4d5d97371853943c3c4ec4586179b624d044"
+      }
+    },
+    {
+      "id": "CLM-0146",
+      "statement": "The PR for retiring CLM-0004 does what its description says: the spec matches the 12-tool, per-call-catalog server and the stale claim is retired",
+      "kind": "documentation",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a tool count (replaced by CLM-0154), per issue #40 and the rewritten PR description.",
+        "retired_at": "2026-11-01T21:54:35.882974841Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0265",
+          "kind": "analysis",
+          "locator": "children of CLM-0146",
+          "summary": "The children check each factual statement in the PR description: the section 4 row, the section 4 catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, and the gates. All are supported, so the spec matches the 12-tool, per-call-catalog server and the stale claim is retired.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:42:11.089259488Z",
+          "seal": {
+            "by": "server",
+            "mac": "55260b89a7bfd177b09cf714eed7bcd3366ce18c0d6ac7511b1e8eca4ac8b176"
+          }
+        },
+        {
+          "id": "EVD-0271",
+          "kind": "analysis",
+          "locator": "children of CLM-0146",
+          "summary": "Supersedes EVD-0265 now that CLM-0153 (changelog wording) is a child. The children check the section 4 row, the catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, the gates and the changelog's account of the replacement; all supported.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:53:01.550225032Z",
+          "seal": {
+            "by": "server",
+            "mac": "18ca9a1a45abf909f0a88d89ad0e7690a010a2b302f3d17b83379850e4589995"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All five active children are supported (EVD-0265).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0265"
+          ],
+          "recorded_at": "2026-11-01T21:42:18.006935549Z",
+          "seal": {
+            "by": "server",
+            "mac": "488d799c2968615e0a94be24d4d00d41c782f62a74ea67baab166a30aae8f8e6"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled: all six active children, including new CLM-0153, are supported (EVD-0271).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0271"
+          ],
+          "recorded_at": "2026-11-01T21:53:07.405708988Z",
+          "seal": {
+            "by": "server",
+            "mac": "d571223633e1e7a16867f070357f378eb9ae3981b7278e041fd35054934a09ec"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:35.882974841Z",
+      "seal": {
+        "by": "server",
+        "mac": "71d3e654a479a466c79e5e5ccddcd2cfd824dc1a70b14096877a7d9e93ff9b89"
+      }
+    },
+    {
+      "id": "CLM-0147",
+      "statement": "PR description: spec section 4 gains the missing next_steps row, so its table lists all 12 tools the server registers",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds the missing `next_steps` row, so the table lists all 12 tools the server registers.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0146"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a tool count (replaced by CLM-0155), per issue #40 and the rewritten PR description.",
+        "retired_at": "2026-11-01T21:54:35.869154178Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0260",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:187; git diff origin/main..HEAD; src/report/next_steps.rs:36-47",
+          "summary": "The diff adds only the next_steps row (line 187); the table at HEAD has 12 rows and matches the 12 tools returned by a live tools/list (EVD-0258). The row's returned keys (integrity, summary, wrong, unproven, other) are the NextSteps struct fields.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.335030693Z",
+          "seal": {
+            "by": "server",
+            "mac": "44e37f176fb036ac06b2c02346278396f8c11630d357d5abd4645a18609ae164"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The diff adds the next_steps row and the table now has 12 rows equal to the live tools/list (EVD-0260).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0260"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.118080938Z",
+          "seal": {
+            "by": "server",
+            "mac": "ca89907081a437c1c9d1fd50f92ae7525afe856f0faac083c0f1fbd723331dcb"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:35.869154178Z",
+      "seal": {
+        "by": "server",
+        "mac": "6e800c1312051d73338149984ce7a3727db2c2f96e2db0b521fe76f58eddf98a"
+      }
+    },
+    {
+      "id": "CLM-0148",
+      "statement": "PR description: spec section 4 gains a paragraph saying every tool takes an optional per-call catalog argument, as added in 0.2.5 (#31), and the paragraph matches the server's behavior",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds a paragraph on the per-call `catalog` argument from 0.2.5 (#31).\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 189,
+          "end": 192
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0261",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:189-192; src/server.rs:37-46,410-416; Cargo.toml version",
+          "summary": "The paragraph says each tool takes an optional catalog (absolute or relative to server cwd), anchors pin HEAD of that repo, no catalog uses --catalog. OnLedger<T> adds optional catalog to every tool, Cargo.toml is 0.2.5, and the ledger for 0.2.5 per-call catalog was merged in PR #34 for issue #31. Verified live: the probe call with catalog failed naming the probe path.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 189,
+                "end": 192
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.371238039Z",
+          "seal": {
+            "by": "server",
+            "mac": "6fb0c82a3e804a0d99b6f9b96bc507f03e90de314bf1fb947cece2f7d549f292"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The added paragraph matches the code (OnLedger on every tool, 0.2.5) per EVD-0261.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0261"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.132367301Z",
+          "seal": {
+            "by": "server",
+            "mac": "99efd3d81f8311b61942a23b42bd799aef307f339ff8ed5c872045a54119510b"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.004558430Z",
+      "seal": {
+        "by": "server",
+        "mac": "cda9a33c9e48fb620b7c322d825d9f8070270a58390e988ccc6f2cf8cc688e88"
+      }
+    },
+    {
+      "id": "CLM-0149",
+      "statement": "PR description: the section 2 non-goal \"multiple catalogs per server instance\" contradicted #34 and now says what still holds (no catalog is selected and held in server state)",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 2: the non-goal 'multiple catalogs per server instance' contradicted #34. It now says what still holds: no catalog is selected and held in server state.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 27,
+          "end": 33
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0262",
+          "kind": "inspection",
+          "locator": "git show 4ed898f~1:docs/superpowers/specs/2026-10-23-claims-mcp-design.md lines 29-31 vs 4ed898f lines 29-32; src/server.rs:37-46",
+          "summary": "Before: 'Multiple catalogs per server instance. One server serves one catalog file'. Since PR #34 any call can name another ledger, so that was false. After: a non-goal of a catalog selected and held in server state, with a default --catalog and a per-call override lasting that call only. That matches OnLedger<T>, where catalog is a per-call Option with no state kept.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 27,
+                "end": 33
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.388625885Z",
+          "seal": {
+            "by": "server",
+            "mac": "b839ba5ac0dc0d08a564aaa3bd9c9d75cf2bdd176fb47b67e4ad6edfff131d0c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The old non-goal was false after per-call catalog; the new wording matches the per-call, stateless design (EVD-0262).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0262"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.146496154Z",
+          "seal": {
+            "by": "server",
+            "mac": "b4838e57557d04579d87482e6bdcd7c1d7e11972e973131c980b3efe7ac2c6f4"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.019234025Z",
+      "seal": {
+        "by": "server",
+        "mac": "d32eb5b49c83d8c4de12301136f5ce1c25d25d65e5c3eea919d82bee93b93a22"
+      }
+    },
+    {
+      "id": "CLM-0150",
+      "statement": "PR description: CLM-0004 is retired with a reason, and it went stale when next_steps (c517669) and recheck (f160302) were added",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"CLM-0004 says tools/list returns 'exactly the 10 tools'. It went stale when next_steps (c517669) and recheck (f160302) were added ... CLM-0004 is retired with a reason.\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0263",
+          "kind": "inspection",
+          "locator": "get_claim CLM-0004 (status retired, reason); git show c517669 / f160302 -- src/server.rs",
+          "summary": "CLM-0004 status is retired with a reason naming next_steps (c517669) and recheck (f160302). Commit c517669 'feat: next_steps MCP tool' adds the next_steps handler and f160302 adds recheck; both are ancestors of main (618bdfc), so the 10-tool statement was already false before this PR.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:58.402988308Z",
+          "seal": {
+            "by": "server",
+            "mac": "4f2d1f5dd19079963563b2c12002adbe9cb11172d2e520bb4cb2e82bb011f53a"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "CLM-0004 is retired with a reason, and the two commits it cites did add the tools before this PR (EVD-0263).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0263"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.160366996Z",
+          "seal": {
+            "by": "server",
+            "mac": "de7804912fbde32e5a04ee07eca8b9d2b618b4a31bf9976ba66895c161543930"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.033956650Z",
+      "seal": {
+        "by": "server",
+        "mac": "e2af86025eca2431b42386e5c92332de4678b6d22c4ed27faec4280eec19f0ff"
+      }
+    },
+    {
+      "id": "CLM-0151",
+      "statement": "PR description: fmt, clippy -D warnings and the test suite pass (175 passed), and registers_all_twelve_tools passes (1 passed)",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description Validation: \"just fmt, cargo clippy --all-targets -- -D warnings, just test (175 passed), cargo test registers_all_twelve_tools (1 passed)\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0264",
+          "kind": "test",
+          "locator": "cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test; cargo test registers_all_twelve_tools (all at 4ed898f)",
+          "summary": "Reran at HEAD 4ed898f: fmt --check exit 0, clippy -D warnings exit 0, cargo test 175 passed 0 failed, registers_all_twelve_tools 1 passed.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:58.416478769Z",
+          "seal": {
+            "by": "server",
+            "mac": "fc5234e10e2f069ed0cf5b661c5c06fd5fe3f7b037533e6d3da61e2f21738602"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every gate was rerun at HEAD with the counts the description states (EVD-0264).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0264"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.173543306Z",
+          "seal": {
+            "by": "server",
+            "mac": "bcca88db658417dc736fd76834c5cf8b7d19f764224b7168f708f760fa449c77"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.048115154Z",
+      "seal": {
+        "by": "server",
+        "mac": "9c4829ce336bf5fd098eb33d2b7cdb56e5cd9176f84f1a04a414fc733fed19d4"
+      }
+    },
+    {
+      "id": "CLM-0152",
+      "statement": "tools/list returns exactly the tools listed in the design spec's section 4 table",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec section 4",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "tools",
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0267",
+          "kind": "test",
+          "locator": "cargo test registers_all_twelve_tools (1 passed) at 400b5c2; src/server.rs:731-757",
+          "summary": "The assertion compares the sorted tool_router names to an explicit name list, so no tool is extra or missing against that list; its list equals the spec table's names (see live set comparison).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 731,
+                "end": 757
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.708974096Z",
+          "seal": {
+            "by": "server",
+            "mac": "df63ba956ebb29b790ac3d7a48dc848fda10f8fcf436e1e86df3f50415463dc2"
+          }
+        },
+        {
+          "id": "EVD-0268",
+          "kind": "demonstration",
+          "locator": "stdio initialize + tools/list to target/debug/claims-mcp at 400b5c2; diff of sorted live names vs names parsed from spec lines 177-188",
+          "summary": "Sorted tool names from the live tools/list response and sorted first-column names of the spec section 4 table rows are identical (diff empty). No tool is in one and not the other.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:52:51.723107328Z",
+          "seal": {
+            "by": "server",
+            "mac": "5ae5236e5fc5a1061b6dc18943e1904d4d020c2195a799e3779b561d8c69995f"
+          }
+        },
+        {
+          "id": "EVD-0269",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:177-188",
+          "summary": "The section 4 table rows at HEAD are the tools the claim refers to; the statement and its source (\"spec section 4\") contain no tool count, so adding a tool and its row keeps it true.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.736898990Z",
+          "seal": {
+            "by": "server",
+            "mac": "d516d75e8a33d377659cd888aff6b8cca47587bdb1e13d327d92816b27cf0c88"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test (EVD-0267) and a live tools/list set comparison against the spec table rows (EVD-0268) both match; the statement is count-free (EVD-0269).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0267",
+            "EVD-0268",
+            "EVD-0269"
+          ],
+          "recorded_at": "2026-11-01T21:53:01.521664495Z",
+          "seal": {
+            "by": "server",
+            "mac": "c31106ce93882ef3a02c553ded32ce2ce19de2b9f6f0e8ef6ef56399dd0b5262"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:52:38.331446662Z",
+      "updated_at": "2026-11-01T21:53:01.521664495Z",
+      "seal": {
+        "by": "server",
+        "mac": "747288fc8f22e4b574e994e83b86b3f3137e2ca8c2cfae106295455a084aa81e"
+      }
+    },
+    {
+      "id": "CLM-0153",
+      "statement": "Changelog entry: the replacement for CLM-0004 says tools/list returns exactly the tools in the spec's section 4 table, with source \"spec section 4\" and a source anchor on that table, and states no count",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "changelog/2026-11-01T21-39-06Z.md at 400b5c2: \"Its replacement says `tools/list` returns exactly the tools listed in the spec's section 4 table, with `source` \\\"spec section 4\\\" and a source anchor on that table. It states no count\"",
+      "source_anchor": {
+        "path": "changelog/2026-11-01T21-39-06Z.md",
+        "lines": {
+          "start": 7,
+          "end": 11
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "changelog/2026-11-01T21-39-06Z.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0270",
+          "kind": "inspection",
+          "locator": "changelog/2026-11-01T21-39-06Z.md:7-11; get_claim CLM-0152",
+          "summary": "The changelog sentence says the replacement states the section 4 table's tools, source \"spec section 4\", anchor on the table, no count. CLM-0152 has exactly that statement (no number), source \"spec section 4\", and source_anchor on spec lines 177-188. The first bullet's \"lists all 12 tools\" refers to the spec table, not the claim.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "changelog/2026-11-01T21-39-06Z.md",
+              "lines": {
+                "start": 7,
+                "end": 11
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.751003962Z",
+          "seal": {
+            "by": "server",
+            "mac": "c3503dbdcb8db66334488e976ede0307700f3915a972ace5f10e39bee51e5031"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The changelog's description of the replacement matches CLM-0152's statement, source and anchor (EVD-0270).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0270"
+          ],
+          "recorded_at": "2026-11-01T21:53:01.536689982Z",
+          "seal": {
+            "by": "server",
+            "mac": "a73193f62a17d29cc512d554c758f8e50de46245f4f318988a76d43ac20c66b3"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:52:42.153516763Z",
+      "updated_at": "2026-11-01T21:54:31.062117137Z",
+      "seal": {
+        "by": "server",
+        "mac": "2a7dfe9381d23507aa55e8ba14a912e1fec1d7230ffb874cef3f5bd86a5d800d"
+      }
+    },
+    {
+      "id": "CLM-0154",
+      "statement": "The PR for retiring CLM-0004 does what its description says: the spec's section 4 tool table and per-call `catalog` text match the server, and the stale claim is retired",
+      "kind": "documentation",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0275",
+          "kind": "analysis",
+          "locator": "children of CLM-0154",
+          "summary": "Replaces the roll-up of the retired CLM-0146. The children check the section 4 table row, the catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, the gates, the changelog's account of the replacement, and the retirement of the counted claims. All are supported, so the spec's tool table and catalog text match the server and the stale claim is retired.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:55:00.111033099Z",
+          "seal": {
+            "by": "server",
+            "mac": "b194a060f01f9fffbf91bea83354a8c33be06191e5c4f6e72e409d5ac161ba28"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All six active children (0148, 0149, 0150, 0151, 0153, 0155, 0156) are supported (EVD-0275).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0275"
+          ],
+          "recorded_at": "2026-11-01T21:55:05.324700045Z",
+          "seal": {
+            "by": "server",
+            "mac": "56a78a9c61a257b0011a80ba99843d0e295e92ff28151d4b6add70caee1fc126"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:05.324700045Z",
+      "seal": {
+        "by": "server",
+        "mac": "5f072788e1afd70f528bf5ffe4adaabbc2438c38ae39faaa00658dc38d70dd97"
+      }
+    },
+    {
+      "id": "CLM-0155",
+      "statement": "PR description: spec section 4 gains the missing next_steps row, so its table lists every tool the server registers",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds the missing `next_steps` row, so the table lists every tool the server registers.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0273",
+          "kind": "demonstration",
+          "locator": "git diff origin/main..HEAD -- spec (one added table row); live stdio tools/list at 400b5c2 vs spec lines 177-188 names",
+          "summary": "The diff adds exactly one table row, next_steps (line 187). Sorted names of the live tools/list response equal the sorted names of the section 4 table rows (diff empty), so the table lists every registered tool and no other.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:54:52.230180956Z",
+          "seal": {
+            "by": "server",
+            "mac": "8241b07fc228282ae119e4cb373ab8b5974490681d3ffa4209e7011a3cbd9d7b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The diff adds the next_steps row and the table's names equal the live tools/list set (EVD-0273).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0273"
+          ],
+          "recorded_at": "2026-11-01T21:55:00.086892251Z",
+          "seal": {
+            "by": "server",
+            "mac": "4098b79924b5a4eec05d84aec403668f29916cc9fa8bfe6454bc69da1f44fc89"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:00.086892251Z",
+      "seal": {
+        "by": "server",
+        "mac": "cc368b559bf56a2a9e80f0bbc94eaa2e0c09a12b0579bf2e931c5452e2903281"
+      }
+    },
+    {
+      "id": "CLM-0156",
+      "statement": "PR description: CLM-0145 and the two claims that quoted the description's counts were retired and replaced with versions that state no count",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"After review, CLM-0145 (the first replacement, which said 'exactly the 12 tools') and the two claims that quoted this description's counts were also retired and replaced with versions that state no count.\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0274",
+          "kind": "inspection",
+          "locator": "list_claims tag change:fix-clm-0004 include_retired; get_claim CLM-0145, CLM-0146, CLM-0147",
+          "summary": "CLM-0145, CLM-0146 and CLM-0147 (the three claims whose statements carried a tool count) are retired, each with a reason naming issue #40. Their count-free replacements CLM-0152, CLM-0154 and CLM-0155 are active, and no active claim with the tag states a tool count in its statement.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:54:52.244074296Z",
+          "seal": {
+            "by": "server",
+            "mac": "4a9e99bd347802174e93e0991aac1ad804d0de79510b4c8cadd7207342c9c1d6"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The three counted claims are retired and count-free replacements are active (EVD-0274).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0274"
+          ],
+          "recorded_at": "2026-11-01T21:55:00.099925559Z",
+          "seal": {
+            "by": "server",
+            "mac": "9f76187507762ac4af9ca40ae1cbad86da94f05f8e708222f3db41f840d11697"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:00.099925559Z",
+      "seal": {
+        "by": "server",
+        "mac": "db0161d6f66e815464a5bd479f20ff59e4923aae1c38ac59b3f68db89eac0559"
       }
     }
   ]
