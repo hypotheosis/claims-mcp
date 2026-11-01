@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 130,
+  "next_claim_seq": 131,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "18cc5d9d3cea4e922664e2ca19d602137231ecbe5f3a0e6a3f2c4d034f557704"
+    "mac": "1bc9042149cf5915287706f44e3bbbed65d7af398c8202c8abbc18d575b2296c"
   },
-  "next_evidence_seq": 225,
+  "next_evidence_seq": 235,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "46cb3a7a21dafc1732caf0a5799b05021f89349c8f3e2aee087e2de4174a624f"
+    "mac": "eaf4acbbadedaa65ccbd2b6bb5eca75309df411bc3e27c7b808061f23446b556"
   },
   "claims": [
     {
@@ -8272,6 +8272,28 @@
             "by": "server",
             "mac": "3b0437d0b5299970d0b1173a194d85b3e606fbfdba2dff400d8613dc87a9056e"
           }
+        },
+        {
+          "id": "EVD-0234",
+          "kind": "analysis",
+          "locator": "children of CLM-0105 (head 59c65ae)",
+          "summary": "After the review commits every child is supported, including the corrected test-count claim and the re-judged CLM-0115, 0116, 0121, 0123, 0127 and 0128; CLM-0108 is retired and replaced. The children cover the replay command, the id mapping, the refusals and the docs.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 107,
+                "end": 141
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.983964699Z",
+          "seal": {
+            "by": "server",
+            "mac": "b24caed2aa3477492cf36adf7a75feb32657538f0ac25e44d9b66278823ea07e"
+          }
         }
       ],
       "verdicts": [
@@ -8287,13 +8309,26 @@
             "by": "server",
             "mac": "15f797346e0a9d1834c5d3196e940012eee67c43565fed137816e1485e10915e"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "All active children are supported at head 59c65ae, and the analysis item records how they cover the parent.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0234"
+          ],
+          "recorded_at": "2026-11-01T19:18:06.026549501Z",
+          "seal": {
+            "by": "server",
+            "mac": "2dcf561624cf25fa11ebc1c4a1fa4b062c8a67bc01ad2c270993c771e85adf62"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:53.254387430Z",
+      "updated_at": "2026-11-01T19:18:06.026549501Z",
       "seal": {
         "by": "server",
-        "mac": "ecfcdf72e88d588965f13f61bbeb8088657ed4f48dda0eb254f8ad3a2ebfad1e"
+        "mac": "0339c5aebe420e0ddaf64199fa4e243a7c4eef4e505356220a8ce3d22dc3d8dd"
       }
     },
     {
@@ -8460,7 +8495,9 @@
         "from-issue:32"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "The PR description's test counts changed after review (171 -> 175 tests, 13 -> 16 rebase tests); a corrected claim records the new counts instead of editing this one.",
+        "retired_at": "2026-11-01T19:18:05.207283827Z"
       },
       "evidence": [
         {
@@ -8492,10 +8529,10 @@
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:33.365442102Z",
+      "updated_at": "2026-11-01T19:18:05.207283827Z",
       "seal": {
         "by": "server",
-        "mac": "82c033dc1a358f6e97587eda7db63475305c969fb642821712ee31fa5c95f94d"
+        "mac": "3e5085c4b9cf97f42675febd38c89069f672dba54845fb6ad7d28bed96aeb1bd"
       }
     },
     {
@@ -8939,6 +8976,28 @@
             "by": "server",
             "mac": "84c6d2a71c47ddd83746978d325d37b3e7e825c2c1ca4ba2dc5a4199b60eb484"
           }
+        },
+        {
+          "id": "EVD-0228",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::a_tampered_input_is_refused (src/rebase.rs:806-817) and a_tampered_onto_or_base_is_refused (src/rebase.rs:819-833), head 59c65ae",
+          "summary": "Both pass. The new test tampers a ledger and asserts '--onto catalog fails its integrity check' for onto and '--base catalog fails its integrity check' for base, so all three inputs are now covered by unit tests.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 819,
+                "end": 833
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.465131844Z",
+          "seal": {
+            "by": "server",
+            "mac": "8c3dc6cddaaf611f61e33102197377f8e679a9323a1e48396229f75496fdb074"
+          }
         }
       ],
       "verdicts": [
@@ -8954,13 +9013,26 @@
             "by": "server",
             "mac": "fb14606322c8077eba29552ee7ad6e0acf196926ecf75e3f5328e3bb5947f6db"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the earlier branch-tamper test is unchanged and a new test covers tampered --onto and --base, all refusing with the integrity message.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0228"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.505890720Z",
+          "seal": {
+            "by": "server",
+            "mac": "739d11c16bb056c6259a60991370c93b75ef1a7abb5d4e46324d0e848dc9f5e3"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:33.649646418Z",
+      "updated_at": "2026-11-01T19:18:05.505890720Z",
       "seal": {
         "by": "server",
-        "mac": "974fad0c2028e5b9cdfb29bb7ab1aac8b07c0bdd8c54d69e1b72ea9019ee9870"
+        "mac": "88bb835d99ba1a9d8cbe315d59a5d1eda70fafaebb1eff2b6f2bc49d73260b49"
       }
     },
     {
@@ -9027,6 +9099,28 @@
             "by": "server",
             "mac": "ab1fe998360ede257286398ad9356e2a16098cd493ae8d9580868fae860e99da"
           }
+        },
+        {
+          "id": "EVD-0229",
+          "kind": "inspection",
+          "locator": "src/rebase.rs:120-129 (head 59c65ae)",
+          "summary": "A claim below --base's counter but missing from --base now returns a rebase refusal 'does not descend from --base' instead of a generic lookup error. The tests a_base_newer_than_the_branch_is_refused and a_base_that_is_not_the_merge_base_is_refused (src/rebase.rs:893-910) still pass in the 16.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 120,
+                "end": 129
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.550411478Z",
+          "seal": {
+            "by": "server",
+            "mac": "926d8424676b907c571f547a5de61e3c2831123d4934778afe7a856d1e09dabe"
+          }
         }
       ],
       "verdicts": [
@@ -9043,13 +9137,26 @@
             "by": "server",
             "mac": "2c26e8b943c03124550f2c5c11fd3287e74c2d8d0647b66df8a9420aefddd056"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the descendancy refusals are unchanged and the new missing-claim path also reports that the branch does not descend from --base.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0229"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.591964636Z",
+          "seal": {
+            "by": "server",
+            "mac": "194460b9c38fd6ed79342bc8ea614d0d4cf45470dcb694de0dd3d6915fc1cae3"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:33.690976027Z",
+      "updated_at": "2026-11-01T19:18:05.591964636Z",
       "seal": {
         "by": "server",
-        "mac": "a24ac9c912eb6e108c80a2abe1f53db2a47949f20f3a6e4ae6d93eae660bc8d3"
+        "mac": "67bb1ecfac64cde9263d296a21e15ee9d0054b872ae9f64d5c0f5576421be168"
       }
     },
     {
@@ -9384,6 +9491,28 @@
             "by": "server",
             "mac": "e1351e5e883070afa3c2dccb77df3e1cdfdc6d5f3da9478a4e0b24949c82fb41"
           }
+        },
+        {
+          "id": "EVD-0230",
+          "kind": "test",
+          "locator": "cargo test store::tests::load_file_reads_without_leaving_a_lock_file (src/store.rs:289-307), head 59c65ae",
+          "summary": "Test removes the store's lock, calls load_file on an existing and a missing path, and asserts neither .claims.json.lock nor .absent.json.lock exists afterward.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 289,
+                "end": 307
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.637334467Z",
+          "seal": {
+            "by": "server",
+            "mac": "43029ea4b4993957fc0ec4ee7bf2b44068c11779257bd542ea0be4cc5cb8c209"
+          }
         }
       ],
       "verdicts": [
@@ -9400,13 +9529,26 @@
             "by": "server",
             "mac": "c7604c3b2927e71821170f412c3dcbb3f4b09ce0e7455db5a42ebf01cb9b5ad7"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "A unit test now asserts load_file leaves no lock file, on top of my earlier scratch-directory observation.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0230"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.679440137Z",
+          "seal": {
+            "by": "server",
+            "mac": "3c129d08e08f01329be52d2d427b974fcfc388eed0f03dc1c677a588865084bb"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:33.890947250Z",
+      "updated_at": "2026-11-01T19:18:05.679440137Z",
       "seal": {
         "by": "server",
-        "mac": "3bce4403d36899129dbb6c5b27e8bc457289d7f5a41b0ac571ae0759a45288c5"
+        "mac": "2a14e170422a950afb8e54186fae470abbae4d7043f24b12a8087928217a891b"
       }
     },
     {
@@ -9529,6 +9671,28 @@
             "by": "server",
             "mac": "5697b5d7894ab6fa314a457154826ca8e79b76a6c7b1f6aa52b6e555ae641375"
           }
+        },
+        {
+          "id": "EVD-0232",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::an_existing_claim_relinked_to_a_new_claim_follows_its_new_id (src/rebase.rs:836-868), head 59c65ae",
+          "summary": "The branch relinks existing CLM-0001 to its own new CLM-0003 while main also added a CLM-0003; the rebased link points at CLM-0004 (the branch's claim), not main's CLM-0003.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 836,
+                "end": 868
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.811028964Z",
+          "seal": {
+            "by": "server",
+            "mac": "d786fd7f898973640b9f4655868e0a1725b3e23a8083e46884094f6319edbc1d"
+          }
         }
       ],
       "verdicts": [
@@ -9545,13 +9709,26 @@
             "by": "server",
             "mac": "a4b15351c43109b15789681c9fd3ba99c6a4cbc608e593f1e76e88bb7f943c9e"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "A new test covers the relink case, so derived_from rewriting is tested for existing claims too; earlier evidence still holds.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0232"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.853413375Z",
+          "seal": {
+            "by": "server",
+            "mac": "d932b4e42a60bdb86674441ef15ad869433139cced128a9fa1c395c66672ebb1"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:33.968423481Z",
+      "updated_at": "2026-11-01T19:18:05.853413375Z",
       "seal": {
         "by": "server",
-        "mac": "99f87284b308294df68124f01880f676469a44731f96910df414cff352ba5fd7"
+        "mac": "04842fea49d8926ec1498b03ac1f05344e333c5c4b64dbff758311ebac420d60"
       }
     },
     {
@@ -9854,6 +10031,28 @@
             "by": "server",
             "mac": "fff26776d7d6d9b97cdf7871ee09e3a74f7e172e5adfa324b033895201562f79"
           }
+        },
+        {
+          "id": "EVD-0231",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::a_retirement_on_the_branch_is_replayed_next_to_main_evidence (src/rebase.rs:871-890), head 59c65ae",
+          "summary": "Branch retires CLM-0002 while main added evidence and a verdict to it; the rebased ledger verifies, the claim is inactive, keeps main's evidence and verdict, and updated_at is the branch's. a_field_change_on_one_side_is_kept covers update_claim (now src/rebase.rs:707-729).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 871,
+                "end": 890
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.725721210Z",
+          "seal": {
+            "by": "server",
+            "mac": "f75066127841d740415df80b4bf95f9abd00d89511df6fe4cde2e97c79abb8e1"
+          }
         }
       ],
       "verdicts": [
@@ -9870,13 +10069,26 @@
             "by": "server",
             "mac": "66636dee7bb4f569c25b0ba28fcff50ddc0f9aa142f4fa0b215970484e9a6b14"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "retire_claim replay now has a unit test as well as my scratch run; update_claim replay was already tested.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0231"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.766709467Z",
+          "seal": {
+            "by": "server",
+            "mac": "bcf591a6c1e86e0ec5ae2b98621d3b713f9cb54c6504f542a10b8c98a4a6357f"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:34.133697956Z",
+      "updated_at": "2026-11-01T19:18:05.766709467Z",
       "seal": {
         "by": "server",
-        "mac": "918c8aa56b378b66a9882a11a405f545a2ef4111685cb5a7cdb9e6e5ae190458"
+        "mac": "93f595cebb43e5a0e8355b63840a349b00e0953cdeccdf2f1924cdeb8cdf97ca"
       }
     },
     {
@@ -9923,6 +10135,28 @@
             "by": "server",
             "mac": "d42b68e13d855948a975def55a3a5eb2e4e25f95e8ac8be260eb3a590a17d301"
           }
+        },
+        {
+          "id": "EVD-0233",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:383-398 (head 59c65ae)",
+          "summary": "The skill's rebase snippet now starts with TMP=$(mktemp -d), so $TMP in the following lines is defined; the snippet still has the merge, rebase and verify steps and the fallback text.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 383,
+                "end": 398
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.898489974Z",
+          "seal": {
+            "by": "server",
+            "mac": "9305ef23c8eddab9d8e2188f8bc5e95e9caa5ed40866fb9167fa2bd111b3c6bd"
+          }
         }
       ],
       "verdicts": [
@@ -9938,13 +10172,26 @@
             "by": "server",
             "mac": "24423374890d439e7c2f0920e660a202382e1de71b49f4b2d8f64be3b8ca492c"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the skill section still documents rebase and its snippet now defines $TMP; the guide and other docs were not changed by these commits.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0233"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.939360641Z",
+          "seal": {
+            "by": "server",
+            "mac": "79d64c930f5d5b1c0b98ad56524a5d6982c0beff39e43db6a1d6821d129d99a0"
+          }
         }
       ],
       "created_at": "2026-11-01T19:09:18.370782726Z",
-      "updated_at": "2026-11-01T19:10:34.171684434Z",
+      "updated_at": "2026-11-01T19:18:05.939360641Z",
       "seal": {
         "by": "server",
-        "mac": "f6cd694c55832bd2fc4f8ddc32071eecb6c068f4bdd8c5707f5d33b0415f3249"
+        "mac": "3880f9ef747e9918caed402f4d6ab0778aa56c641bee855fa704c99fde5ff5ea"
       }
     },
     {
@@ -10007,6 +10254,100 @@
       "seal": {
         "by": "server",
         "mac": "02f3677583ab57437fbf8e82b50f3088a41481f5a0e311a4e93c4434079a9561"
+      }
+    },
+    {
+      "id": "CLM-0130",
+      "statement": "PR description: `just test` passes with 175 tests, including 16 new `rebase::tests`, one CLI output test, and a `store::load_file` test",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: `just test` ✅ (175 passed, including 16 new `rebase::tests`, one CLI output test, and a `store::load_file` test)",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs",
+        "src/store.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0225",
+          "kind": "test",
+          "locator": "cargo test (head 59c65ae)",
+          "summary": "test result: ok. 175 passed; 0 failed; 0 ignored.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:18:05.291273976Z",
+          "seal": {
+            "by": "server",
+            "mac": "68ec2c736fc9befd8780ab057a3be60751989b8f14ed05752c79887beed573b6"
+          }
+        },
+        {
+          "id": "EVD-0226",
+          "kind": "test",
+          "locator": "cargo test rebase:: (head 59c65ae)",
+          "summary": "test result: ok. 16 passed; 0 failed (159 filtered out).",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:18:05.332036252Z",
+          "seal": {
+            "by": "server",
+            "mac": "274efaddfb87a58688bea1a118359eff8c16409a1b70c84af780a97dc968d6a0"
+          }
+        },
+        {
+          "id": "EVD-0227",
+          "kind": "test",
+          "locator": "cargo test load_file (head 59c65ae); src/store.rs:289-307",
+          "summary": "store::tests::load_file_reads_without_leaving_a_lock_file passed (1 passed). The CLI output test remains at src/main.rs (write_mapping test).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 289,
+                "end": 307
+              },
+              "commit": "59c65ae3f8cb47d62bab89567c8f390f0d27800f"
+            }
+          },
+          "recorded_at": "2026-11-01T19:18:05.378203085Z",
+          "seal": {
+            "by": "server",
+            "mac": "13e169f9cf086781103c9838378e07f42863604679da8bf852baac27d81d3178"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Full run printed 175 passed, the rebase module ran 16 tests (13 earlier plus 3 added), and the load_file test passed by name.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0225",
+            "EVD-0226",
+            "EVD-0227"
+          ],
+          "recorded_at": "2026-11-01T19:18:05.419977294Z",
+          "seal": {
+            "by": "server",
+            "mac": "94aaf4984734cbe30b3591783e6989719693e736cc60268f225e1833572ada51"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:18:05.249450357Z",
+      "updated_at": "2026-11-01T19:18:05.419977294Z",
+      "seal": {
+        "by": "server",
+        "mac": "a38b684a96440b966f3bd6311ca07692aa3672ba52686be0ca9804b5c864953c"
       }
     }
   ]
