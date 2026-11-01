@@ -280,15 +280,17 @@ argument writes the wrong file; check with `git status` in both checkouts before
 server older than 0.2.5 does not have the argument and silently ignores it, so every call would
 go to the session's ledger. Neither the version nor the tool schema you see settles it: an
 unreleased build reports the last released version, and a client can keep showing the schema it
-loaded before the server was upgraded or reconnected. Ask the server instead:
+loaded before the server was upgraded or reconnected. Ask the server instead, naming a ledger
+in a directory that does not exist:
 
 ```json
-list_claims {"catalog": ""}
+list_claims {"catalog": "/nonexistent-claims-probe/claims.json"}
 ```
 
-A server that supports `catalog` refuses an empty path with an error ("catalog must be a path to
-a ledger file, or omitted to use the server's own"). That error means you can go ahead. If the
-call **succeeds**, the server ignored the argument: **stop**, make no further claims-mcp calls,
+A server that supports `catalog` tries to open that ledger and fails with an error ("catalog I/O
+error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory"). That error means
+you can go ahead. (Don't probe with an empty string: some clients drop an empty argument value
+before the call is sent.) If the call **succeeds**, the server ignored the argument: **stop**, make no further claims-mcp calls,
 and ask the user to upgrade claims-mcp and restart the session or reconnect the server (`/mcp`
 in Claude Code). Delete the `.claims.json.lock` that call may have left in the session's
 directory.
