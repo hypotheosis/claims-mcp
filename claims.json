@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 163,
+  "next_claim_seq": 164,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "91d2aae70a26777e1dd9ec5935d64399a49e0d0abe1457862087cdef8ba68eec"
+    "mac": "73b4c89f6b87272f3b9114ec82495bd49f2592bc4fe1f14f490c7398ce82e239"
   },
-  "next_evidence_seq": 292,
+  "next_evidence_seq": 295,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "9b41840a79b022edd9d66c4c471b62b5f7349cdf154a5e226a1fd435d367544f"
+    "mac": "c65f4170676b5715962c01e81e0a1d9c3ba93a31fc371a4b6ef39cd2671b380a"
   },
   "claims": [
     {
@@ -12886,6 +12886,18 @@
             "by": "server",
             "mac": "1a00bb54027f7c6005a917d800b25a1f08ac728fefb738b33807c115bb578a14"
           }
+        },
+        {
+          "id": "EVD-0292",
+          "kind": "demonstration",
+          "locator": "Rerunnable from the repo root at 7b490e4. (1) cargo build. (2) TMP=$(mktemp -d); cp claims.json $TMP/c.json. (3) Tamper: jq '.claims[0].statement = \"TAMPERED\"' $TMP/c.json > $TMP/t.json && mv $TMP/t.json $TMP/c.json. (4) sha256sum $TMP/c.json (before). (5) Pipe into `target/debug/claims-mcp --catalog $TMP/c.json` these JSON-RPC lines (one per line, then keep stdin open ~2s): {\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"clientInfo\":{\"name\":\"rerun\",\"version\":\"1\"}}} ; {\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"} ; then tools/call lines id 1..6: {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"add_claim\",\"arguments\":{\"statement\":\"x\",\"kind\":\"functional\",\"level\":\"unit\",\"integrity_level\":1,\"verification_method\":\"inspection\",\"source\":\"s\"}}} ; id 2 add_claims {\"claims\":[<same claim object>]} ; id 3 update_claim {\"id\":\"CLM-0001\",\"tags\":[\"t\"]} ; id 4 retire_claim {\"id\":\"CLM-0001\",\"reason\":\"r\"} ; id 5 add_evidence {\"claim_id\":\"CLM-0001\",\"kind\":\"inspection\",\"locator\":\"l\",\"summary\":\"s\",\"stance\":\"supports\"} ; id 6 record_verdict {\"claim_id\":\"CLM-0001\",\"verdict\":\"supported\",\"rationale\":\"r\",\"auditor\":\"a\",\"evidence_ids\":[\"EVD-0001\"]}. (6) sha256sum $TMP/c.json (after). The six mutating tools are those whose handlers call self.mutate in src/server.rs.",
+          "summary": "Observed on a rerun of exactly these steps: all six responses (ids 1-6) had isError true and the text \"catalog $TMP/c.json was changed outside claims-mcp, so every write is refused until it is restored. Failed checks: CLM-0001 (seal does not match its content). Never edit the catalog file directly. To recover, restore it from git (`git checkout -- $TMP/c.json`, or revert the commit that edited it), then redo the intended change through the claims tools. Reads and audit_report still work.\" sha256 prefix before and after were identical (728da7b36d04e917). Only the lock sidecar was added next to c.json. The repo's claims.json was not touched. Supersedes EVD-0281, whose locator pointed at an uncommitted scratch script.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T23:06:40.609466001Z",
+          "seal": {
+            "by": "server",
+            "mac": "0a3a31c86ce3ce57b2db974eccd469da21d676da9896269bf576b67a87757467"
+          }
         }
       ],
       "verdicts": [
@@ -12902,13 +12914,27 @@
             "by": "server",
             "mac": "21412612cf211a8b08aaa8d4038b735a5c5c4962264f47ccb31b5a0db1fd7f1b"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "The self-contained rerun (EVD-0292) called every mutating tool on a tampered copy; each refused with the failing record and git restore steps and the file hash was unchanged. The committed tests agree (EVD-0282). This verdict relies on EVD-0292 and EVD-0282, not on EVD-0281.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0292",
+            "EVD-0282"
+          ],
+          "recorded_at": "2026-11-01T23:06:49.010563184Z",
+          "seal": {
+            "by": "server",
+            "mac": "8cfabcc57d03354f7478c46f739a385ea32e6ec306b7ff778fbf3959aa18c94e"
+          }
         }
       ],
       "created_at": "2026-11-01T22:17:39.647914708Z",
-      "updated_at": "2026-11-01T22:18:13.332086448Z",
+      "updated_at": "2026-11-01T23:06:49.010563184Z",
       "seal": {
         "by": "server",
-        "mac": "6b24abde000aac10d6d47cda81b9195d50e491961a7980e29d5757722e1707b3"
+        "mac": "960a4bf6f10c354b8d4797d0dcc0f78368d53b185d0be0a2a76d6a48929bc984"
       }
     },
     {
@@ -12940,7 +12966,9 @@
         "from-issue:40"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40 review (brooke-reviews, PR #42): 'match the AnchorStatus enum' is false read strictly, because the docs omit Current by design. Restated precisely.",
+        "retired_at": "2026-11-01T23:07:11.067002243Z"
       },
       "evidence": [
         {
@@ -12982,10 +13010,10 @@
         }
       ],
       "created_at": "2026-11-01T22:17:39.647914708Z",
-      "updated_at": "2026-11-01T22:18:13.345669095Z",
+      "updated_at": "2026-11-01T23:07:11.067002243Z",
       "seal": {
         "by": "server",
-        "mac": "813a856d0fd127c66e04f29b273377a315ae562abb246f8387caae04721e73e4"
+        "mac": "32b241bed01026dfa0bf19462abe1a32c4b725cd2e709b3fe7cd0b32ee4d87b0"
       }
     },
     {
@@ -13128,6 +13156,18 @@
             "by": "server",
             "mac": "ab409b89fca61c3e20f532a2c026844a0e096c9da057a100ecbac5fb04076b57"
           }
+        },
+        {
+          "id": "EVD-0293",
+          "kind": "demonstration",
+          "locator": "Rerunnable from the repo root at 7b490e4 (bash, needs jq): cargo build; TMP=$(mktemp -d); cp claims.json $TMP/c.json; SPEC=docs/superpowers/specs/2026-10-23-claims-mcp-design.md; sed -n '203,216p' $SPEC | grep -oE '^  - `[a-z_]+`' | sed -E 's/^  - `([a-z_]+)`/\\1/' | sort > $TMP/spec.txt; sed -n '/pub struct Gaps/,/^}/p' src/report.rs | grep -oE 'pub [a-z_]+: Vec<ClaimId>' | sed -E 's/^pub ([a-z_]+):.*/\\1/' | sort > $TMP/struct.txt; (printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"clientInfo\":{\"name\":\"rerun\",\"version\":\"1\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"audit_report\",\"arguments\":{\"include_matrix\":true}}}'; sleep 2) | target/debug/claims-mcp --catalog $TMP/c.json 2>/dev/null | jq -c 'select(.id==1)|.result.content[0].text|fromjson' > $TMP/report.json; jq -r '.gaps|keys[]' $TMP/report.json | sort > $TMP/live.txt; diff $TMP/spec.txt $TMP/struct.txt && diff $TMP/struct.txt $TMP/live.txt && echo SETS_EQUAL; jq -c '{top:keys, matrix_rows:(.matrix|length), active:.totals.active_claims}' $TMP/report.json",
+          "summary": "Observed on rerun: both diffs empty and SETS_EQUAL printed. All three lists are the same set of nine names: dangling_links, decomposition, no_evidence, not_enough_info, refuted, refuted_without_source_anchor, rigor, stale, unverified. The last command printed {\"top\":[\"gaps\",\"integrity\",\"matrix\",\"totals\"],\"matrix_rows\":142,\"active\":142}, so the report carries a matrix with one row per active claim. Supersedes EVD-0288 and EVD-0289, which referred to a home-directory path and an uncommitted script.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T23:07:11.048411317Z",
+          "seal": {
+            "by": "server",
+            "mac": "4883a2eea4d526c394bc28b648a58343ae8deeff811c948d0409430d746e7a47"
+          }
         }
       ],
       "verdicts": [
@@ -13144,13 +13184,104 @@
             "by": "server",
             "mac": "640f27ae596b8e4bd5982c5de72955baf4bc1f0e5ab0ce4ae9c73e1406799c17"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-judged on rerunnable evidence: a repeatable command compared spec 4.1's gap names, the Gaps fields and the live audit_report gap keys as sets and they are equal; the report also carried a matrix (EVD-0293, EVD-0290). This verdict does not rely on EVD-0288 or EVD-0289.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0293",
+            "EVD-0290"
+          ],
+          "recorded_at": "2026-11-01T23:07:30.216432426Z",
+          "seal": {
+            "by": "server",
+            "mac": "66b2cb20545a71b165cafd7ae7bb9b010ad5cbc5998f4367abd329999e7c5728"
+          }
         }
       ],
       "created_at": "2026-11-01T22:20:29.091321122Z",
-      "updated_at": "2026-11-01T22:20:39.069046969Z",
+      "updated_at": "2026-11-01T23:07:30.216432426Z",
       "seal": {
         "by": "server",
-        "mac": "ad6523799ba45c12e7f7b0b7b595631ed697a64e9a7b87f96c95a98cbca7f012"
+        "mac": "b04ab387785af34961b99dc58b46aa577ba35f6ba7e701c02cc98dfcbb226f71"
+      }
+    },
+    {
+      "id": "CLM-0163",
+      "statement": "The recheck statuses documented in concepts/anchors.md are exactly the non-current AnchorStatus variants",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/anchors.md lines 32-39 (recheck status table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/anchors.md",
+        "lines": {
+          "start": 32,
+          "end": 39
+        },
+        "commit": "f3dbb15cc6a29769cc8bd61b34e440eb38989926"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/anchors.md",
+        "src/recheck.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0294",
+          "kind": "analysis",
+          "locator": "Rerunnable from the repo root (bash): TMP=$(mktemp -d); sed -n '32,39p' docs/site/src/concepts/anchors.md | grep -oE '^\\| `[a-z_]+`' | sed -E 's/^\\| `([a-z_]+)`/\\1/' | sort > $TMP/docs.txt; sed -n '/pub enum AnchorStatus/,/^}/p' src/recheck.rs | grep -oE '^    [A-Z][A-Za-z]+,' | tr -d ' ,' | sed -E 's/([a-z])([A-Z])/\\1_\\2/g' | tr A-Z a-z | sort > $TMP/enum.txt; diff $TMP/docs.txt <(grep -vx current $TMP/enum.txt) && echo DOCS_EQ_ENUM_MINUS_CURRENT",
+          "summary": "Observed on a run: docs set = changed, commit_missing, missing, moved, overturned, unpinned. Enum set (snake_case, as serde renders it) = those plus current. The diff against the enum minus `current` was empty and DOCS_EQ_ENUM_MINUS_CURRENT printed. The omission of `current` is deliberate: the page says recheck prints only anchors that are not current (docs/site/src/concepts/anchors.md:41).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/recheck.rs",
+              "lines": {
+                "start": 19,
+                "end": 35
+              },
+              "commit": "f3dbb15cc6a29769cc8bd61b34e440eb38989926"
+            }
+          },
+          "recorded_at": "2026-11-01T23:07:22.234983874Z",
+          "seal": {
+            "by": "server",
+            "mac": "d34c756d201687d397812796c1c0193fa93b4bf6fec7218afdfc1417ce36f199"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The set of statuses in the docs table equals the AnchorStatus variants minus Current, compared as sets by a repeatable command, and the page says current anchors are not printed (EVD-0294).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0294"
+          ],
+          "recorded_at": "2026-11-01T23:07:30.200306810Z",
+          "seal": {
+            "by": "server",
+            "mac": "ba73873eea9e7eb916827f921063a543b9cbd910d30e0438c3465899e838a258"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T23:07:11.088186249Z",
+      "updated_at": "2026-11-01T23:07:30.200306810Z",
+      "seal": {
+        "by": "server",
+        "mac": "34fb5ac4d657ed8acbef8e6ba96b6733e01550003276a82d5fc263b39d131eda"
       }
     }
   ]
