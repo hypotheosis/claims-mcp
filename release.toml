@@ -1,0 +1,28 @@
+# cargo-release settings. `just release-prepare` runs cargo-release with these, and
+# `just release-ship` lands its commit through a pull request and pushes the tag. "Releasing" in
+# docs/site/src/development.md describes the flow.
+
+allow-branch = ["main"]
+
+# release.yml publishes from this tag and refuses any other name.
+tag-name = "v{{version}}"
+tag-message = "Release v{{version}}"
+# scripts/release-notes.sh leaves pull requests with this title out of the release notes, and
+# scripts/release-ship.sh titles the release pull request with it; change all three together.
+pre-release-commit-message = "chore: Release v{{version}}"
+
+# The report's notes name the version they describe; nothing else in them changes per release.
+pre-release-replacements = [
+    { file = "report/audit-notes.toml", search = '(?m)^version = "[^"]*"$', replace = 'version = "{{version}}"', exactly = 1 },
+]
+# Writes the generated changelog entry into changelog/ and stages it, so it lands in the release
+# commit.
+pre-release-hook = ["scripts/release-changelog.sh", "{{version}}"]
+
+# Nothing goes to crates.io, and `just release-ship` pushes: the commit through a pull request,
+# the tag to its merge commit.
+publish = false
+push = false
+# The release commit only changes version strings and the changelog. CI runs the full suite on
+# the release pull request, which `just release-ship` waits for before merging.
+verify = false

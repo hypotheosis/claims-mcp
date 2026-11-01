@@ -3,9 +3,10 @@
 # These are claims-mcp's own notes for its self-audit. To report on another project, start from
 # report/audit-notes.example.toml instead of copying this file.
 #
-# SNAPSHOT: these notes record the auditor's judgment on the first self-audit of claims-mcp
-# (catalog at 969620b, re-audited in PR #3), carried into 0.2.0 through 0.2.5 with notes saying so.
-# They are not a default. Rewrite the assessment and points whenever the catalog is re-audited.
+# SNAPSHOT: the assessment records the auditor's judgment on the first self-audit of claims-mcp
+# (catalog at 969620b, re-audited in PR #3), then one fixed paragraph on what was audited since.
+# It does not change per release: `just release-prepare` updates only `version`. Rewrite the
+# assessment and points only when the catalog is re-audited as a whole.
 # Counts, verdicts, and gaps are deliberately left out: the report computes those from the
 # catalog, so prose here cannot contradict them.
 
@@ -20,36 +21,11 @@ audited requirement. That audit's one refutation (CLM-0034) concerned a process 
 the server: the implementation plan no longer matched the committed source. Issue #1 resolved \
 it by marking the plan as historical; CLM-0034 was retired and replaced by CLM-0066.
 
-This assessment dates from the 0.1.0 audit and was not redone for 0.2.0. Version 0.2.0 adds \
-integrity seals (issue #9). Their behavior was not re-audited as claims, except CLM-0037, which \
-replaces CLM-0005 for the catalog's new schema version. The Integrity section shows the seal \
-check for this catalog.
-
-Version 0.2.1 adds the next_steps tool and tldr subcommand (PR #15) and the summary and full \
-detail levels of this report (PR #16). Neither was audited as claims.
-
-Version 0.2.2 builds this report's template into the binary, adds the report init command, and \
-serves the template and the notes example as MCP resources (PR #19). These were not audited as \
-claims either.
-
-Version 0.2.3 adds commit-pinned anchors on evidence and claim sources, absence refutations, and \
-the recheck command and tool (PR #22, issue #21). These were not audited as claims.
-
-After 0.2.3, the detailed documentation moved from the README to a documentation site. Claims \
-CLM-0067 to CLM-0077 check the site against the code. Anchored evidence exists only for them, \
-for the 0.2.5 claims below, and for one later check of CLM-0004 (EVD-0176), so the anchor \
-recheck covers only those.
-
-Version 0.2.4 adds the generated claims.json JSON Schema, its CLI command, stable and \
-format-version-pinned documentation URLs, and the release artifact (PR #28, issue #26). These \
-were not audited as claims.
-
-Version 0.2.5 adds the per-call catalog argument on every tool (PR #34, issue #31) and the rebase \
-command, which replays a branch's ledger records onto main's (PR #35, issue #32). Unlike the \
-earlier additions, both were audited as claims by an independent auditor on a different model: \
-CLM-0078 to CLM-0104 and CLM-0105 to CLM-0130. Also in 0.2.5, the claims-audit skill's \
-pull-request mode and its claims_call.py helper (PR #33), and a viewer layout fix (PR #30), were \
-not audited as claims.
+This assessment dates from the 0.1.0 audit. Most changes from 0.2.0 to 0.2.5 were not audited \
+as claims. The exceptions are CLM-0037 (the catalog schema version that integrity seals \
+introduced in 0.2.0), CLM-0067 to CLM-0077 (the documentation site against the code), and \
+CLM-0078 to CLM-0130 (0.2.5's per-call catalog argument and rebase command). Since 0.2.5, \
+changes are audited as claims in the pull requests that make them; dependency updates are not.
 """
 
 [[points]]
