@@ -26,3 +26,13 @@ Install a release binary (see [Install](install.md)), then:
 policy choice. Failing makes every change to anchored code trigger a re-audit. Not failing (and
 reporting it instead) keeps drift visible without blocking merges. `claims-mcp tldr` always exits
 0 while the catalog can be read, so use it for reporting, not gating.
+
+## Branches that both write the ledger
+
+Ids come from counters in the ledger, so two branches that both add claims, or both add
+evidence, hand out the same ids. Git does not always see a conflict: two branches that each add
+one evidence item to different claims merge cleanly into a ledger with two records of the same
+id, and the server then refuses to read it. Run `claims-mcp verify` on the result of the merge,
+which GitHub's `pull_request` event checks out by default, so a PR that would break the ledger
+fails before it merges. To fix such a branch, take the main branch's `claims.json` and record the
+branch's findings again through the tools; never edit or merge the file by hand.
