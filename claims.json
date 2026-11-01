@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 78,
+  "next_claim_seq": 105,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "5dd00356474934b9114b8b9ff2bfe423bad70c087aab156c1ac5c0acdf54bf7c"
+    "mac": "065454a838be246886a5e053c92d83e7569c276645945feceac2944163302a81"
   },
-  "next_evidence_seq": 135,
+  "next_evidence_seq": 183,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "e2217d7efd85be3c708ea7d9bad7d34942d8fc8dca3c7af861046a55730d02ff"
+    "mac": "4e24ca6f7707783fb09b95cee90efff7eb94026a483d0f7203bd54cf3116f8d5"
   },
   "claims": [
     {
@@ -336,6 +336,28 @@
             "by": "server",
             "mac": "7520260a4780b8206107c5cc539a5223198277c707cb59113c743aaf3c52dcfd"
           }
+        },
+        {
+          "id": "EVD-0176",
+          "kind": "test",
+          "locator": "cargo test server::tests::registers_all_twelve_tools (1 passed)",
+          "summary": "The test asserts the server registers 12 tools (adds next_steps and recheck to the 10 the claim names), so 'exactly the 10 tools' does not hold. The count was already 12 on origin/main; this PR did not change it.",
+          "stance": "refutes",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 727,
+                "end": 753
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:52:07.380743092Z",
+          "seal": {
+            "by": "server",
+            "mac": "3e85f5bd760d6cc7f3787fcc0a9c52b82b04d933b0a5c570b5f1bc6f889b8597"
+          }
         }
       ],
       "verdicts": [
@@ -364,13 +386,26 @@
             "by": "server",
             "mac": "10fa6a4f9d835e660484d7814e321fc1c658edb29a8ca5543f3cea3d1aa52230"
           }
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "The claim says tools/list returns exactly 10 tools but the server registers 12, a count that predates this PR (EVD-0176). Fix: retire CLM-0004 and add a claim that tools/list returns the 12 tools add_claim through recheck, verified by registers_all_twelve_tools.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0176"
+          ],
+          "recorded_at": "2026-11-01T15:52:22.448956077Z",
+          "seal": {
+            "by": "server",
+            "mac": "6ca8102b37e924d4f5cebafb9cf5a2e5842eb6ff2bca04834218b34394ed7a70"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:51:50.911595901Z",
+      "updated_at": "2026-11-01T15:52:22.448956077Z",
       "seal": {
         "by": "server",
-        "mac": "b9b7987e6b70f684b355569043e3ea4981adb8dbe76e789f1161eef79d4c4817"
+        "mac": "e7b377e30bf2f440790d3869dfefe75c7f1cdb646d542b007be017a1219c3fba"
       }
     },
     {
@@ -5071,6 +5106,28 @@
             "by": "server",
             "mac": "517e92121382606abb994c7610f37a9e15da596c0f23b28d3719489aa212364e"
           }
+        },
+        {
+          "id": "EVD-0175",
+          "kind": "inspection",
+          "locator": "docs/site/src/guides/install.md:94-112; reference/cli.md; reference/tools.md at b59e57e",
+          "summary": "Re-read after the PR touched install.md: the skill install block still shows 'cp -r skills/claims-audit ~/.claude/skills/'; install.md still covers download, cargo install/build and registration; cli.md still has the --catalog configuration; tools.md is still the tool reference. The PR only added a sentence at install.md:73-75.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/guides/install.md",
+              "lines": {
+                "start": 95,
+                "end": 111
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:52:07.334086259Z",
+          "seal": {
+            "by": "server",
+            "mac": "2bde1a8d45f145dcb0e7bc88688fdde53a0dd14f93f0780d14b24481b41b464a"
+          }
         }
       ],
       "verdicts": [
@@ -5086,13 +5143,26 @@
             "by": "server",
             "mac": "490fa110945d5e396dafb75131e0c741f166dae3cd4cb67bb40c10874a7e0e4b"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited after the PR edited install.md: all four documented topics and the cp -r skill install command are still present (EVD-0175).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0175"
+          ],
+          "recorded_at": "2026-11-01T15:52:22.407038149Z",
+          "seal": {
+            "by": "server",
+            "mac": "d2df2b5f98c7784d1aa048442057a7c1d4215cdb28210dba83041b4548d3c744"
+          }
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.214838152Z",
+      "updated_at": "2026-11-01T15:52:22.407038149Z",
       "seal": {
         "by": "server",
-        "mac": "c3e76f1efc75f82106e9f96ea2e8b05eda012039923784e83bf894c1aa13d4f0"
+        "mac": "a1eb851f6e0be80be1d4067b5239cba53adbdeb6ef3006ab6b3430b5f37847db"
       }
     },
     {
@@ -5427,6 +5497,28 @@
             "by": "server",
             "mac": "cb00c1ceb6cf29159221bf9ce7674866c61683c92adf2673dd767160cf77a67a"
           }
+        },
+        {
+          "id": "EVD-0174",
+          "kind": "inspection",
+          "locator": "src/server.rs:127-400 and docs/site/src/reference/tools.md:8-35 at b59e57e",
+          "summary": "On head, the router registers 12 tools (registers_all_twelve_tools lists add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim) and the reference table at tools.md:11-22 lists the same 12 names; the PR added only a catalog section and a recheck sentence.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/tools.md",
+              "lines": {
+                "start": 11,
+                "end": 34
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:52:07.279546201Z",
+          "seal": {
+            "by": "server",
+            "mac": "391418e4ca68efb0530f4fa7dc302d969da5b100f1aeae60e57298c8a4550fed"
+          }
         }
       ],
       "verdicts": [
@@ -5442,13 +5534,26 @@
             "by": "server",
             "mac": "ca3b2141be77c53f265eb679758edb2fea478ddb38dc30c6e6f7d7c134193105"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head after the PR changed src/server.rs: the server still registers 12 tools and the reference lists the same 12 (EVD-0174).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0174"
+          ],
+          "recorded_at": "2026-11-01T15:52:22.364564048Z",
+          "seal": {
+            "by": "server",
+            "mac": "e8fd4100eaf350f8749ced540691f20ed4c5b81d02845a452750ece95d595790"
+          }
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.151002839Z",
+      "updated_at": "2026-11-01T15:52:22.364564048Z",
       "seal": {
         "by": "server",
-        "mac": "670b52c1c5d69818524560ac409bcb0d7d0557b7faa77b0b18a64822955f8847"
+        "mac": "3a2757bbda531c87bda9193d616f163f723825f46c5adb76d0083297cc576623"
       }
     },
     {
@@ -5824,6 +5929,2166 @@
       "seal": {
         "by": "server",
         "mac": "d314adc8fddd4448d4a3a5adc330fa80f9ca04cb151364478017910222a796db"
+      }
+    },
+    {
+      "id": "CLM-0078",
+      "statement": "claims-mcp lets a tool call choose its ledger with a per-call catalog argument",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31",
+      "derived_from": [],
+      "artifacts": [
+        "src/server.rs",
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0173",
+          "kind": "analysis",
+          "locator": "children of CLM-0078",
+          "summary": "All 26 child claims (acceptance criteria 1-4, the issue's every-tool, git-refusal and instructions requirements, and the PR description's statements of fact) are supported by tests I reran and stdio runs I made on head b59e57e; none is refuted, so the per-call catalog argument is implemented, tested and documented as the issue asks.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:52:07.232457077Z",
+          "seal": {
+            "by": "server",
+            "mac": "5fdced49c165a4eb86a42b270390e278fa11f4ce2dc7ea38d871ce51183912ae"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every child claim is supported and the roll-up evidence records how they cover the issue's four acceptance criteria.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0173"
+          ],
+          "recorded_at": "2026-11-01T15:52:22.322154828Z",
+          "seal": {
+            "by": "server",
+            "mac": "b503c89238e689a7aa3402b874b6b5567eb1de6e1b63d3979c3ee3cc9a014b6e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:52:22.322154828Z",
+      "seal": {
+        "by": "server",
+        "mac": "7fc3d2734d4db736fa1fc58662174cda28f9e48d3f68ca85cf9fbe30224888f6"
+      }
+    },
+    {
+      "id": "CLM-0079",
+      "statement": "All 12 MCP tools accept an optional catalog argument (absolute path, or relative to the server's cwd) and none requires it",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"An optional `catalog` argument on every tool (absolute path, or relative to the server's cwd)\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0135",
+          "kind": "test",
+          "locator": "cargo test server::tests::every_tool_advertises_the_catalog_argument (1 passed)",
+          "summary": "Test lists the router's tools, asserts there are 12, and for each asserts input_schema.properties has catalog and required does not contain it. Test passed on head b59e57e when I ran it.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1274,
+                "end": 1294
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.689688358Z",
+          "seal": {
+            "by": "server",
+            "mac": "bcc5b2900c959765219b94dd741082252572c45a843c7d9266849f58619be42c"
+          }
+        },
+        {
+          "id": "EVD-0136",
+          "kind": "inspection",
+          "locator": "src/server.rs:128-400 handlers",
+          "summary": "All 12 #[tool] handlers take Parameters<OnLedger<...>> (recheck takes OnLedger<NoParams>); catalog is Option<PathBuf> with serde default, and the doc comment says absolute or relative to the server's working directory. store_for passes the path to CatalogStore::new unchanged, so a relative path resolves against the process cwd.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 28,
+                "end": 48
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.728055226Z",
+          "seal": {
+            "by": "server",
+            "mac": "c848cd5a8567e2721ca10ddddc2f89a52535244ed045184f3512f3c1376bd4d0"
+          }
+        },
+        {
+          "id": "EVD-0137",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py (stdio, server --catalog audit/own/claims.json, cwd audit/own); add_claim/recheck with catalog=<abs path>",
+          "summary": "Over real stdio with the head debug binary an absolute catalog argument was accepted by add_claim and recheck. A relative path 'r1/../r1/claims.json' resolved against the server cwd (audit/own) and failed with an I/O error because audit/own/r1 does not exist, consistent with 'relative to the server's cwd'.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:15.763853746Z",
+          "seal": {
+            "by": "server",
+            "mac": "ed7378083bede02c2c966433f64ef737547e9a933706f89e736c99e54d0d4ac3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The handlers' parameter types and the schema test show every tool, 12 of 12, takes an optional catalog that is never required; the stdio run showed absolute paths accepted and relative paths resolved against the server cwd.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0135",
+            "EVD-0136",
+            "EVD-0137"
+          ],
+          "recorded_at": "2026-11-01T15:51:51.833384425Z",
+          "seal": {
+            "by": "server",
+            "mac": "91b28bf13c836feb3cafb7ffd8a0997679abbf1e411e0371243a0e3231b5a4eb"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:51.833384425Z",
+      "seal": {
+        "by": "server",
+        "mac": "be3b199aedbcab45004348230db2317dbce2e69d508fabcdd66bb62617d5667e"
+      }
+    },
+    {
+      "id": "CLM-0080",
+      "statement": "A tool call with catalog set writes that file and pins anchors to HEAD of the repository holding it, regardless of the server's --catalog and cwd",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"A tool call with `catalog` set writes that file and pins anchors to that repository's `HEAD`, regardless of the server's `--catalog` and cwd.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0138",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository (1 passed)",
+          "summary": "Server built on a tempdir ledger outside git; add_claim with catalog in repo A and repo B (B has an extra commit) both get id CLM-0001, source_anchor.commit equals git rev-parse HEAD of each own repo, each file contains only its own claim, and the server's own claims.json does not exist afterwards.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1137,
+                "end": 1215
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.802489245Z",
+          "seal": {
+            "by": "server",
+            "mac": "29a2f58c42ee1f47c42a5acd8ca511554d84b6a742819f82b28e8ed30ff570c2"
+          }
+        },
+        {
+          "id": "EVD-0139",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py stdio run against head debug binary",
+          "summary": "Server started with --catalog audit/own/claims.json (outside git). add_claim with catalog=audit/r1/claims.json returned source_anchor.commit 2dead97b... and with audit/r2/claims.json returned 2b2d5e47...; git rev-parse HEAD in r1 and r2 printed exactly those values. No claims.json was created under audit/own.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:15.838892266Z",
+          "seal": {
+            "by": "server",
+            "mac": "f059dd37e2a283988f933078e56409c9a11c2e6fff6576273a21589046783553"
+          }
+        },
+        {
+          "id": "EVD-0140",
+          "kind": "inspection",
+          "locator": "src/server.rs:411-461",
+          "summary": "store_for builds CatalogStore::new(path) for a named catalog; read and mutate pass that same store to the operation, and LazyRepo/GitCli::for_store(store) runs git rev-parse in store.directory() (src/anchor.rs:305-327), so the repository is the one holding the named ledger, independent of the server's cwd.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 461
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.876427352Z",
+          "seal": {
+            "by": "server",
+            "mac": "6c54b5226c65ec3502e142ac6ce25c740c13b6cc2af29b842b5e0180a5ccce02"
+          }
+        },
+        {
+          "id": "EVD-0177",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py (stdio, head 2187c3f debug binary, server --catalog outside git)",
+          "summary": "Re-run on head: add_claim with catalog=r1 and r2 pinned source_anchor.commit 2dead97b... and 2b2d5e47..., equal to git rev-parse HEAD of each; nothing written to the server's own ledger dir. cargo test ...per_call_catalog_writes_that_ledger_and_pins_its_repository passed (1 passed); full cargo test 157 passed.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 464
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.879260892Z",
+          "seal": {
+            "by": "server",
+            "mac": "990b94814c450eb83086a6e3a9592e727eff280caedb2f6051994c6203d13e89"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The unit test and my own stdio run each show two repositories with different HEADs getting claims pinned to their own HEAD while the server's own ledger outside git stays untouched; the code path derives the repository from the named ledger's directory.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0138",
+            "EVD-0139",
+            "EVD-0140"
+          ],
+          "recorded_at": "2026-11-01T15:51:51.872644105Z",
+          "seal": {
+            "by": "server",
+            "mac": "e169eebb527d286b3650db1cc7463b5759568622afd2715ab3056b9b83a257e3"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head 2187c3f: the unit test and my stdio re-run again pin each ledger's anchors to its own repo HEAD.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0177"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.110946599Z",
+          "seal": {
+            "by": "server",
+            "mac": "5689e3ac27629dd583fd13a50c21622d03096eb4ef35c373e1e29280db569fc3"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.110946599Z",
+      "seal": {
+        "by": "server",
+        "mac": "172a507a55d0dd7104c8dc5e35f817bd5fbf32bb2723284154ddfac7ca0f4d1e"
+      }
+    },
+    {
+      "id": "CLM-0081",
+      "statement": "A tool call without catalog behaves exactly as before and uses the server's --catalog",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"Calls without `catalog` behave exactly as now.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0141",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository (1 passed)",
+          "summary": "The last block of the test calls add_claim through default_ledger (catalog None) and asserts the claim lands in the server's own ledger with id CLM-0001.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1206,
+                "end": 1215
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.915083531Z",
+          "seal": {
+            "by": "server",
+            "mac": "3a591b22165c50d5cd75905e4e54c63810f2fad33d7781df8490ca7f356c2dd4"
+          }
+        },
+        {
+          "id": "EVD-0142",
+          "kind": "inspection",
+          "locator": "git diff origin/main..HEAD -- src/server.rs; src/server.rs:411-422",
+          "summary": "Each old handler used self.store (cloned for LazyRepo/GitCli::for_store); each new handler resolves store_for(None) -> self.store.clone() and runs the same closure body (add_claim, add_claims, update_claim, add_evidence, retire_claim, record_verdict, get_claim, list_claims, trace, audit_report, next_steps, recheck). I compared every handler body at origin/main with head and found only the added store argument. In-process locking is the per-ledger flock in store.rs, so one-off stores for the same path still serialize.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 422
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:15.953865910Z",
+          "seal": {
+            "by": "server",
+            "mac": "42d3bfba151df6341d81381f0c4bc590249fb75a33b98a921310a6e19fe7b837"
+          }
+        },
+        {
+          "id": "EVD-0143",
+          "kind": "test",
+          "locator": "python3 audit/oldtarget build of origin/main vs head, same stdio script",
+          "summary": "Not used as support: with the head binary a call without catalog and an anchor outside git returned the same git rev-parse error text as the origin/main binary (audit/e2e.py run on both).",
+          "stance": "neutral",
+          "recorded_at": "2026-11-01T15:51:15.989337429Z",
+          "seal": {
+            "by": "server",
+            "mac": "8d05beadb1a5b59a28afa5bb9500e7a2c04e67ac8f7997f177a6bdf5305bf880"
+          }
+        },
+        {
+          "id": "EVD-0178",
+          "kind": "inspection",
+          "locator": "src/server.rs:411-424 store_for at 2187c3f",
+          "summary": "The None arm still returns self.store.clone(); the only change since b59e57e is a tracing::debug! inside the named-ledger arm, which runs only when catalog is given. cargo test ...per_call_catalog... (no-catalog block) passes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 424
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.925633798Z",
+          "seal": {
+            "by": "server",
+            "mac": "a9ea53895af16a296ccd9ef6ebabe79a43597d0b6d20df2331b0c7191f5e0608"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The no-catalog branch of store_for returns the server's own store and every handler body is otherwise unchanged from origin/main; a test asserts a no-catalog call still writes the server's ledger.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0141",
+            "EVD-0142"
+          ],
+          "recorded_at": "2026-11-01T15:51:51.912328567Z",
+          "seal": {
+            "by": "server",
+            "mac": "6b2b9e1ded5092e9a3c42ec2c82c60f830fbac839ed6e250f0b28c6ddc511b6a"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: the no-catalog arm is unchanged; the new debug log is only in the named-ledger arm.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0178"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.163728583Z",
+          "seal": {
+            "by": "server",
+            "mac": "3c9ab4588f5e8d4b608cbf4b13a825c61b731431e134a5d751d44bf409b0772e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.163728583Z",
+      "seal": {
+        "by": "server",
+        "mac": "45046dd5543aed6bf0c903f8f14465f66342ae381d3327d665521c4ca0cb5135"
+      }
+    },
+    {
+      "id": "CLM-0082",
+      "statement": "Tests cover two ledgers in two repositories written through one server",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"Tests cover two ledgers in two repositories written through one server.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0144",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository; anchors_follow_the_named_ledgers_repository (1 passed each)",
+          "summary": "per_call_catalog_writes_... builds two repo() tempdirs with different HEADs and a server whose ledger is in a third tempdir, and writes one ledger through each.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1137,
+                "end": 1170
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.029040371Z",
+          "seal": {
+            "by": "server",
+            "mac": "0ef2731bbe0208707a3e0f5eb316c63beeb1d7f0537ec2036a257334e1fee6ff"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "per_call_catalog_writes_... drives two ledgers in two separate repos through one ClaimsServer and asserts on each.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0144"
+          ],
+          "recorded_at": "2026-11-01T15:51:51.952119690Z",
+          "seal": {
+            "by": "server",
+            "mac": "63b6d1bdfc9d63e961b818c8279a3173f14370f4a7d7be6f7f75248dd76106ae"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:51.952119690Z",
+      "seal": {
+        "by": "server",
+        "mac": "370c994c92ba079c51d8e730a26373ca12e77d5289412b306c2177bb15217a60"
+      }
+    },
+    {
+      "id": "CLM-0083",
+      "statement": "The claims-audit skill's pull-request mode uses the catalog argument instead of claims_call.py",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"The claims-audit skill's pull-request mode uses the argument instead of `claims_call.py`.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0145",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-286",
+          "summary": "The 'Which ledger the server writes' paragraph now tells the auditor to pass catalog with the absolute ledger path on every call, with a JSON example, and shows claims_call.py only under 'If the connected server is claims-mcp 0.2.4 or earlier'. git grep claims_call shows no other instruction to use the script in skills/ or docs/.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 287
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.068556512Z",
+          "seal": {
+            "by": "server",
+            "mac": "da285ef4d8414457a5bbcb967f68546fe918cbf7c37832d8af262b4e87eb84ca"
+          }
+        },
+        {
+          "id": "EVD-0179",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-287 at 2187c3f",
+          "summary": "PR mode still tells the auditor to pass catalog with the absolute ledger path on every call (lines 265-274) and now introduces claims_call.py only after 'Check the tools' input schemas first: if they have no catalog property...' (279-282).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 287
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.970018898Z",
+          "seal": {
+            "by": "server",
+            "mac": "f7defd923678afd08fb3599fb7d62bf7f3d0537f1f560b2f5a393aa5f2171f44"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The skill's pull-request mode now instructs passing catalog on every call and demotes claims_call.py to a fallback for old servers.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0145"
+          ],
+          "recorded_at": "2026-11-01T15:51:51.990794488Z",
+          "seal": {
+            "by": "server",
+            "mac": "67cf81a4c3ac4bef027255cce04c5fdc7fa85c24044de72c9ad3b644c5600045"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: PR mode still passes catalog on every call and keeps claims_call.py only as the fallback.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0179"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.208702595Z",
+          "seal": {
+            "by": "server",
+            "mac": "47d8aecd6b55a23fd6a9635c405559f63beaa4b53f8599bbffde7cc7ea260923"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.208702595Z",
+      "seal": {
+        "by": "server",
+        "mac": "2846fa0f6200e287555b75c7898c23e6391ecf8c5890cb79f15de45b240d9e73"
+      }
+    },
+    {
+      "id": "CLM-0084",
+      "statement": "An anchored call whose ledger directory is not inside a git work tree is refused",
+      "kind": "safety",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"Refuse a `catalog` path whose directory is not inside a git work tree when an anchor is involved, as today.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0146",
+          "kind": "test",
+          "locator": "cargo test server::tests::anchors_follow_the_named_ledgers_repository (1 passed)",
+          "summary": "With the server's ledger in a non-git tempdir, add_claim with a source_anchor and no catalog returns is_error true with text starting 'git rev-parse'; the same call naming a ledger in a git repo succeeds.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1217,
+                "end": 1239
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.108157614Z",
+          "seal": {
+            "by": "server",
+            "mac": "12a85e4f8e7fa48c93c8375ebba2b01e294d38e121e85b3730df46c0e604e3a0"
+          }
+        },
+        {
+          "id": "EVD-0147",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py (stdio, head debug binary)",
+          "summary": "add_claim with a source_anchor and no catalog while the server's ledger is in audit/own (not a repo) returned isError true: 'git rev-parse --show-toplevel --show-prefix failed: fatal: not a git repository'. Nothing was written to audit/own/claims.json.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.149301610Z",
+          "seal": {
+            "by": "server",
+            "mac": "227aec26af1f03db6a0a8f7fe002b4a6ceccfef66b3e0da6abf260c740639123"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test and the stdio run both show an anchored call with a non-git ledger directory refused with the git rev-parse error, and accepted once catalog names a ledger inside a repository.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0146",
+            "EVD-0147"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.030956562Z",
+          "seal": {
+            "by": "server",
+            "mac": "1e8334e1a0553ff1e1742e6b02d4f334b5716712de1b62b0450783ffd278f0a3"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.030956562Z",
+      "seal": {
+        "by": "server",
+        "mac": "528cf28c2f7af1f7e0242d5c357871fb0a905610d5324827fe88670cdfa9b3d4"
+      }
+    },
+    {
+      "id": "CLM-0085",
+      "statement": "The server's instructions mention the catalog argument",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"Mention the argument in the server's `instructions` and in the skill\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0148",
+          "kind": "inspection",
+          "locator": "src/server.rs:494-505 INSTRUCTIONS",
+          "summary": "The instructions string says every tool takes an optional catalog argument naming the ledger for that call, anchors pin HEAD of its repository, and to pass it on every call when working in another checkout such as a git worktree. get_info sends INSTRUCTIONS via with_instructions.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 494,
+                "end": 505
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.187450157Z",
+          "seal": {
+            "by": "server",
+            "mac": "93aef8b6de7a94cb699cdebaef44050e9c19bb6a80466f3d936155ad11996dfa"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "INSTRUCTIONS names the catalog argument and tells agents in another checkout, such as a git worktree, to pass it on every call.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0148"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.069988282Z",
+          "seal": {
+            "by": "server",
+            "mac": "52c333322342253b28eb6f846f0bd6bb63af28443b351866e1295d00742dd157"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.069988282Z",
+      "seal": {
+        "by": "server",
+        "mac": "5ee75ee4c82d4c39b7846493264aee345470d5697d8841407a3a72422b9bb07b"
+      }
+    },
+    {
+      "id": "CLM-0086",
+      "statement": "A generic OnLedger<T> wrapper adds an optional catalog beside each tool's own (flattened) parameters",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"a generic `OnLedger<T>` wrapper adds an optional `catalog` beside each tool's own (flattened) parameters\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0149",
+          "kind": "inspection",
+          "locator": "src/server.rs:28-48",
+          "summary": "pub struct OnLedger<T> has catalog: Option<PathBuf> (#[serde(default)]) and params: T with #[serde(flatten)]; derives Deserialize and JsonSchema. The test catalog_sits_beside_the_tools_own_flattened_parameters (1 passed) deserializes flat JSON with catalog next to claim_id/verdict.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 28,
+                "end": 48
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.227209300Z",
+          "seal": {
+            "by": "server",
+            "mac": "af3551b474b73ef737331c9a69d5b4a20bbf26d102389737f21d7b17059cc025"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "OnLedger<T> has an optional catalog and a flattened params field, as the PR says, and the deserialization test confirms flat JSON works.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0149"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.108925211Z",
+          "seal": {
+            "by": "server",
+            "mac": "00a30f24f7486e9b74277d37772400f529f8b42f83441ba220bbc5ac6fa0d286"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.108925211Z",
+      "seal": {
+        "by": "server",
+        "mac": "efbae2bca5723881ad4b8f9e22badf0ff0438085d99981ba87e4c121677eea1e"
+      }
+    },
+    {
+      "id": "CLM-0087",
+      "statement": "recheck takes OnLedger<NoParams>",
+      "kind": "interface",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"`recheck` takes `OnLedger<NoParams>`\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0150",
+          "kind": "inspection",
+          "locator": "src/server.rs:397",
+          "summary": "async fn recheck(&self, Parameters(call): Parameters<OnLedger<NoParams>>) at line 397, and NoParams is defined at line 47.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 397,
+                "end": 397
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.267601804Z",
+          "seal": {
+            "by": "server",
+            "mac": "9043db0dc3b193e4a47e1880f8d2b8c6f9c4daad451289f330e5c8166ce25324"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The recheck handler's parameter type is OnLedger<NoParams> at src/server.rs:397.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0150"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.148905764Z",
+          "seal": {
+            "by": "server",
+            "mac": "729cec497ac04af5444dc98f7bb470e7a645319e082784e7e898090a94f65f06"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.148905764Z",
+      "seal": {
+        "by": "server",
+        "mac": "5592926b0f4c3012262b17199335c3a3c1602e30afcd35a11e8f19077117ebaf"
+      }
+    },
+    {
+      "id": "CLM-0088",
+      "statement": "ClaimsServer::read and ClaimsServer::mutate resolve the ledger once per call and pass its store to the operation, which finds the git repository from the ledger's own directory",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"`ClaimsServer::read` / `ClaimsServer::mutate` resolve the ledger once per call and pass its store to the operation, which finds the git repository from the ledger's own directory.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "src/anchor.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0151",
+          "kind": "inspection",
+          "locator": "src/server.rs:404-461",
+          "summary": "read and mutate each call self.store_for(catalog) once, clone the store as repo_store, and pass &repo_store to the operation; store_for returns CatalogStore::new(path) for a named ledger. GitCli::for_store runs git rev-parse in store.directory() (src/anchor.rs:305-310), the ledger's own directory.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 404,
+                "end": 461
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.307808097Z",
+          "seal": {
+            "by": "server",
+            "mac": "f240d00ff2e78092e67b125d963abcce4ef5f2f46e5de2e9c6db3054833744f6"
+          }
+        },
+        {
+          "id": "EVD-0152",
+          "kind": "inspection",
+          "locator": "src/anchor.rs:305-310",
+          "summary": "for_store uses git_command(store.directory()) to find the repository, so the repo is derived from the ledger's directory.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/anchor.rs",
+              "lines": {
+                "start": 305,
+                "end": 310
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.347293618Z",
+          "seal": {
+            "by": "server",
+            "mac": "9e9c344a9bea5a1fed060a3e209d48b6e48f65f674a1e3ae14b6e75413a053ad"
+          }
+        },
+        {
+          "id": "EVD-0180",
+          "kind": "inspection",
+          "locator": "src/server.rs:411-464",
+          "summary": "read and mutate still call store_for once, clone the store as repo_store and pass &repo_store to the operation; the new debug! log in store_for does not change that. GitCli::for_store (src/anchor.rs:305-310) is unchanged and uses store.directory().",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 464
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.015101221Z",
+          "seal": {
+            "by": "server",
+            "mac": "4eb8977c4fe5458c01256f6f7e266e60077a33313eae419dfa6d3e209a6104a7"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "read and mutate call store_for once, clone the resulting store and hand it to the operation, and GitCli::for_store finds the repository from store.directory().",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0151",
+            "EVD-0152"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.189175888Z",
+          "seal": {
+            "by": "server",
+            "mac": "4fdc58f6702cf6fb175c32ecd3760505e2fa91a14ca4d655620360ac7e9a146b"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: read and mutate still resolve the store once and pass it on; the debug log changes nothing else.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0180"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.256630245Z",
+          "seal": {
+            "by": "server",
+            "mac": "98d7a50d35357ab66db51076d3fbb4c86a00654983f8b8c1a80aa59268184f3e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.256630245Z",
+      "seal": {
+        "by": "server",
+        "mac": "f36e3e2f792f5ddd78b9af73fa98a0d1d4b8e38a357addfe015a227328efdecf"
+      }
+    },
+    {
+      "id": "CLM-0089",
+      "statement": "An empty catalog path is refused with a validation error",
+      "kind": "functional",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"An empty `catalog` path is refused with a validation error.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0153",
+          "kind": "test",
+          "locator": "cargo test server::tests::empty_catalog_path_is_an_explained_error (1 passed)",
+          "summary": "Calls list_claims with catalog Some(PathBuf::new()); asserts is_error true and the text contains 'catalog must be a path'.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1241,
+                "end": 1254
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.387569362Z",
+          "seal": {
+            "by": "server",
+            "mac": "0d3d998815787a8d2677365b8390bcef1a82062c328af93d07f66ee98b4fae86"
+          }
+        },
+        {
+          "id": "EVD-0154",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py (stdio) list_claims with catalog \"\"",
+          "summary": "Returned isError true: \"invalid input: catalog must be a path to a ledger file, or omitted to use the server's own\". store_for maps it to ClaimsError::Validation (src/server.rs:411-422), whose Display is the 'invalid input:' prefix.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 422
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.432793321Z",
+          "seal": {
+            "by": "server",
+            "mac": "e4427db3c7bdad16d3c48ee8650a2816752c0f04a5876fac24d8498faefe103f"
+          }
+        },
+        {
+          "id": "EVD-0181",
+          "kind": "test",
+          "locator": "cargo test server::tests::empty_catalog_path_is_an_explained_error (1 passed) at 2187c3f; stdio catalog \"\"",
+          "summary": "Empty path still hits the guard at src/server.rs:414-417 before the new debug! line and returns the validation error; my stdio call again returned \"invalid input: catalog must be a path to a ledger file...\" with isError true.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 424
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.061287327Z",
+          "seal": {
+            "by": "server",
+            "mac": "fdc9486a4db7fe164a80f160bf2a7f01e4f667bb308b811f43e704db2ff4cc67"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The unit test asserts the refusal text and my stdio call returned an invalid input error for an empty catalog.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0153",
+            "EVD-0154"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.228879950Z",
+          "seal": {
+            "by": "server",
+            "mac": "2ca614998b0c1ff7a247d701bc690aad04ab8c5924b03ad6dc8be3b3d30bd1d3"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: the empty-path guard precedes the new log line, test passes, stdio call refused.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0181"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.305451518Z",
+          "seal": {
+            "by": "server",
+            "mac": "446b07135e33132c563670044ffc7d020e4a875bea4a54eadef8ed500772f0c9"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.305451518Z",
+      "seal": {
+        "by": "server",
+        "mac": "387dfd3678510a9172dc1fadaf567010741d3376c0723a20126e004b205f19ec"
+      }
+    },
+    {
+      "id": "CLM-0090",
+      "statement": "The docs add a 'Choosing the ledger' section to the tools reference, plus notes in the CLI, install and security pages",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: \"a \\\"Choosing the ledger\\\" section in the tools reference, plus notes in the CLI, install and security pages.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/tools.md",
+        "docs/site/src/reference/cli.md",
+        "docs/site/src/guides/install.md",
+        "docs/site/src/reference/security.md"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0155",
+          "kind": "inspection",
+          "locator": "docs/site/src/reference/tools.md:23-35; cli.md:33-35; install.md:73-75; security.md:15-18",
+          "summary": "tools.md has '## Choosing the ledger'; cli.md, install.md and security.md each gained a note linking to #choosing-the-ledger or describing the catalog parameter (git diff origin/main..HEAD -- docs).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/tools.md",
+              "lines": {
+                "start": 23,
+                "end": 35
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.473877027Z",
+          "seal": {
+            "by": "server",
+            "mac": "5a8826c6486aeb7f478926d6803a50241baaf27143392895c0f1f3cd9dc4295b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "tools.md has the Choosing the ledger section and cli.md, install.md and security.md each gained a note, per the diff.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0155"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.273874908Z",
+          "seal": {
+            "by": "server",
+            "mac": "8db221b62e1368e5b683cc288e432f6fb4e83a10a70bf38925f9df3cab598128"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.273874908Z",
+      "seal": {
+        "by": "server",
+        "mac": "2a9024b1b574bccf75f8e26b17d6c2e940fbebacd68f1c2431a319d457e0e45f"
+      }
+    },
+    {
+      "id": "CLM-0091",
+      "statement": "The skill keeps claims_call.py as the fallback for servers at 0.2.4 or earlier, which ignore unknown arguments without an error",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "PR description: \"keeps the script as the fallback for servers at 0.2.4 or earlier, which ignore unknown arguments without an error\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md",
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0156",
+          "kind": "demonstration",
+          "locator": "audit/oldtarget/debug/claims-mcp built from git archive origin/main (version 0.2.4), python3 audit/e2e.py",
+          "summary": "Against the origin/main 0.2.4 binary the same stdio script gave: list_claims with catalog \"\" returned [] with isError false (argument ignored, no validation error), and add_claim with a source_anchor and catalog=audit/r1/claims.json failed with the server's own-directory 'git rev-parse ... not a git repository' error, the same as a call without catalog, so the old server did not act on the argument. No error named the unknown field.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.511815684Z",
+          "seal": {
+            "by": "server",
+            "mac": "f61b38a3fa04253789334380761ed3c3ac4de3bf82b3946518677aede88dcef3"
+          }
+        },
+        {
+          "id": "EVD-0157",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-286",
+          "summary": "The skill states that a 0.2.4-or-earlier server has no catalog parameter in its input schema and ignores the argument, and keeps the claims_call.py commands as the fallback.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 286
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.552568109Z",
+          "seal": {
+            "by": "server",
+            "mac": "6bed2ed6505519b589dbb357be9539474867938d6d9facc72d485c6d4e2d7cb3"
+          }
+        },
+        {
+          "id": "EVD-0182",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-283 at 2187c3f; origin/main 0.2.4 binary run (EVD-0156)",
+          "summary": "Judged as stated (fallback for 0.2.4-or-earlier servers that silently ignore unknown arguments). The skill still keeps claims_call.py as the fallback, now triggered by an input schema lacking catalog, and still says the released 0.2.4 and earlier lack the argument and silently ignore it. My earlier run of the 0.2.4 build confirms the ignoring. The version-based trigger was replaced by a schema check that covers those servers, so the stated behaviour holds though the wording differs.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 283
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.114043660Z",
+          "seal": {
+            "by": "server",
+            "mac": "ae664366ae75a19bcdb6c6efac3a9588b6d776baed9fa13ed7e57ca00e5b1566"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Running the origin/main 0.2.4 binary showed it neither validates nor acts on catalog, so the fallback to claims_call.py is needed there and the stated reason holds.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0156",
+            "EVD-0157"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.313920071Z",
+          "seal": {
+            "by": "server",
+            "mac": "67b0df9c871b033ef53d79e1f330c925d8c61f036864fa801cafb18964fac958"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Judged as stated: the skill still keeps the fallback and still says 0.2.4-or-earlier servers silently ignore catalog; the trigger is now the schema check, which covers those servers.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0182"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.367823788Z",
+          "seal": {
+            "by": "server",
+            "mac": "38d59a30086d3af35ccf7e7295d88ad6411b8c6c52eea0052514b14887aeb766"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T18:53:00.367823788Z",
+      "seal": {
+        "by": "server",
+        "mac": "b348e7f7633ac8134a33309794ebe32f6cc24118cff8768e12e52e9c86ba4266"
+      }
+    },
+    {
+      "id": "CLM-0092",
+      "statement": "cargo fmt reports no formatting changes on the head commit",
+      "kind": "non_functional",
+      "level": "system",
+      "integrity_level": 1,
+      "verification_method": "test",
+      "source": "PR description: \"`just fmt` ✅\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0158",
+          "kind": "test",
+          "locator": "cargo fmt --check (exit 0)",
+          "summary": "cargo fmt --check printed nothing and exited 0 on head b59e57e. just fmt runs cargo fmt, so no rewrite is needed.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.590776577Z",
+          "seal": {
+            "by": "server",
+            "mac": "6f47a329ef31484a89e9017977d63086785e8b93f7b6ed0565e6b1c94b04bdf0"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "cargo fmt --check exits 0 with no output on the head commit.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0158"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.353685483Z",
+          "seal": {
+            "by": "server",
+            "mac": "e043a93a8d69d8264dff3f71a180013de6be3948885c55c9ccbbb9c2467ba190"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.353685483Z",
+      "seal": {
+        "by": "server",
+        "mac": "03ab99d5275bc5d45a8c5daf121204ab933613fae075467e9e454a976940fca8"
+      }
+    },
+    {
+      "id": "CLM-0093",
+      "statement": "cargo clippy --all-targets -- -D warnings passes on the head commit",
+      "kind": "non_functional",
+      "level": "system",
+      "integrity_level": 1,
+      "verification_method": "test",
+      "source": "PR description: \"`cargo clippy --all-targets -- -D warnings` ✅\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0159",
+          "kind": "test",
+          "locator": "cargo clippy --all-targets -- -D warnings",
+          "summary": "Finished dev profile with no warnings or errors on head b59e57e.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.630901770Z",
+          "seal": {
+            "by": "server",
+            "mac": "704b00edac400c17facbebcb282f8aaba8417efc584de527c3b6afa918fd451d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "cargo clippy --all-targets -D warnings finished with no diagnostics on head.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0159"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.393706906Z",
+          "seal": {
+            "by": "server",
+            "mac": "86e21fe26d51d3d4d89dbbc719b327c8113abeaa1c47adaa5eeb3c3e88d3d866"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.393706906Z",
+      "seal": {
+        "by": "server",
+        "mac": "d9b8ebb567668e8830da6c786331a9a28cb7c5f47ab74aff23399f8c2321ee70"
+      }
+    },
+    {
+      "id": "CLM-0094",
+      "statement": "cargo test passes 157 tests on the head commit",
+      "kind": "non_functional",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"`just test` ✅ (157 passed)\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0160",
+          "kind": "test",
+          "locator": "cargo test",
+          "summary": "test result: ok. 157 passed; 0 failed; 0 ignored on head b59e57e (lib/bin run that holds server tests).",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.668173484Z",
+          "seal": {
+            "by": "server",
+            "mac": "a6a3bf171dbb7b22d360756360393103d82c599b29a0d8948f575990d5086fba"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "cargo test on head reports 157 passed, 0 failed.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0160"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.443571470Z",
+          "seal": {
+            "by": "server",
+            "mac": "98379a02aec89773e1966103b20ce6832c54c4b5e4db5e7aff62a81aedaaa567"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.443571470Z",
+      "seal": {
+        "by": "server",
+        "mac": "8386b65b080f56c57592530da2d011592dca3ab64f7d1190c482246d3c61d7ea"
+      }
+    },
+    {
+      "id": "CLM-0095",
+      "statement": "A test writes two ledgers in two repositories with different HEADs through one server whose own ledger is outside git, pins each anchor to its own repository's HEAD, and leaves the server's own ledger untouched",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"two ledgers in two repositories (with different HEADs) written through one server whose own ledger is outside git, with each anchor pinned to its own repository's HEAD and the server's own ledger untouched\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0161",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository (1 passed)",
+          "summary": "The test makes first and second repos, adds an empty 'second' commit to second only, writes via catalog to each, asserts each source_anchor.commit equals that repo's rev-parse HEAD, asserts each file holds only its own claim, and asserts the server tempdir's claims.json does not exist; server() puts the own ledger in a tempdir, outside git.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1137,
+                "end": 1180
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.708845469Z",
+          "seal": {
+            "by": "server",
+            "mac": "37b8871d9701fdf9253977cdffa4f9b689ecb89a5e580dd237b56174fd4a3489"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test constructs exactly the scenario described and asserts each element.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0161"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.483964514Z",
+          "seal": {
+            "by": "server",
+            "mac": "a9a8e9303e3f165a69582529801312fa32ab70a312ab05fa962c758f7b46c2f2"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.483964514Z",
+      "seal": {
+        "by": "server",
+        "mac": "3fe599da56f0ea2976f975dd92cf135faac92d0eaf102faf9680ee13e6ceec53"
+      }
+    },
+    {
+      "id": "CLM-0096",
+      "statement": "Tests cover reads and recheck on a named ledger",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"reads and `recheck` on a named ledger\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0162",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository",
+          "summary": "get_claim on the second ledger returns statement 'second'; recheck on the first ledger returns head equal to first repo's HEAD and checked 1.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1181,
+                "end": 1204
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.749862155Z",
+          "seal": {
+            "by": "server",
+            "mac": "00db6e4ee5d3151bba18366d3afa5ce005ea4fdba449c4c91c1dfb9bd403e422"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The same test calls get_claim and recheck with catalog and asserts the second ledger's claim and the first repo's HEAD.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0162"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.523589955Z",
+          "seal": {
+            "by": "server",
+            "mac": "cdc0c8a4152cf90a45c646dd00d4b105687ee6f4e5b921d3006ad5e05ffffdfe"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.523589955Z",
+      "seal": {
+        "by": "server",
+        "mac": "a793ae5c6dc21ea6391a38512418fbaf1fd889a387ab4c0fe307ab1bd2acb44c"
+      }
+    },
+    {
+      "id": "CLM-0097",
+      "statement": "A test shows a call without catalog still writing the server's ledger",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"a call without `catalog` still writing the server's ledger\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0163",
+          "kind": "test",
+          "locator": "cargo test server::tests::per_call_catalog_writes_that_ledger_and_pins_its_repository",
+          "summary": "Final block adds 'plain' via default_ledger and asserts the server's own claims.json contains it and the id is CLM-0001.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1206,
+                "end": 1215
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.791153852Z",
+          "seal": {
+            "by": "server",
+            "mac": "172b57e788252a77b3fb87fa156c2e4605ea87fef8775d356890532c7cfe0a0c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The final block of the test asserts the no-catalog call lands in the server's own ledger.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0163"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.563904629Z",
+          "seal": {
+            "by": "server",
+            "mac": "28bfcdbe9ca09f6a76aa4a91d53a9024c129d3366d1439b49f8d95316c2e7e98"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.563904629Z",
+      "seal": {
+        "by": "server",
+        "mac": "ef23c193363ad195b9c9c04f3c839dd0a75b5fce35048e327805de8e827f88c7"
+      }
+    },
+    {
+      "id": "CLM-0098",
+      "statement": "A test shows an anchored call that names no ledger refused outside git, then succeeding with catalog",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"an anchored call that names no ledger being refused outside git, then succeeding with `catalog`\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0164",
+          "kind": "test",
+          "locator": "cargo test server::tests::anchors_follow_the_named_ledgers_repository (1 passed)",
+          "summary": "First asserts is_error true and text starts with 'git rev-parse' for an anchored call with no catalog; then asserts is_error false for the same call with catalog in a repo.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1217,
+                "end": 1239
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.840654814Z",
+          "seal": {
+            "by": "server",
+            "mac": "e3646f8658bffb6bc10b24ab79f62ad9a3a3d84dad7f79b22b6d8d323a2f4360"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "anchors_follow_the_named_ledgers_repository asserts refusal then success as described.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0164"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.605188236Z",
+          "seal": {
+            "by": "server",
+            "mac": "e7ff3439489fb7d172f117094b20244932faa7b7ad372067aee6eac4f90e5fb5"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.605188236Z",
+      "seal": {
+        "by": "server",
+        "mac": "6974a48e0a3305e3a748b2bf8a0f4492008fa72e0b5cb51a942111b0e155a2a3"
+      }
+    },
+    {
+      "id": "CLM-0099",
+      "statement": "A test covers flat deserialization of OnLedger with a tool's own parameters",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"flat deserialization\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0165",
+          "kind": "test",
+          "locator": "cargo test server::tests::catalog_sits_beside_the_tools_own_flattened_parameters (1 passed)",
+          "summary": "Deserializes OnLedger<RecordVerdictParams> from flat JSON and asserts catalog and claim_id; also OnLedger<NoParams> from {} gives catalog None.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1256,
+                "end": 1271
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.889909006Z",
+          "seal": {
+            "by": "server",
+            "mac": "553cf42c78dd5ee7716d677c7a66d6a2e8ee62a2e008e50212549f9ec1b256f3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "catalog_sits_beside... deserializes OnLedger from flat JSON and asserts both catalog and the tool's own field.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0165"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.646812874Z",
+          "seal": {
+            "by": "server",
+            "mac": "d8b5c4498ffba00792a5e4a3b0b788682efe6f2265cf190dea9bc1e25f22e707"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.646812874Z",
+      "seal": {
+        "by": "server",
+        "mac": "4454ec7fa9e57ba3bc68c905f8870be6684e255c4f3fd36476de778147c1c9aa"
+      }
+    },
+    {
+      "id": "CLM-0100",
+      "statement": "A test checks that every tool's input schema offers an optional catalog",
+      "kind": "documentation",
+      "level": "unit",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"every tool's schema offering an optional `catalog`\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0166",
+          "kind": "test",
+          "locator": "cargo test server::tests::every_tool_advertises_the_catalog_argument (1 passed)",
+          "summary": "For all 12 tools asserts properties.catalog exists and is not in required.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1274,
+                "end": 1294
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:16.941458334Z",
+          "seal": {
+            "by": "server",
+            "mac": "c34f3c6068ff8cc7b75462e44f43ce8fec97cac369d9361f0808316c6f1482d9"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "every_tool_advertises_the_catalog_argument checks the property exists and is not required for all 12 tools.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0166"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.688055581Z",
+          "seal": {
+            "by": "server",
+            "mac": "cf15fd534fe03ad9d4a061f681f80ffde77ad0411ca5a0852a739ac3ddac3107"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.688055581Z",
+      "seal": {
+        "by": "server",
+        "mac": "a31723e919a27832f6b54a60c5dfaba5d7e163ab8e702d7876812a43a012a208"
+      }
+    },
+    {
+      "id": "CLM-0101",
+      "statement": "Running the debug binary over stdio with --catalog outside git and two catalog arguments puts a claim in each ledger pinned to its own HEAD, and recheck on one ledger reports its HEAD",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "PR description: \"Ran the debug binary over stdio with `--catalog` outside git and two `catalog` arguments: each ledger got its claim pinned to its own HEAD, and `recheck` on one ledger reported its HEAD.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0167",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py audit audit/../target/debug/claims-mcp (stdio, server --catalog audit/own/claims.json outside git)",
+          "summary": "Reproduced the described run: add_claim with catalog r1 and r2 and a source_anchor produced commits equal to each repo's git rev-parse HEAD (2dead97b..., 2b2d5e47...); recheck on r2 returned head 2b2d5e47... checked 1 current 1. I ran it myself; the author's run is not the evidence.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:16.981755698Z",
+          "seal": {
+            "by": "server",
+            "mac": "d4e006a88148bf771acb0e8d43ef9c095777f90c47231a6a699ee970d216ae72"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "I repeated the described stdio run on the head binary and obtained the described outcome.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0167"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.728026354Z",
+          "seal": {
+            "by": "server",
+            "mac": "7601e0b9fac3734cfac384e8068bed34105246a268cdb490ff88d9ee9793d6d4"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.728026354Z",
+      "seal": {
+        "by": "server",
+        "mac": "d67e9183714c0bab6203d154bad06b2ba7f225022a0be4094d7755904c6c2dc2"
+      }
+    },
+    {
+      "id": "CLM-0102",
+      "statement": "mdbook build docs/site succeeds and the #choosing-the-ledger anchor renders",
+      "kind": "documentation",
+      "level": "system",
+      "integrity_level": 1,
+      "verification_method": "demonstration",
+      "source": "PR description: \"`mdbook build docs/site` succeeds, and the new `#choosing-the-ledger` anchor renders.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/tools.md"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0168",
+          "kind": "demonstration",
+          "locator": "mdbook build docs/site -d audit/book; grep -c 'id=\"choosing-the-ledger\"' audit/book/reference/tools.html",
+          "summary": "Build finished with INFO only (no errors) and the grep printed 1.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T15:51:17.024057318Z",
+          "seal": {
+            "by": "server",
+            "mac": "b029eaf7fc38d141fc952d7f1e567e6718bfe1784ae0b897a74e65c636141db0"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "mdbook build succeeded and the generated tools.html contains the choosing-the-ledger id.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0168"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.771355677Z",
+          "seal": {
+            "by": "server",
+            "mac": "da6c74e5e11ea56e90fff2e0f3b7f6c3259a2f0d10674504576a3ea165188220"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.771355677Z",
+      "seal": {
+        "by": "server",
+        "mac": "6a01ef2b7bf117944a17e1d49744e889c4368bc3d3e6c5634adb026427fc9adf"
+      }
+    },
+    {
+      "id": "CLM-0103",
+      "statement": "The one-shot claims-mcp call CLI is not part of this PR",
+      "kind": "constraint",
+      "level": "system",
+      "integrity_level": 1,
+      "verification_method": "analysis",
+      "source": "PR description: \"The optional one-shot `claims-mcp call` CLI is not part of this PR.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/main.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0169",
+          "kind": "inspection",
+          "locator": "git grep -E '\\bCall\\b|claims-mcp call|\"call\"' -- src Cargo.toml (0 hits); src/main.rs:57-103",
+          "summary": "No call subcommand: the Command enum lists Schema, Verify, Tldr, Recheck, Seal, Report only.",
+          "stance": "supports",
+          "anchor": {
+            "search": {
+              "pattern": "\\bCall\\b|claims-mcp call|\"call\"",
+              "scope": [
+                "Cargo.toml",
+                "src"
+              ],
+              "hits": 0,
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:17.070985642Z",
+          "seal": {
+            "by": "server",
+            "mac": "f5da48e7efb007e5db00b5325280ba012a356e0e7927ab75f00296d1e7933464"
+          }
+        },
+        {
+          "id": "EVD-0170",
+          "kind": "inspection",
+          "locator": "src/main.rs:57-103 enum Command",
+          "summary": "Subcommands present are Schema, Verify, Tldr, Recheck, Seal, Report; no one-shot call command.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 57,
+                "end": 103
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:17.114588006Z",
+          "seal": {
+            "by": "server",
+            "mac": "25e117dcc01a90d9457f14111d924e48a7f9c1737d9e322ef9f7ba1a28299428"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A zero-hit search over src and Cargo.toml plus the Command enum, which lists no call subcommand, show the one-shot CLI was not added.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0169",
+            "EVD-0170"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.813215235Z",
+          "seal": {
+            "by": "server",
+            "mac": "c05ffcd1e88628dc83e0ede4f14430ff5df52da2afdd4ff43cf4cdb6e959a689"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.813215235Z",
+      "seal": {
+        "by": "server",
+        "mac": "7b2395eca7e0e20c5f4c3b60b4dee9b32133ffcd404151ec7e6c5412477599e5"
+      }
+    },
+    {
+      "id": "CLM-0104",
+      "statement": "The change adds no open_catalog tool; the per-call argument is the only mechanism",
+      "kind": "constraint",
+      "level": "system",
+      "integrity_level": 1,
+      "verification_method": "analysis",
+      "source": "PR description: \"I chose the per-call argument ... over an `open_catalog` tool.\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0171",
+          "kind": "inspection",
+          "locator": "git grep -nE 'open_catalog' (0 hits in src, skills, docs, Cargo.toml)",
+          "summary": "No open_catalog tool; registers_all_twelve_tools asserts the 12-name list, none of which is open_catalog.",
+          "stance": "supports",
+          "anchor": {
+            "search": {
+              "pattern": "open_catalog",
+              "case_insensitive": true,
+              "scope": [
+                "Cargo.toml",
+                "docs",
+                "skills",
+                "src"
+              ],
+              "hits": 0,
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:17.164948431Z",
+          "seal": {
+            "by": "server",
+            "mac": "b5b35b6f4abafdffcfb92c213a0c524faa39df8cc115b34be226f8e51e852573"
+          }
+        },
+        {
+          "id": "EVD-0172",
+          "kind": "test",
+          "locator": "cargo test server::tests::registers_all_twelve_tools (1 passed)",
+          "summary": "The tool name list asserted equal to the 12 existing names (add_claim ... recheck).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 727,
+                "end": 757
+              },
+              "commit": "b59e57e8a7c08b6a940aafd9e4a87a627f330a00"
+            }
+          },
+          "recorded_at": "2026-11-01T15:51:17.208145773Z",
+          "seal": {
+            "by": "server",
+            "mac": "15e8c0f0876f1c75565c83905822528a34d8634a07f5796aef5d52ac2f93fc11"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A zero-hit search for open_catalog across src, skills and docs plus the exact 12-tool list test show no such tool exists.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0171",
+            "EVD-0172"
+          ],
+          "recorded_at": "2026-11-01T15:51:52.854367062Z",
+          "seal": {
+            "by": "server",
+            "mac": "67826cfc01410a03d6836321ace199398683b0b9daae5f95882ffededa30f575"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T15:49:34.022660328Z",
+      "updated_at": "2026-11-01T15:51:52.854367062Z",
+      "seal": {
+        "by": "server",
+        "mac": "b748fc1f95aef1874439bd25626355b00e9c307d75c219c3aceaf8ba9c0a8e08"
       }
     }
   ]

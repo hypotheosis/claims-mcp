@@ -71,8 +71,10 @@ claude mcp add --scope project claims -- claims-mcp --catalog claims.json
 `--scope project` writes `.mcp.json`, so everyone working in the repository gets the server.
 Use `--scope user` to make it available in all your projects, or leave the flag off to register
 it for this project only. A relative `--catalog` resolves against the directory Claude Code is
-started in. If you prefer to write the `.mcp.json` entry by hand (use an absolute `command`
-path if the binary is not on `PATH`):
+started in; an agent working in another checkout, such as a git worktree, names its own ledger
+with each tool's [`catalog` parameter](../reference/tools.md#choosing-the-ledger). If you
+prefer to write the `.mcp.json` entry by hand (use an absolute `command` path if the binary is
+not on `PATH`):
 
 ```json
 {
