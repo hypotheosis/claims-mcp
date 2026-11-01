@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 143,
+  "next_claim_seq": 145,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "527f25aed3b34599a08e4e01ba05dddeec52ef4d6e66f54f562241f27305ce0d"
+    "mac": "43af11dffd2ca2da443a5641a6d28a3e2d912026db23ee36b7532b6229444d03"
   },
-  "next_evidence_seq": 248,
+  "next_evidence_seq": 257,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "0b20693e886aa87ba1153936184b81fc78105ac68908be26f52b3e0256bb8f48"
+    "mac": "2e4f4c4272b1c4cca09d0648bc400e713171466fc56fd3569deb686a758645b3"
   },
   "claims": [
     {
@@ -6570,6 +6570,28 @@
             "by": "server",
             "mac": "4e8004b1949300bdb2286152b1fb558bc2ed05f88c108387cd44aee77d603506"
           }
+        },
+        {
+          "id": "EVD-0254",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-303 (head 5b49984)",
+          "summary": "PR mode still says to pass catalog with the absolute ledger path on every call (265-277); claims_call.py is not mentioned in skills/ or docs/; the probe and stop instructions now run to line 303.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 303
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.390994161Z",
+          "seal": {
+            "by": "server",
+            "mac": "b7be43050872116db009d72371e66029191f2599efd093f316748c550b268636"
+          }
         }
       ],
       "verdicts": [
@@ -6624,13 +6646,26 @@
             "by": "server",
             "mac": "6ec230ecf5e81d294e0cabe44598bc8e1bdf6c1fcf50792dabdc26e523f698b6"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 5b49984: catalog on every call still stated and claims_call.py absent.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0254"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.778910399Z",
+          "seal": {
+            "by": "server",
+            "mac": "cefb9de9543edff69ecc338c3c316557d60a15e69bc9f90db715fb9b44aa27a1"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T21:17:54.427216016Z",
+      "updated_at": "2026-11-01T21:22:35.778910399Z",
       "seal": {
         "by": "server",
-        "mac": "afaa05c9e9be98b04dee0b011a5ea05ad95b4c80225b0b15f9e0cd63dcf34dec"
+        "mac": "3549d4425cc7ba2fbb1712bc0de2c0a7bafb8d0857e02d79e09a6bcc3054d076"
       }
     },
     {
@@ -10420,6 +10455,18 @@
             "by": "server",
             "mac": "f20aa24cda155b2f37658fd895015a76a1a198cf82f586a1e1ca1e7bd97cf538"
           }
+        },
+        {
+          "id": "EVD-0256",
+          "kind": "analysis",
+          "locator": "children of CLM-0131",
+          "summary": "At 5b49984 all children (CLM-0132 to CLM-0144) are supported, including the new pass-condition claims CLM-0143 and CLM-0144; the script is gone and the skill stops and asks for upgrade or reconnect on success or an inconclusive error.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:22:35.804630725Z",
+          "seal": {
+            "by": "server",
+            "mac": "b199c5b6ed0abc3b4427750e58e921bd7a6cabe772f50c1c727900fbc3f1daf0"
+          }
         }
       ],
       "verdicts": [
@@ -10435,13 +10482,26 @@
             "by": "server",
             "mac": "9cf62003382d0b1d550508f3870b69fd412ff57adf12fae602c630bfe8c43b45"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 5b49984: all children, including the new pass-condition claims, are supported.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0256"
+          ],
+          "recorded_at": "2026-11-01T21:22:39.351866075Z",
+          "seal": {
+            "by": "server",
+            "mac": "de7ca95d40afc2b1580baa46ddb9b50df03a7bd65c3e717521bcd6da420f9d4b"
+          }
         }
       ],
       "created_at": "2026-11-01T21:17:05.286970039Z",
-      "updated_at": "2026-11-01T21:18:03.018121279Z",
+      "updated_at": "2026-11-01T21:22:39.351866075Z",
       "seal": {
         "by": "server",
-        "mac": "33f7b7dd74669ea5c8cc748b47afc5d3df857b4afc844a22b1e66705571d8d58"
+        "mac": "b35b767588ba678b677f4281c3699dc02d83141bd1d8fecab6dfcfda3b3a2648"
       }
     },
     {
@@ -10634,6 +10694,28 @@
             "by": "server",
             "mac": "681bca35af63a556033fd11339554bbece4df2beb2db53ef16904f9b816e339e"
           }
+        },
+        {
+          "id": "EVD-0251",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-303 (5b49984)",
+          "summary": "The probe is still list_claims with catalog /nonexistent-claims-probe/claims.json; the expected error names the probe path and counts as go-ahead. Narrowed: a different error is now inconclusive, not proof, so the claim holds for the error the probe yields (one naming the path).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 303
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.334226366Z",
+          "seal": {
+            "by": "server",
+            "mac": "f6dd2f2718ca0b300a6d24f2cd32f3280cef4b8363f5d7a64bc835322e2aa14e"
+          }
         }
       ],
       "verdicts": [
@@ -10649,13 +10731,26 @@
             "by": "server",
             "mac": "d4af88547aeb9401100e80bd5cb4e26f8f25690b0ee714d4b4014f082cd4eb58"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 5b49984: the probe and its path-naming error as go-ahead are still in SKILL.md 279-303.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0251"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.736698537Z",
+          "seal": {
+            "by": "server",
+            "mac": "a8c86b9473fd39186c37818d1069c1f90c8958d9f3ac8ab21068e7c2e6a35a30"
+          }
         }
       ],
       "created_at": "2026-11-01T21:17:05.286970039Z",
-      "updated_at": "2026-11-01T21:17:54.464353007Z",
+      "updated_at": "2026-11-01T21:22:35.736698537Z",
       "seal": {
         "by": "server",
-        "mac": "ffb84e457a927c2e99c7b7f2abd9a5661e3ae8b0191178aa9ffbc736c2359f79"
+        "mac": "794850b6aa74b5b886c2130653dcac57bde18af8259690be8a31c19af4fcf6d4"
       }
     },
     {
@@ -10708,6 +10803,28 @@
             "by": "server",
             "mac": "e900b2990a87b0e0eb43d522b55c3a98e318ea99817d8fa7c429b1eaff9f5a9f"
           }
+        },
+        {
+          "id": "EVD-0252",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:295-303 (5b49984)",
+          "summary": "\"Any other outcome means stop: make no further claims-mcp calls, and ask the user to upgrade claims-mcp and restart the session or reconnect the server\"; the first listed outcome is \"If the call succeeds, the server ignored the argument.\" No fallback script remains.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 295,
+                "end": 303
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.350949681Z",
+          "seal": {
+            "by": "server",
+            "mac": "9b1c0619debcf6014e671e3165759ed9c55bfdbfa5d119c9b13e9bf71313293c"
+          }
         }
       ],
       "verdicts": [
@@ -10723,13 +10840,26 @@
             "by": "server",
             "mac": "ff81d5fc893c5f793a487b451d4eb8ede3f78f3f73555368b783b6af303ebebf"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 5b49984: success still means stop and ask for upgrade and restart or reconnect.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0252"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.749498870Z",
+          "seal": {
+            "by": "server",
+            "mac": "e4d6cec2debf6550327c2d28e8c04d72397d1c6b5e7cbb4a7dfcd55365dec448"
+          }
         }
       ],
       "created_at": "2026-11-01T21:17:05.286970039Z",
-      "updated_at": "2026-11-01T21:17:54.477196359Z",
+      "updated_at": "2026-11-01T21:22:35.749498870Z",
       "seal": {
         "by": "server",
-        "mac": "7cd974b013a9e79a0b7eeec42870c8f56d493433f8d1c385f07654721559a796"
+        "mac": "37a57a77c1ae035c6cb612bdd0ba0540056a354badf3355c97ebb6ae612331df"
       }
     },
     {
@@ -10856,6 +10986,28 @@
             "by": "server",
             "mac": "967c40301094f7e22282aac61496b3b9927033083724d20ebe1467cbeadb5d65"
           }
+        },
+        {
+          "id": "EVD-0253",
+          "kind": "inspection",
+          "locator": "docs/site/src/reference/tools.md:37-43 (5b49984)",
+          "summary": "The rewrapped paragraph still describes the same check: a read tool with catalog /nonexistent-claims-probe/claims.json; a supporting server fails to open it, an older one answers normally; the schema is not proof. mdbook build passes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/tools.md",
+              "lines": {
+                "start": 37,
+                "end": 43
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.368047426Z",
+          "seal": {
+            "by": "server",
+            "mac": "e1e94f1c1fe4b10162580dff147f260a719444e8b33c25e986f9babf1c9991d2"
+          }
         }
       ],
       "verdicts": [
@@ -10871,13 +11023,26 @@
             "by": "server",
             "mac": "bb3dc624b178d239d48863ec5c0851893cab533a8284d79aa23ed6ae217e9680"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 5b49984: tools.md 37-43 still describes the same check, now with the path-naming condition.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0253"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.766032986Z",
+          "seal": {
+            "by": "server",
+            "mac": "9ddc42c8b9f78c29ca85ddcd09a84c97e9d2f04f2898d78d1792b33311b02def"
+          }
         }
       ],
       "created_at": "2026-11-01T21:17:05.286970039Z",
-      "updated_at": "2026-11-01T21:17:54.501220807Z",
+      "updated_at": "2026-11-01T21:22:35.766032986Z",
       "seal": {
         "by": "server",
-        "mac": "9e37aa7b8c142f6b673831d52dee2e177b110a0b3ee51159c35bda4a2e9ec60d"
+        "mac": "6481f165ace73843663bbf9e404343074d4d4523ab3392d4eab7a00234cdf9a9"
       }
     },
     {
@@ -11034,6 +11199,18 @@
             "by": "server",
             "mac": "1d1ef04dc8a79a4c46151996fa1017598096ae12787b3cffa5b6b9eb0b08e52f"
           }
+        },
+        {
+          "id": "EVD-0255",
+          "kind": "log",
+          "locator": "cargo test; cargo clippy --all-targets -- -D warnings; cargo fmt --check; mdbook build docs/site (at 5b49984)",
+          "summary": "Rerun at 5b49984: cargo test 175 passed, 0 failed; clippy finished clean; fmt --check clean; mdbook built with no errors.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:22:23.404989696Z",
+          "seal": {
+            "by": "server",
+            "mac": "521276023a6ec28b3ad3f403d32fc9a1c16d36dbeda2ccc11f49da565cd47dd5"
+          }
         }
       ],
       "verdicts": [
@@ -11049,13 +11226,26 @@
             "by": "server",
             "mac": "e69c5d5113f0399b3b277301696ca2a4eaed8f93b3a64acf592fcdf1ccb8f3f3"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Gates rerun at 5b49984 pass with 175 tests.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0255"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.791995693Z",
+          "seal": {
+            "by": "server",
+            "mac": "eb9bb16559c5835c4b6b08fd59713fc8c774ec801be7dcec7b9b7ae5c3d86a2c"
+          }
         }
       ],
       "created_at": "2026-11-01T21:17:05.286970039Z",
-      "updated_at": "2026-11-01T21:17:54.541369857Z",
+      "updated_at": "2026-11-01T21:22:35.791995693Z",
       "seal": {
         "by": "server",
-        "mac": "b94848a6633a80c648c416b0a3878112b26c5887344f4020e52e3efb01160491"
+        "mac": "96f64808825415647b0587a54dd4765777faf94661d491ccfc7356d8f9c82d66"
       }
     },
     {
@@ -11178,6 +11368,167 @@
       "seal": {
         "by": "server",
         "mac": "fcb7615c46c84e0f83efad340d9b47731f743811dae00ae4008367717d2eb107"
+      }
+    },
+    {
+      "id": "CLM-0143",
+      "statement": "the skill treats only an error naming the probe path as a pass, and an error not naming it as inconclusive (stop)",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back; review fix 5b49984",
+      "source_anchor": {
+        "path": "skills/claims-audit/SKILL.md",
+        "lines": {
+          "start": 290,
+          "end": 303
+        },
+        "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0248",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:290-303 (5b49984)",
+          "summary": "\"Go ahead only if the error names /nonexistent-claims-probe/.\" \"Any other outcome means stop\"; sub-bullets list success (server ignored catalog) and an error not naming the probe path (inconclusive; an older server reads the session ledger and may fail for its own reasons). Stop instruction: no further calls, ask for upgrade and restart/reconnect.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 290,
+                "end": 303
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.286666222Z",
+          "seal": {
+            "by": "server",
+            "mac": "431bedf437043c401ccfc600596f2be1e7c9b27efee454d682a0074bd66300f9"
+          }
+        },
+        {
+          "id": "EVD-0249",
+          "kind": "demonstration",
+          "locator": "claims MCP list_claims {\"catalog\": \"/nonexistent-claims-probe/claims.json\"} at head 5b49984",
+          "summary": "The 0.2.5 server's error was \"catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory (os error 2)\", which names /nonexistent-claims-probe/, so the stated pass condition is satisfiable by a supporting server.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:22:23.300838148Z",
+          "seal": {
+            "by": "server",
+            "mac": "30139041b3481da9b44e1ae14fe9a3d39400706ed0a25c5b913a7ee1bead318e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "SKILL.md 290-303 allows go-ahead only for an error naming the probe path and says to stop for success or any other error; the real server error names the path.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0248",
+            "EVD-0249"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.709464646Z",
+          "seal": {
+            "by": "server",
+            "mac": "0a9933b39335322e12844a9514b27007d4811888d434282e76d86a14ecaa891e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:22:05.433273338Z",
+      "updated_at": "2026-11-01T21:22:35.709464646Z",
+      "seal": {
+        "by": "server",
+        "mac": "a28a518a3d4f2d0fa564b3317d178d50c04d7680aa97530a5cb0535446bc2630"
+      }
+    },
+    {
+      "id": "CLM-0144",
+      "statement": "docs/site/src/reference/tools.md says a supporting server fails with an error that names the probe path, and that an error not naming it is inconclusive because an older server reading its own ledger can fail for unrelated reasons",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back; review fix 5b49984",
+      "source_anchor": {
+        "path": "docs/site/src/reference/tools.md",
+        "lines": {
+          "start": 37,
+          "end": 43
+        },
+        "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/tools.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0250",
+          "kind": "inspection",
+          "locator": "docs/site/src/reference/tools.md:37-43 (5b49984)",
+          "summary": "Says a supporting server fails \"with an error that names that path\", an older one answers normally, and \"Treat an error that doesn't name the probe path as inconclusive: an older server reading its own ledger can fail for unrelated reasons.\" mdbook build passes; lines are now wrapped evenly.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/tools.md",
+              "lines": {
+                "start": 37,
+                "end": 43
+              },
+              "commit": "5b499842d0cb6869108b76a8ea6db84d482b1eb4"
+            }
+          },
+          "recorded_at": "2026-11-01T21:22:23.317230751Z",
+          "seal": {
+            "by": "server",
+            "mac": "de55e1671b6ba4f9b07d7797132118696cb88125d8729e07bb6fa99a18171185"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "tools.md 37-43 states the path-naming error and the inconclusive case.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0250"
+          ],
+          "recorded_at": "2026-11-01T21:22:35.723961625Z",
+          "seal": {
+            "by": "server",
+            "mac": "40ea27b4b781ae26621a2035b9638940c4ff3b95258bff80608ef0f9a046caff"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:22:05.433273338Z",
+      "updated_at": "2026-11-01T21:22:35.723961625Z",
+      "seal": {
+        "by": "server",
+        "mac": "556981d1060d9facd6d4125d3781984880ff9441b879fb29fcd04eecccfcbcbd"
       }
     }
   ]
