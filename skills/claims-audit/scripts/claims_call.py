@@ -129,8 +129,18 @@ def main():
         print(f"claims_call.py: {error}", file=sys.stderr)
         status = 2
     finally:
-        proc.stdin.close()
-        proc.wait(timeout=30)
+        # Never let shutdown replace the outcome: the results below must still be printed.
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+            print("claims_call.py: claims-mcp did not exit; killed it", file=sys.stderr)
+            status = status or 2
 
     json.dump(results, sys.stdout, indent=2)
     sys.stdout.write("\n")
