@@ -150,7 +150,8 @@ case "$1 $2" in
             git -C "${TEST_UPSTREAM_CLONE}" commit --quiet --allow-empty -m 'landed meanwhile'
             git -C "${TEST_UPSTREAM_CLONE}" push --quiet origin main
         fi
-        printf 'https://github.com/example/repo/pull/1\n'
+        # TEST_PR_URL: what gh prints instead of the pull request's URL.
+        printf '%s\n' "${TEST_PR_URL-https://github.com/example/repo/pull/1}"
         ;;
     'pr checks')
         # TEST_CHECK_COUNT checks registered (default 1); watching them exits with
@@ -164,12 +165,21 @@ case "$1 $2" in
     'pr view')
         case " $* " in
             *' reviews '*) printf '%s\n' "${TEST_REVIEW_COUNT:-1}" ;;
-            *' mergeCommit '*) git -C "${TEST_INTEGRATION_CLONE}" rev-parse HEAD ;;
+            # TEST_MERGE_COMMIT, when set (even empty), replaces the real merge commit.
+            *' mergeCommit '*)
+                if [[ -n "${TEST_MERGE_COMMIT+set}" ]]; then
+                    printf '%s\n' "${TEST_MERGE_COMMIT}"
+                else
+                    git -C "${TEST_INTEGRATION_CLONE}" rev-parse HEAD
+                fi
+                ;;
             *) printf 'unexpected gh pr view: %s\n' "$*" >&2; exit 64 ;;
         esac
         ;;
     'api graphql')
+        # TEST_GRAPHQL_STATUS: the exit status of the review threads query (default 0).
         printf '%s\n' "${TEST_UNRESOLVED_THREADS:-0}"
+        exit "${TEST_GRAPHQL_STATUS:-0}"
         ;;
     'pr close')
         ;;
@@ -505,6 +515,46 @@ test_ship_closes_when_main_moves() {
     pass 'ship: main moving mid-ship closes the pull request and tags nothing'
 }
 
+# Ship's remaining guards: a bad RELEASE_REVIEWER, gh pr create printing no URL, and a failed
+# review threads query stop before any merge; a missing merge commit, or one that does not
+# contain the release commit, stop after the merge and before the tag moves or is pushed.
+test_ship_guards() {
+    local work integration unrelated
+    work="$(create_repository ship-guards)"
+    prepare_release "${work}"
+
+    RELEASE_REVIEWER='not a login!' run_script "${work}" scripts/release-ship.sh
+    assert_rejected 'a bad reviewer login' "RELEASE_REVIEWER 'not a login!' is not a login"
+    TEST_PR_URL='created, see the web UI' run_script "${work}" scripts/release-ship.sh
+    assert_rejected 'no pull request URL' \
+        "gh pr create returned 'created, see the web UI', not a pull request URL"
+    TEST_GRAPHQL_STATUS=1 run_script "${work}" scripts/release-ship.sh
+    assert_rejected 'a failed review threads query' \
+        "could not read the review threads of ${PR_URL}"
+    ! remote_has_ref ship-guards refs/tags/v1.2.3 || fail 'a guard let the tag through'
+
+    for case_name in ship-no-merge-commit ship-unrelated-merge-commit; do
+        work="$(create_repository "${case_name}")"
+        integration="$(second_clone "${case_name}" integration)"
+        prepare_release "${work}"
+        if [[ "${case_name}" == ship-no-merge-commit ]]; then
+            TEST_MERGE_COMMIT='' TEST_INTEGRATION_CLONE="${integration}" \
+                TEST_RELEASE_BRANCH='release/v1.2.3' run_script "${work}" scripts/release-ship.sh
+            assert_rejected 'no merge commit' "${PR_URL} reports no merge commit"
+        else
+            unrelated="$(git -C "${work}" rev-parse 'v1.2.2^{commit}')"
+            TEST_MERGE_COMMIT="${unrelated}" TEST_INTEGRATION_CLONE="${integration}" \
+                TEST_RELEASE_BRANCH='release/v1.2.3' run_script "${work}" scripts/release-ship.sh
+            assert_rejected 'an unrelated merge commit' \
+                "merge commit ${unrelated} does not contain the release commit"
+        fi
+        ! remote_has_ref "${case_name}" refs/tags/v1.2.3 || fail "${case_name}: tag pushed"
+        [[ "$(git -C "${work}" rev-parse 'v1.2.3^{commit}')" \
+            == "$(git -C "${work}" rev-parse HEAD)" ]] || fail "${case_name}: the local tag moved"
+    done
+    pass 'ship: a bad reviewer login, no PR URL, a failed thread query, and a bad merge commit'
+}
+
 test_ship_tags_merge_commit() {
     local work integration gh_log tagged
     work="$(create_repository ship-ok)"
@@ -650,6 +700,7 @@ main() {
     test_ship_stops_on_failed_checks
     test_ship_stops_on_review
     test_ship_closes_when_main_moves
+    test_ship_guards
     test_ship_tags_merge_commit
     test_branch_check
     test_abort_refusals
