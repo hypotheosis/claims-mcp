@@ -254,9 +254,11 @@ producer's account, and the core rule forbids using them as evidence.
 
 - **Ledger mode**: `claims.json` is tracked in the repository (`git ls-files --error-unmatch
   claims.json`). Findings are recorded in it through the tools and committed on the branch.
-- **Table-only mode**: no tracked ledger. **Call no write tool**: the server creates the ledger
-  on the first write, so a write would add an unplanned `claims.json` to the repository. Read
-  tools are fine. Apply the same method and return the findings for the PR description only,
+- **Table-only mode**: no tracked ledger. **Make no claims-mcp calls at all.** A write creates the
+  ledger, and even a read creates the sidecar `.claims.json.lock` next to where the ledger would
+  be, which a later `git add -A` would commit; with no ledger there is nothing to read anyway.
+  If either file appears, delete it before committing. Apply the same method and return the
+  findings for the PR description only,
   **without claim ids**. Ids in a description would not match the ones a ledger committed later
   assigns.
 
