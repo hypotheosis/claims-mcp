@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 105,
+  "next_claim_seq": 130,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "065454a838be246886a5e053c92d83e7569c276645945feceac2944163302a81"
+    "mac": "18cc5d9d3cea4e922664e2ca19d602137231ecbe5f3a0e6a3f2c4d034f557704"
   },
-  "next_evidence_seq": 183,
+  "next_evidence_seq": 225,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "4e24ca6f7707783fb09b95cee90efff7eb94026a483d0f7203bd54cf3116f8d5"
+    "mac": "46cb3a7a21dafc1732caf0a5799b05021f89349c8f3e2aee087e2de4174a624f"
   },
   "claims": [
     {
@@ -5607,6 +5607,28 @@
             "by": "server",
             "mac": "7f997b4755ab110bd7033c87d18bb0469984bafaab502766df7a8114a217bd48"
           }
+        },
+        {
+          "id": "EVD-0221",
+          "kind": "inspection",
+          "locator": "docs/site/src/reference/cli.md:23-32 vs src/main.rs:60-120 enum Command (head 5a8638f)",
+          "summary": "The Command enum has Schema, Verify, Tldr, Recheck, Rebase, Seal, Report{Init}; the table lists (none), verify, tldr, recheck, rebase, seal --adopt, report init and schema. The new rebase row keeps the lists equal.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/cli.md",
+              "lines": {
+                "start": 23,
+                "end": 32
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:53.299544191Z",
+          "seal": {
+            "by": "server",
+            "mac": "85d2dd785b102e640627cc574c4a20c329dfd96121e2456099cded42c8e80a8e"
+          }
         }
       ],
       "verdicts": [
@@ -5622,13 +5644,26 @@
             "by": "server",
             "mac": "4c0e0d13cd22c015f40e1b825e31a02cb78eb09021b3ff68f519f98e3f593d12"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head after the diff changed the anchored lines: the new Rebase variant has its row, so the reference still lists exactly the subcommands.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0221"
+          ],
+          "recorded_at": "2026-11-01T19:10:53.341753272Z",
+          "seal": {
+            "by": "server",
+            "mac": "3e9fa276bcb99b8b1a70b22c1283b3cac5be0f7c7be1e4aeb76fe3ddde330aad"
+          }
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.169997613Z",
+      "updated_at": "2026-11-01T19:10:53.341753272Z",
       "seal": {
         "by": "server",
-        "mac": "cb15d8710773b884153cefdd4423017b76f64fd61698be538a36f6a79bdfa1ce"
+        "mac": "852477cd5d4a3a73622c728baf0017c6a33bc53f7855696e1d143055b1f74840"
       }
     },
     {
@@ -6491,6 +6526,28 @@
             "by": "server",
             "mac": "f7defd923678afd08fb3599fb7d62bf7f3d0537f1f560b2f5a393aa5f2171f44"
           }
+        },
+        {
+          "id": "EVD-0222",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-286 (head 5a8638f)",
+          "summary": "PR mode still says to pass catalog with the absolute ledger path on every call and keeps claims_call.py as the fallback after a schema check; this diff changed only the 'When main's ledger moved' section.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 286
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:53.388176237Z",
+          "seal": {
+            "by": "server",
+            "mac": "da7deb691611f9e93fbc82aaa7753e138677c21a5b69381c146465e74181fdcd"
+          }
         }
       ],
       "verdicts": [
@@ -6519,13 +6576,26 @@
             "by": "server",
             "mac": "47d8aecd6b55a23fd6a9635c405559f63beaa4b53f8599bbffde7cc7ea260923"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the anchored paragraph is unchanged in substance.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0222"
+          ],
+          "recorded_at": "2026-11-01T19:10:53.430480669Z",
+          "seal": {
+            "by": "server",
+            "mac": "41164bfb034cf126230e57bbbfbcb64a1bbf72540fbb3a207cac5612c336b9af"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T18:53:00.208702595Z",
+      "updated_at": "2026-11-01T19:10:53.430480669Z",
       "seal": {
         "by": "server",
-        "mac": "2846fa0f6200e287555b75c7898c23e6391ecf8c5890cb79f15de45b240d9e73"
+        "mac": "6b363b337b0ab955ce5341d4c06d656ca13128c931c8d99c490cd2830ff9b8a5"
       }
     },
     {
@@ -7200,6 +7270,28 @@
             "by": "server",
             "mac": "ae664366ae75a19bcdb6c6efac3a9588b6d776baed9fa13ed7e57ca00e5b1566"
           }
+        },
+        {
+          "id": "EVD-0223",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-286 (head 5a8638f)",
+          "summary": "The skill still keeps claims_call.py as the fallback when the tool schema lacks catalog (0.2.4 and earlier ignore the argument).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 286
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:53.476513592Z",
+          "seal": {
+            "by": "server",
+            "mac": "026fbb6361d1d246b33293a0be28db6ed2dc98079a07d17d7a118d2811504757"
+          }
         }
       ],
       "verdicts": [
@@ -7229,13 +7321,26 @@
             "by": "server",
             "mac": "38d59a30086d3af35ccf7e7295d88ad6411b8c6c52eea0052514b14887aeb766"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the fallback text is still present.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0223"
+          ],
+          "recorded_at": "2026-11-01T19:10:53.517403360Z",
+          "seal": {
+            "by": "server",
+            "mac": "09dd5abd6e376445abad8b21a3cfb36b88e979af41c9fcead5a4eb70de58ebea"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T18:53:00.367823788Z",
+      "updated_at": "2026-11-01T19:10:53.517403360Z",
       "seal": {
         "by": "server",
-        "mac": "b348e7f7633ac8134a33309794ebe32f6cc24118cff8768e12e52e9c86ba4266"
+        "mac": "84e0614bf607f479296b540f0b2fbcbc635a4f36c44e738e80e6a4946e499eeb"
       }
     },
     {
@@ -7973,6 +8078,28 @@
             "by": "server",
             "mac": "25e117dcc01a90d9457f14111d924e48a7f9c1737d9e322ef9f7ba1a28299428"
           }
+        },
+        {
+          "id": "EVD-0224",
+          "kind": "inspection",
+          "locator": "src/main.rs:60-120 enum Command (head 5a8638f); git grep for call subcommand: 0 hits",
+          "summary": "This PR adds Rebase to Command; no one-shot call subcommand exists.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 60,
+                "end": 120
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:53.562701791Z",
+          "seal": {
+            "by": "server",
+            "mac": "27106ad856ffd25d543255ff0366fbc13f88c52813e14f7c223572f64c6fb935"
+          }
         }
       ],
       "verdicts": [
@@ -7989,13 +8116,26 @@
             "by": "server",
             "mac": "c05ffcd1e88628dc83e0ede4f14430ff5df52da2afdd4ff43cf4cdb6e959a689"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at head: the enum has no call subcommand.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0224"
+          ],
+          "recorded_at": "2026-11-01T19:10:53.604397161Z",
+          "seal": {
+            "by": "server",
+            "mac": "52b3f0a1bb59472b5d8040376ff6a5aa3d0b4b349f3f3ad4711d8a1389c3d7d3"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:52.813215235Z",
+      "updated_at": "2026-11-01T19:10:53.604397161Z",
       "seal": {
         "by": "server",
-        "mac": "7b2395eca7e0e20c5f4c3b60b4dee9b32133ffcd404151ec7e6c5412477599e5"
+        "mac": "c04464442922dec276a0d9d6e941160b6b7857711061be674e716e4a80a52ac9"
       }
     },
     {
@@ -8089,6 +8229,1784 @@
       "seal": {
         "by": "server",
         "mac": "b748fc1f95aef1874439bd25626355b00e9c307d75c219c3aceaf8ba9c0a8e08"
+      }
+    },
+    {
+      "id": "CLM-0105",
+      "statement": "claims-mcp rebase combines two branches that both wrote claims.json into a ledger that passes verify (issue #32, option 2)",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/32 'A replay command'",
+      "derived_from": [],
+      "artifacts": [
+        "src/rebase.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0220",
+          "kind": "analysis",
+          "locator": "children of CLM-0105",
+          "summary": "All 24 child claims are supported: the two acceptance criteria by end-to-end runs in scratch git repos with the release binary, and the PR description's statements by test, build and lint runs, code reading and further scratch runs. Together they cover the replay command, the id mapping, the refusals and the docs.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 107,
+                "end": 132
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:53.211364856Z",
+          "seal": {
+            "by": "server",
+            "mac": "3b0437d0b5299970d0b1173a194d85b3e606fbfdba2dff400d8613dc87a9056e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All children are supported, and the analysis item explains their coverage of option 2.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0220"
+          ],
+          "recorded_at": "2026-11-01T19:10:53.254387430Z",
+          "seal": {
+            "by": "server",
+            "mac": "15f797346e0a9d1834c5d3196e940012eee67c43565fed137816e1485e10915e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:53.254387430Z",
+      "seal": {
+        "by": "server",
+        "mac": "ecfcdf72e88d588965f13f61bbeb8088657ed4f48dda0eb254f8ad3a2ebfad1e"
+      }
+    },
+    {
+      "id": "CLM-0106",
+      "statement": "Two branches that both added claims and evidence can be combined into a ledger that passes `verify`, with no hand edits",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/32 Acceptance (1)",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0183",
+          "kind": "demonstration",
+          "locator": "scratch repo audit/r2: base (1 claim); b1 and b2 each add a parent+child claim, 2 evidence items and a verdict; git merge --no-commit; git checkout HEAD -- claims.json; claims-mcp rebase --onto main2.json --base base2.json; claims-mcp verify",
+          "summary": "Rebase of b2 onto b1's ledger printed CLM-0002->CLM-0004, CLM-0003->CLM-0005, EVD-0001->EVD-0003, EVD-0002->EVD-0004; verify printed 'integrity verified (13 records checked)', rc 0. Child's derived_from became CLM-0004 and the verdict's evidence_ids became EVD-0004. No hand edits.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.640916841Z",
+          "seal": {
+            "by": "server",
+            "mac": "f81e3eff2e5c067fce07f2dbac9b583fed9a299389f72f63eeff3437b30f6fb4"
+          }
+        },
+        {
+          "id": "EVD-0184",
+          "kind": "demonstration",
+          "locator": "scratch repo audit/r1: issue reproduction (one evidence item on each branch), guide procedure, then verify",
+          "summary": "git merged b1 then b2 cleanly; the guide's procedure printed EVD-0001 -> EVD-0002 and verify printed 'integrity verified (6 records checked)'; merging the result back into main then verify also passed (rc 0).",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.681229387Z",
+          "seal": {
+            "by": "server",
+            "mac": "f193ea91b4997fd4627c679574542333de706d59b0d75c4f8f095a1eeda917d0"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both the issue's reproduction (r1) and a larger case with new claims, evidence and verdicts on both sides (r2) ended in a ledger passing verify with no hand edits, using the guide's procedure and the binary built at head.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0183",
+            "EVD-0184"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.284603110Z",
+          "seal": {
+            "by": "server",
+            "mac": "519879bc76fc7abf1bb0586973e6fd3415e0ad4f7c2d5b9599123244d8c20f10"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.284603110Z",
+      "seal": {
+        "by": "server",
+        "mac": "be897dda5d6e9951bfbd85647ec2a8300c3e82dabc3b889f3942d99c34955951"
+      }
+    },
+    {
+      "id": "CLM-0107",
+      "statement": "The rebase command prints the old-to-new id mapping so a PR description can be updated",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/32 Acceptance (2)",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/main.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0185",
+          "kind": "demonstration",
+          "locator": "claims-mcp --catalog claims.json rebase ... (audit/r1, audit/r2) and with --json (audit/r3)",
+          "summary": "Human output lists 'rebased ... : N new claims, M new evidence items' then one 'OLD -> NEW' line per claim and evidence item; --json printed {\"claims\":[{\"from\":\"CLM-0001\",\"to\":\"CLM-0003\"},...],\"evidence\":[{\"from\":\"EVD-0001\",\"to\":\"EVD-0002\"},...]}.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.720663900Z",
+          "seal": {
+            "by": "server",
+            "mac": "a7a4fd16d69b829722eb867d6021ad02344959dcb2aa322d2c870baa45c75607"
+          }
+        },
+        {
+          "id": "EVD-0186",
+          "kind": "inspection",
+          "locator": "src/main.rs:474-495 write_mapping and :438-470 rebase_catalog",
+          "summary": "write_mapping prints one 'from -> to' line per claim then per evidence item; --json serializes the IdMapping. A unit test at src/main.rs:546-558 asserts the exact text.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 474,
+                "end": 495
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:05.762402060Z",
+          "seal": {
+            "by": "server",
+            "mac": "7777496ad889b5de822403994951d36d8faf4a7b86cbbd320cef3aa8578b386b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The binary printed the old-to-new mapping in text and JSON, and the code and a unit test show the format.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0185",
+            "EVD-0186"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.324890266Z",
+          "seal": {
+            "by": "server",
+            "mac": "843f587e5c26a94e3e3ba09b8bc0f776c442eb3ee5e7bf8e288bf8f8edf2c2c0"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.324890266Z",
+      "seal": {
+        "by": "server",
+        "mac": "711cb088a05f537fd1e78c4429c0a4cdb750d60b9ff9f36efc82aaf7dbfc02ab"
+      }
+    },
+    {
+      "id": "CLM-0108",
+      "statement": "PR description: `just test` passes with 171 tests, including 13 new `rebase::tests`",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: `just test` ✅ (171 passed, including 13 new `rebase::tests` and one CLI output test)",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0187",
+          "kind": "test",
+          "locator": "cargo test (head 5a8638f)",
+          "summary": "test result: ok. 171 passed; 0 failed. cargo test rebase:: ran 13 passed (a_base_newer..., rebasing_twice_is_refused, ...). 13 rebase::tests confirmed by name listing; the CLI output test is main.rs write_mapping test.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.801841093Z",
+          "seal": {
+            "by": "server",
+            "mac": "4cfadd7aa976bced64f876b1e5f1021257873b17e792c110920db9e5608486b0"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "cargo test at head printed 171 passed, 0 failed, and 13 rebase tests ran by name.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0187"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.365442102Z",
+          "seal": {
+            "by": "server",
+            "mac": "8908beefb37b05b7766a6fafd06d2e144d7f94fe4e072440633fa825be700fb4"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.365442102Z",
+      "seal": {
+        "by": "server",
+        "mac": "82c033dc1a358f6e97587eda7db63475305c969fb642821712ee31fa5c95f94d"
+      }
+    },
+    {
+      "id": "CLM-0109",
+      "statement": "PR description: `cargo clippy --all-targets -- -D warnings` is clean",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: `cargo clippy --all-targets -- -D warnings` ✅",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0188",
+          "kind": "log",
+          "locator": "cargo clippy --all-targets -- -D warnings (head 5a8638f)",
+          "summary": "Finished with no warnings or errors.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.840759614Z",
+          "seal": {
+            "by": "server",
+            "mac": "8aefe717d2efc4c5ca6d90982a4dc83edec11ef9b0f873f7e18599ca33df535d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Clippy with -D warnings finished cleanly at head.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0188"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.405248456Z",
+          "seal": {
+            "by": "server",
+            "mac": "7043dcb415fe14b5926454e3bed3c2a6fd46ae6380d92ab8d4e32422bf8b74ac"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.405248456Z",
+      "seal": {
+        "by": "server",
+        "mac": "16218be3af201ca18dda9aa3b2005621ac95c918ae71bc557c956a2b28130a83"
+      }
+    },
+    {
+      "id": "CLM-0110",
+      "statement": "PR description: `just fmt` leaves the tree unchanged",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 1,
+      "verification_method": "test",
+      "source": "PR description: `just fmt` ✅",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0189",
+          "kind": "log",
+          "locator": "just fmt; git status --short (head 5a8638f)",
+          "summary": "After just fmt, git status --short printed nothing: the tree was unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.880880909Z",
+          "seal": {
+            "by": "server",
+            "mac": "a7d7d4dedc383f41170bb395e73f81b95dbd68da0c811a4226fbfe3c7288cce3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "just fmt left git status empty.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0189"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.444388678Z",
+          "seal": {
+            "by": "server",
+            "mac": "96e258c0b766f956958900ca4623d69e26dbc6cb6da8fe2c57e69bef70c318c5"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.444388678Z",
+      "seal": {
+        "by": "server",
+        "mac": "0ff98ab61f88d7e1f38d62b865f78ae68430af2689b41cba75a49f8a75af295e"
+      }
+    },
+    {
+      "id": "CLM-0111",
+      "statement": "PR description: `just docs` (mdbook build) succeeds",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 1,
+      "verification_method": "test",
+      "source": "PR description: `just docs` (mdbook build) ✅",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0190",
+          "kind": "log",
+          "locator": "just docs (mdbook build)",
+          "summary": "mdbook finished: 'HTML book written to docs/site/book', no errors.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.921132094Z",
+          "seal": {
+            "by": "server",
+            "mac": "6733e25fc68147bfa002a1beeeabdc18b64aa803a6a0d619df843ee9e28f0069"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "just docs built the book without errors.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0190"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.483863191Z",
+          "seal": {
+            "by": "server",
+            "mac": "291c2e188528ded9609b1c03806c7d299bad034a80d52b9fe750eb3d343caca1"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.483863191Z",
+      "seal": {
+        "by": "server",
+        "mac": "af1b7470cf694ccd71eceebaad88bb56111398f9837d909f06b15ca1a6e59c50"
+      }
+    },
+    {
+      "id": "CLM-0112",
+      "statement": "PR description: the issue's reproduction (one evidence item on each branch, textual merge clean, verify failing with EVD-0001 appears more than once) is repaired by the guide's procedure and the merge result passes verify",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "PR description: the issue's reproduction ... is repaired by the guide's procedure, and the merge result passes `verify`",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "docs/site/src/guides/parallel-branches.md"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0191",
+          "kind": "demonstration",
+          "locator": "scratch repo audit/r1 as in CLM-0106; second leg: pre-rebase merge state",
+          "summary": "Before rebase the merge of b1 and b2 was textually clean (Auto-merging claims.json, no conflict); after the guide's checkout/show/rebase steps verify passed. The pre-rebase failure 'EVD-0001 appears more than once' is the issue's own reproduction and is covered by the unit test evidence_that_merged_without_a_conflict_gets_new_ids.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:05.962549953Z",
+          "seal": {
+            "by": "server",
+            "mac": "4a0ff70f82d5dcd32e10bde64731088e79ff9f41d582242ba4c8d9a98210eda6"
+          }
+        },
+        {
+          "id": "EVD-0192",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::evidence_that_merged_without_a_conflict_gets_new_ids (src/rebase.rs:553-579)",
+          "summary": "Test builds the issue reproduction, asserts seal::verify(&rebased).verified, EVD-0001 -> EVD-0002, and next_evidence_seq 3.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 553,
+                "end": 579
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.006805551Z",
+          "seal": {
+            "by": "server",
+            "mac": "e174d0d71c75df2af9037eaaa0a6f801065b00ad24deb41b9e3fb8a0acb802bd"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The issue's reproduction was run with real git branches and the binary; the guide's steps produced a ledger that passes verify, and a unit test asserts the same case. The failing pre-rebase state is the issue's own observation and is covered by the unit test.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0191",
+            "EVD-0192"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.524881379Z",
+          "seal": {
+            "by": "server",
+            "mac": "7798f3c24ac634062b29c6519f0344ca6254a95d4c721df35a2de382b64e0ead"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.524881379Z",
+      "seal": {
+        "by": "server",
+        "mac": "34e24cdfec87b305ed8228848a70d4e11263b8e704956112e1fbc578007854f6"
+      }
+    },
+    {
+      "id": "CLM-0113",
+      "statement": "PR description: a case with new claims, evidence and verdicts on both sides ends in a ledger that passes verify",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "PR description: a case with new claims, evidence and verdicts on both sides ... also ends in a ledger that passes `verify`",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0193",
+          "kind": "demonstration",
+          "locator": "scratch repo audit/r2 (see CLM-0106 first item)",
+          "summary": "New claims, evidence and verdicts on both sides: rebase ok and verify 'integrity verified (13 records checked)'. Git did not report a conflict in this case (Auto-merging claims.json), so the 'git reports a conflict' wording was not reproduced; the outcome (passes verify) was.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.047174917Z",
+          "seal": {
+            "by": "server",
+            "mac": "aa0b246626cd22e03d53b1f4a4139139ea3c55b18c75d8087c5f8e18d3f3eff5"
+          }
+        },
+        {
+          "id": "EVD-0194",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::new_claims_on_both_sides_are_renumbered_with_their_links (src/rebase.rs:582-644)",
+          "summary": "Unit test of new claims on both sides with links, evidence and verdicts; passes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 582,
+                "end": 644
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.091308674Z",
+          "seal": {
+            "by": "server",
+            "mac": "3dbced2d248f4ebdb0c87da7df6234c54908a789d43bc651c7cff11f8ea75a03"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A case with new claims, evidence and verdicts on both sides was run end to end and passes verify. Git reported no conflict in my construction of it, but the claim only asserts the verify outcome.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0193",
+            "EVD-0194"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.564596473Z",
+          "seal": {
+            "by": "server",
+            "mac": "a1a289496a818a78a78227753986835ffec1895cb523094965d7867d2609c8dc"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.564596473Z",
+      "seal": {
+        "by": "server",
+        "mac": "4ce4c0bf178d3c70205bfe5b2e5e6bb1a943f1766ad2a7877c204187a70987aa"
+      }
+    },
+    {
+      "id": "CLM-0114",
+      "statement": "PR description: a second `rebase` with the same inputs is refused with exit 1",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "PR description: a second `rebase` with the same inputs is refused; Manual Test Plan: exit 1, '--onto already holds EVD-0001 exactly as the branch does'",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0195",
+          "kind": "demonstration",
+          "locator": "claims-mcp --catalog claims.json rebase --onto main.json --base base.json (second run, audit/r1)",
+          "summary": "Second run exited 1 (ERROR ... cannot rebase: --onto already holds EVD-0001 exactly as the branch does, so the branch was already rebased onto it or --base is not the merge base).",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.132864314Z",
+          "seal": {
+            "by": "server",
+            "mac": "5ab927444d723d23ebac70fa5cb0b16107378a4f3adaf3aad3e5422e1ef4c22e"
+          }
+        },
+        {
+          "id": "EVD-0196",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::rebasing_twice_is_refused (src/rebase.rs:785-796)",
+          "summary": "Asserts the error contains 'already holds EVD-0001'.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 785,
+                "end": 796
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.176026538Z",
+          "seal": {
+            "by": "server",
+            "mac": "36a360fb9479f542099c91ca1ee6741491fcc5d4f0b22cd82ab9018815a99352"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The second run exited 1 with the stated message, and the unit test asserts the same.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0195",
+            "EVD-0196"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.607228816Z",
+          "seal": {
+            "by": "server",
+            "mac": "a80e970d78db71a69fdcdf2738ae2c3d5ae278b4cb8ad886a31d677330e38daf"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.607228816Z",
+      "seal": {
+        "by": "server",
+        "mac": "eb4561dfcec3c77f27537698068094ea697bfbde303a5b2061dde1a5733cadf9"
+      }
+    },
+    {
+      "id": "CLM-0115",
+      "statement": "PR description: rebase refuses when an input ledger fails its integrity check",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "test",
+      "source": "PR description: Refuses with exit 1 and writes nothing when an input fails its integrity check",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0197",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::a_tampered_input_is_refused (src/rebase.rs:798-809); CLI run with edited --onto (audit/tamper.json)",
+          "summary": "Unit test passes; CLI run with a hand-edited --onto printed 'the --onto catalog fails its integrity check (CLM-0002: seal does not match its content)'.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 798,
+                "end": 809
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.220130746Z",
+          "seal": {
+            "by": "server",
+            "mac": "84c6d2a71c47ddd83746978d325d37b3e7e825c2c1ca4ba2dc5a4199b60eb484"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The unit test and a CLI run with a hand-edited --onto both refused with an integrity-check message.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0197"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.649646418Z",
+          "seal": {
+            "by": "server",
+            "mac": "fb14606322c8077eba29552ee7ad6e0acf196926ecf75e3f5328e3bb5947f6db"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.649646418Z",
+      "seal": {
+        "by": "server",
+        "mac": "974fad0c2028e5b9cdfb29bb7ab1aac8b07c0bdd8c54d69e1b72ea9019ee9870"
+      }
+    },
+    {
+      "id": "CLM-0116",
+      "statement": "PR description: rebase refuses when an input does not descend from --base",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: Refuses ... when an input does not descend from `--base`",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0198",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::a_base_newer_than_the_branch_is_refused and a_base_that_is_not_the_merge_base_is_refused (src/rebase.rs:811-828)",
+          "summary": "Both assert 'does not descend from --base'; check_descends at src/rebase.rs:156-166 compares the counters, and appended() at :251-265 compares record prefixes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 811,
+                "end": 828
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.263609341Z",
+          "seal": {
+            "by": "server",
+            "mac": "9fbbbf1feed736a9d18674086da04f37fd3bb3df0f7894b1bdeb12ce02b464b1"
+          }
+        },
+        {
+          "id": "EVD-0219",
+          "kind": "inspection",
+          "locator": "src/rebase.rs:156-166 check_descends and :259-272 appended",
+          "summary": "Corrects EVD-0198's line reference to appended(). check_descends refuses when a ledger's counters are below --base's; appended() refuses when a claim's evidence/verdicts do not start with --base's.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 259,
+                "end": 272
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:33.242570049Z",
+          "seal": {
+            "by": "server",
+            "mac": "ab1fe998360ede257286398ad9356e2a16098cd493ae8d9580868fae860e99da"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Tests for a base newer than the branch and a base that is not the merge base both refuse, and the code compares counters and record prefixes.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0198",
+            "EVD-0219"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.690976027Z",
+          "seal": {
+            "by": "server",
+            "mac": "2c26e8b943c03124550f2c5c11fd3287e74c2d8d0647b66df8a9420aefddd056"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.690976027Z",
+      "seal": {
+        "by": "server",
+        "mac": "a24ac9c912eb6e108c80a2abe1f53db2a47949f20f3a6e4ae6d93eae660bc8d3"
+      }
+    },
+    {
+      "id": "CLM-0117",
+      "statement": "PR description: rebase refuses when both sides changed one claim's fields differently",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: Refuses ... both sides changed one claim's fields differently",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0199",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::different_field_changes_on_both_sides_conflict (src/rebase.rs:723-746)",
+          "summary": "Different statement edits on both sides -> error 'CLM-0002 was changed differently'; the same edit on both sides succeeds.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 723,
+                "end": 746
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.307854649Z",
+          "seal": {
+            "by": "server",
+            "mac": "a030f182c45acea6cdb2da487c7441848403ef6f2cfefd1e2f608e1cac0013b3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test shows differing edits conflict and identical edits do not.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0199"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.733281468Z",
+          "seal": {
+            "by": "server",
+            "mac": "df3d182cdf6c2d1e004a15ec0da997ad3e6aa5e139625cba725addf02e220c6f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.733281468Z",
+      "seal": {
+        "by": "server",
+        "mac": "51d34dc4aa1ab83d003105ab5b0304eb049655c1075d967fbbf5c8089f6678e7"
+      }
+    },
+    {
+      "id": "CLM-0118",
+      "statement": "PR description: rebase refuses when the branch added evidence or verdicts to a claim --onto retired",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: Refuses ... the branch added evidence or verdicts to a claim `--onto` retired",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0200",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::evidence_on_a_claim_main_retired_conflicts (src/rebase.rs:748-762)",
+          "summary": "Branch adds evidence+verdict to CLM-0002 which main retired -> error contains 'which --onto retired'.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 748,
+                "end": 762
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.352260498Z",
+          "seal": {
+            "by": "server",
+            "mac": "f1411e2076b798627c70a8b2b6c2c3716f4a5f3ca4666a4bfc5b0c92c2235dba"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test asserts the retired-claim refusal message.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0200"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.772132209Z",
+          "seal": {
+            "by": "server",
+            "mac": "187e9a6bb3f618c221264cf4750e2812650e8b5ac12190ee856b54e7b62f332c"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.772132209Z",
+      "seal": {
+        "by": "server",
+        "mac": "8a8c8e7ae82f34fe71ba2adf7fbd67010769ca8fd6e6dae39ed24aa6e6c75373"
+      }
+    },
+    {
+      "id": "CLM-0119",
+      "statement": "PR description: rebase refuses when links from the two sides form a derived_from cycle",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: Refuses ... links from the two sides form a `derived_from` cycle",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0201",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::links_that_close_a_loop_across_the_sides_are_refused (src/rebase.rs:764-783)",
+          "summary": "Branch links CLM-0001 under CLM-0002 while main links CLM-0002 under CLM-0001 -> error contains 'lead from CLM-0002 back'.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 764,
+                "end": 783
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.397111337Z",
+          "seal": {
+            "by": "server",
+            "mac": "c516238778abbd3d0651403fae8d2c23ed5301309a27ee7de1e877342ba6abb3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test builds opposite links on the two sides and asserts a cycle refusal.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0201"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.812673266Z",
+          "seal": {
+            "by": "server",
+            "mac": "177a7205e24e09c978ff4cfaa9a1af9304c45697839ef8b87ca93f3746120403"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.812673266Z",
+      "seal": {
+        "by": "server",
+        "mac": "3d38e5e72cedb1d7006186a16fb2dc9ab3832dc894796695b3abaa054b4a47f3"
+      }
+    },
+    {
+      "id": "CLM-0120",
+      "statement": "PR description: a refused rebase leaves the branch's ledger unchanged",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "demonstration",
+      "source": "PR description: Refuses with exit 1 and writes nothing",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs",
+        "src/main.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0202",
+          "kind": "demonstration",
+          "locator": "sha1sum claims.json before and after a refused rebase (audit/r1, second run)",
+          "summary": "Hash e6dee250... identical before and after the refused run; no temp or extra file besides the existing .claims.json.lock.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.438689517Z",
+          "seal": {
+            "by": "server",
+            "mac": "e39ceb6252f2ff0acfd2b8e19ec0f0aa761f7fb14cf7613b16bd768a5c0f358e"
+          }
+        },
+        {
+          "id": "EVD-0203",
+          "kind": "inspection",
+          "locator": "src/main.rs:449-458 and src/rebase.rs:107-132",
+          "summary": "The rebase runs inside store.mutate; on Err the closure does not replace *branch and the store does not save, so nothing is written (save only follows Ok).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/main.rs",
+              "lines": {
+                "start": 449,
+                "end": 458
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.482511063Z",
+          "seal": {
+            "by": "server",
+            "mac": "31d6c9de4451250bbe34dd6ed5444d0d002768c6d75913884f3fbf4c15fa4d80"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A refused run left the file hash unchanged, and the code only saves after an Ok result.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0202",
+            "EVD-0203"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.851743378Z",
+          "seal": {
+            "by": "server",
+            "mac": "cc30d8cfc9f13cd556153dc13749cbad643f181e938f1c57c387b8fc810ae813"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.851743378Z",
+      "seal": {
+        "by": "server",
+        "mac": "e6972043ec3ccbd3881214a5a13fe7510d6eaf415e577396b6a0da31850aed19"
+      }
+    },
+    {
+      "id": "CLM-0121",
+      "statement": "PR description: --onto and --base are read through a lockless store::load_file, so no lock file is left beside them",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "demonstration",
+      "source": "PR description: read through a new lockless `store::load_file`, so no lock file is left beside them",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/store.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0204",
+          "kind": "inspection",
+          "locator": "src/store.rs:218-244 load_file and src/main.rs:449-455",
+          "summary": "load_file only reads (fs::read) and validates, taking no lock; main.rs calls it for --base and --onto inside the branch store's mutate.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 218,
+                "end": 244
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.526094499Z",
+          "seal": {
+            "by": "server",
+            "mac": "3c387f848dcacbae98d5d674425c4936a00eaa15e5731acefbd16436b786f19a"
+          }
+        },
+        {
+          "id": "EVD-0205",
+          "kind": "demonstration",
+          "locator": "ls -a on the scratch dir holding main.json/base.json after runs",
+          "summary": "Only the branch repo ledger got .claims.json.lock; the directory holding --onto and --base files (audit/) has no .lock file.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.567636058Z",
+          "seal": {
+            "by": "server",
+            "mac": "e1351e5e883070afa3c2dccb77df3e1cdfdc6d5f3da9478a4e0b24949c82fb41"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "load_file takes no lock and the scratch directory holding --onto and --base got no lock file; only the branch ledger has one.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0204",
+            "EVD-0205"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.890947250Z",
+          "seal": {
+            "by": "server",
+            "mac": "c7604c3b2927e71821170f412c3dcbb3f4b09ce0e7455db5a42ebf01cb9b5ad7"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.890947250Z",
+      "seal": {
+        "by": "server",
+        "mac": "3bce4403d36899129dbb6c5b27e8bc457289d7f5a41b0ac571ae0759a45288c5"
+      }
+    },
+    {
+      "id": "CLM-0122",
+      "statement": "PR description: when --onto is --base the result is identical to the branch's ledger",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: When `--onto` is `--base`, the result is identical to the branch's ledger",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0206",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::rebasing_onto_the_base_changes_nothing (src/rebase.rs:646-660)",
+          "summary": "assert_eq!(rebased, branch) with onto == base, and every mapping entry maps to itself.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 646,
+                "end": 660
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.611427465Z",
+          "seal": {
+            "by": "server",
+            "mac": "26d53feb262030aa9a28c9ae72db36edf7a8cb96cd3194c4ec6eb90f4cbdcdc4"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test asserts the rebased ledger equals the branch's and every mapping entry is the identity.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0206"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.930198542Z",
+          "seal": {
+            "by": "server",
+            "mac": "41bb01cb7fc9cb11d9406460db6c84fa7df1b9db7e36a1eec615bbf9392223c1"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.930198542Z",
+      "seal": {
+        "by": "server",
+        "mac": "78b613ba214fa29b157947e65ee83be38fb2e261a490c58b56cc7448e396c471"
+      }
+    },
+    {
+      "id": "CLM-0123",
+      "statement": "PR description: derived_from links and the evidence ids that verdicts cite are rewritten to the new ids",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: `derived_from` links and the evidence ids that verdicts cite are rewritten to the new ids",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0207",
+          "kind": "demonstration",
+          "locator": "audit/r2 output: child CLM-0003 derived_from -> ['CLM-0004'], verdict evidence_ids [EVD-0002] -> [EVD-0004]",
+          "summary": "Dumped the rebased ledger: links and cited evidence ids use the new ids.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.653868097Z",
+          "seal": {
+            "by": "server",
+            "mac": "56b13af72f8a5c52353397d85b859d82988b820e6cd34f1ab1b9acd914ec1209"
+          }
+        },
+        {
+          "id": "EVD-0208",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::new_claims_on_both_sides_are_renumbered_with_their_links (src/rebase.rs:582-644); evidence_that_merged_without_a_conflict_gets_new_ids asserts verdicts[0].evidence_ids == EVD-0002",
+          "summary": "Tests assert rewritten derived_from and cited evidence ids.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 582,
+                "end": 644
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.698984288Z",
+          "seal": {
+            "by": "server",
+            "mac": "5697b5d7894ab6fa314a457154826ca8e79b76a6c7b1f6aa52b6e555ae641375"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both the CLI dump of the rebased ledger and the unit tests show derived_from and verdict-cited evidence ids rewritten.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0207",
+            "EVD-0208"
+          ],
+          "recorded_at": "2026-11-01T19:10:33.968423481Z",
+          "seal": {
+            "by": "server",
+            "mac": "a4b15351c43109b15789681c9fd3ba99c6a4cbc608e593f1e76e88bb7f943c9e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:33.968423481Z",
+      "seal": {
+        "by": "server",
+        "mac": "99f87284b308294df68124f01880f676469a44731f96910df414cff352ba5fd7"
+      }
+    },
+    {
+      "id": "CLM-0124",
+      "statement": "PR description: records that existed at --base keep their ids",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: Records that existed at `--base` keep their ids",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0209",
+          "kind": "demonstration",
+          "locator": "audit/r2: CLM-0001 and its EVD-0002 from main kept; branch's pre-base records unchanged",
+          "summary": "Base claim CLM-0001 kept its id; evidence the branch added to it (EVD-0002 on branch) got a new id, while main's evidence on it stayed. Base claims (CLM-0001, CLM-0002 in r1) kept ids in all runs.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.740319337Z",
+          "seal": {
+            "by": "server",
+            "mac": "2ca623c4bd4e922d6c9e59e54e5d7f5b421f4c0c12d8b02e740485076f4e20be"
+          }
+        },
+        {
+          "id": "EVD-0210",
+          "kind": "inspection",
+          "locator": "src/rebase.rs:182-211 number_new_records",
+          "summary": "Only ids >= base.next_claim_seq / next_evidence_seq are renumbered; everything else maps to itself.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 182,
+                "end": 211
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.784326864Z",
+          "seal": {
+            "by": "server",
+            "mac": "2e5bccbda454ed1023217360105c4e6187ab3c10242f607d3f884df6ff6bc3c4"
+          }
+        },
+        {
+          "id": "EVD-0218",
+          "kind": "inspection",
+          "locator": "src/rebase.rs:170-197 number_new_records",
+          "summary": "Corrects EVD-0210's line range. Only branch claims with id >= base.next_claim_seq and evidence with id >= base.next_evidence_seq get new ids; mapping.claim/evidence fall back to the same id for everything else.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 170,
+                "end": 197
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:33.196636856Z",
+          "seal": {
+            "by": "server",
+            "mac": "29e2c3ae1a315aa34da1bf186a812af1c0c6653df306b5619f1366bd1d2eea9e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The numbering code renumbers only ids at or above the base counters, so earlier records keep theirs; the base claims kept their ids in every scratch run.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0218"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.008946427Z",
+          "seal": {
+            "by": "server",
+            "mac": "c836e41c7d46c48a4191a233c7a8e4aba89c6c809f929e5647906fecf00f5554"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.008946427Z",
+      "seal": {
+        "by": "server",
+        "mac": "05cb59fa354b7ae8c9b586024b0b4c29cf50e285d97effe4ab662742c5ba260b"
+      }
+    },
+    {
+      "id": "CLM-0125",
+      "statement": "PR description: a missing --base file counts as an empty ledger",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: a missing file counts as an empty ledger",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs",
+        "src/store.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0211",
+          "kind": "demonstration",
+          "locator": "claims-mcp --catalog r3/claims.json rebase --onto main.json --base nonexistent.json --json (audit/r3)",
+          "summary": "Exit 0 with a mapping that renumbers all of the branch's claims (treated as new): CLM-0001->CLM-0003 etc.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.824693929Z",
+          "seal": {
+            "by": "server",
+            "mac": "ffcae90e0349103a9b3474d2d508481ebef51636a9f918942a3e5d2d477ce481"
+          }
+        },
+        {
+          "id": "EVD-0212",
+          "kind": "inspection",
+          "locator": "src/store.rs:225-230 load_file",
+          "summary": "NotFound -> Ok(Catalog::default()).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 225,
+                "end": 230
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.867778924Z",
+          "seal": {
+            "by": "server",
+            "mac": "3582c4e378c4090413f52ea2177de53d48cab83efcfc7bbc154018e3dded3631"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A nonexistent --base was run and treated as an empty ledger; load_file returns the default catalog on NotFound.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0211",
+            "EVD-0212"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.049379393Z",
+          "seal": {
+            "by": "server",
+            "mac": "5e3f0aaa10e8f0d7ad6370d1affa3fc7be4a3997656e80112d5885a9d296bdec"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.049379393Z",
+      "seal": {
+        "by": "server",
+        "mac": "30d265d7aa6bc6d9b4a8db86eb4e6cbba350c3654ad8845ed2ed020efd88d774"
+      }
+    },
+    {
+      "id": "CLM-0126",
+      "statement": "PR description: verdicts appended to existing claims are replayed after main's",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: verdicts appended to existing claims (after main's)",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0213",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::verdicts_from_both_sides_on_one_claim_are_kept_in_order (src/rebase.rs:678-697)",
+          "summary": "Claim with a verdict on each side ends with main's verdict citing EVD-0001 then the branch's citing EVD-0002.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 678,
+                "end": 697
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.911909381Z",
+          "seal": {
+            "by": "server",
+            "mac": "fbcafa1bd1810e19dc73269a2c4ff45d06f8232f4f68f8926f70144c779862ff"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test shows main's verdict first and the branch's after it, with cited evidence renumbered.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0213"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.091162513Z",
+          "seal": {
+            "by": "server",
+            "mac": "2f659c639032b23cf025beb3ec53414559a0608c66ae85e0658a86cce7a4e19a"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.091162513Z",
+      "seal": {
+        "by": "server",
+        "mac": "1b6e9f7d4685258436f090b5a6dbe4895d7a330183bc9822e0295ce872b71cbb"
+      }
+    },
+    {
+      "id": "CLM-0127",
+      "statement": "PR description: update_claim and retire_claim field changes to existing claims are replayed",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: `update_claim`/`retire_claim` field changes to existing claims",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "src/rebase.rs"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0214",
+          "kind": "test",
+          "locator": "cargo test rebase::tests::a_field_change_on_one_side_is_kept (src/rebase.rs:699-721)",
+          "summary": "update_claim statement change on the branch is kept on top of main's evidence.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/rebase.rs",
+              "lines": {
+                "start": 699,
+                "end": 721
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:06.954657994Z",
+          "seal": {
+            "by": "server",
+            "mac": "c1f6f35a58299af5833991f3b6fdd3f0ee8b474eba74e36acd8b08cf8470563b"
+          }
+        },
+        {
+          "id": "EVD-0215",
+          "kind": "demonstration",
+          "locator": "audit/r4: branch retires CLM-0001, main adds evidence to CLM-0002; rebase then verify",
+          "summary": "Result: CLM-0001 status retired with reason 'gone', CLM-0002 has main's 1 evidence item; verify 'integrity verified (5 records checked)'.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T19:10:06.996839896Z",
+          "seal": {
+            "by": "server",
+            "mac": "fff26776d7d6d9b97cdf7871ee09e3a74f7e172e5adfa324b033895201562f79"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "update_claim is covered by a unit test, and retire_claim was replayed in a scratch run that passed verify.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0214",
+            "EVD-0215"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.133697956Z",
+          "seal": {
+            "by": "server",
+            "mac": "66636dee7bb4f569c25b0ba28fcff50ddc0f9aa142f4fa0b215970484e9a6b14"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.133697956Z",
+      "seal": {
+        "by": "server",
+        "mac": "918c8aa56b378b66a9882a11a405f545a2ef4111685cb5a7cdb9e6e5ae190458"
+      }
+    },
+    {
+      "id": "CLM-0128",
+      "statement": "PR description: the guide, a CLI reference row, links from the CI guide and seals page, and the skill's 'When main's ledger moved' document rebase",
+      "kind": "documentation",
+      "level": "software",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: Docs: a new guide ... Also a CLI reference row, links from the CI guide and the seals page, and the claims-audit skill's 'When main's ledger moved'",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "docs/site/src/guides/parallel-branches.md",
+        "docs/site/src/reference/cli.md",
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0216",
+          "kind": "inspection",
+          "locator": "docs/site/src/guides/parallel-branches.md:1-83; docs/site/src/reference/cli.md:29; docs/site/src/concepts/seals.md:21; docs/site/src/guides/ci.md:38; skills/claims-audit/SKILL.md:373-402; docs/site/src/SUMMARY.md:26",
+          "summary": "All six places mention or link rebase; the guide procedure was executed verbatim in audit/r1 and worked; the skill section says to use rebase when `rebase --help` works and otherwise record findings again. just docs builds.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/guides/parallel-branches.md",
+              "lines": {
+                "start": 1,
+                "end": 83
+              },
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:07.041551235Z",
+          "seal": {
+            "by": "server",
+            "mac": "d42b68e13d855948a975def55a3a5eb2e4e25f95e8ac8be260eb3a590a17d301"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The docs and skill mention rebase in the named places, the guide procedure worked when executed, and the book builds.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0216"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.171684434Z",
+          "seal": {
+            "by": "server",
+            "mac": "24423374890d439e7c2f0920e660a202382e1de71b49f4b2d8f64be3b8ca492c"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.171684434Z",
+      "seal": {
+        "by": "server",
+        "mac": "f6cd694c55832bd2fc4f8ddc32071eecb6c068f4bdd8c5707f5d33b0415f3249"
+      }
+    },
+    {
+      "id": "CLM-0129",
+      "statement": "PR description: changelog/2026-11-01T19-06-07Z.md exists and describes this change",
+      "kind": "documentation",
+      "level": "software",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: Changelog: `changelog/2026-11-01T19-06-07Z.md`",
+      "derived_from": [
+        "CLM-0105"
+      ],
+      "artifacts": [
+        "changelog/2026-11-01T19-06-07Z.md"
+      ],
+      "tags": [
+        "from-issue:32"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0217",
+          "kind": "inspection",
+          "locator": "changelog/2026-11-01T19-06-07Z.md",
+          "summary": "File exists in the diff (36 lines) and describes the change.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "changelog/2026-11-01T19-06-07Z.md",
+              "commit": "5a8638f3fc213eddff54680c7280d891e9d8086d"
+            }
+          },
+          "recorded_at": "2026-11-01T19:10:07.087176527Z",
+          "seal": {
+            "by": "server",
+            "mac": "ce5abd2b495e0a9c5f62ffd65b84a660db1bf2b097f77153e5e604209c23d367"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The changelog file exists in the diff and describes the change.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0217"
+          ],
+          "recorded_at": "2026-11-01T19:10:34.210139664Z",
+          "seal": {
+            "by": "server",
+            "mac": "8e3635eb1412cfba30f40aeb6c0e8de8fc5dc2b6f4ad115f570fec76c671a15e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T19:09:18.370782726Z",
+      "updated_at": "2026-11-01T19:10:34.210139664Z",
+      "seal": {
+        "by": "server",
+        "mac": "02f3677583ab57437fbf8e82b50f3088a41481f5a0e311a4e93c4434079a9561"
       }
     }
   ]
