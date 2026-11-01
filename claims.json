@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 169,
+  "next_claim_seq": 188,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "4d98832b314cc13865772b922b4ec78811cf52f24c83d185cdd6d29a66c3c321"
+    "mac": "9745adb8615b6164c60e9ffdf93b6f3348e2152ef25f69a752ed98e4451c4097"
   },
-  "next_evidence_seq": 292,
+  "next_evidence_seq": 330,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "9b41840a79b022edd9d66c4c471b62b5f7349cdf154a5e226a1fd435d367544f"
+    "mac": "f4679a2d0b60b4ae145b327e91f6f509b2e565a8912566460729a5c08d79adb6"
   },
   "claims": [
     {
@@ -53,6 +53,66 @@
             "by": "server",
             "mac": "5b56697f3f8ead2dcc310eca151325c856af79df38995c9973cf9e3547b060a8"
           }
+        },
+        {
+          "id": "EVD-0266",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0120, which still counted retired CLM-0004. CLM-0004 (stdio tool surface) is retired and replaced by CLM-0145 (12 tools, supported), and CLM-0146 (PR for the spec update) is a new child. Trace down shows every active child supported: stdio and tool surface (0002, 0145), rmcp (0003), trace/FEVER/IEEE levels/gap reports (0010, 0012, 0014, 0015), skill and wiring (0016, 0017), spec conformance (0019, 0146), sealed JSON catalog (0037). The concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:42:18.057954720Z",
+          "seal": {
+            "by": "server",
+            "mac": "15029c883f482264f4fa3a18c365f42deb7638af80b014d0a45d19459eff4732"
+          }
+        },
+        {
+          "id": "EVD-0272",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0266, which named CLM-0145 (now retired). The tool-surface element is covered by CLM-0152 (supported, count-free). Every active child is supported: 0002, 0003, 0010, 0012, 0014, 0015, 0016, 0017, 0019, 0037, 0146, 0152.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:53:01.564361574Z",
+          "seal": {
+            "by": "server",
+            "mac": "6cd7b66fbaa31aa0a598ca0ab55b1164522361aa2ec63567ec434ce16d5fe890"
+          }
+        },
+        {
+          "id": "EVD-0276",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0272, which named the now-retired CLM-0146. Tool surface is covered by CLM-0152 and the PR's changes by CLM-0154, both supported. Every active child is supported: 0002, 0003, 0010, 0012, 0014, 0015, 0016, 0017, 0019, 0037, 0152, 0154.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:55:00.122259790Z",
+          "seal": {
+            "by": "server",
+            "mac": "48c25ab6e1e838ff7aa427dd526291f7d420b72292d7f42c0e6420b2c6b400d9"
+          }
+        },
+        {
+          "id": "EVD-0285",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0276, which named the now-retired CLM-0016. The skill element of concept.md is covered by CLM-0157 (supported, count-free). trace down at 1acd9d0 shows every active child supported: 0002, 0003, 0010, 0012, 0014, 0015, 0017, 0019, 0037, 0152, 0154, 0157. Concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:18:50.312580834Z",
+          "seal": {
+            "by": "server",
+            "mac": "55d1641207f3a59f958603b300d5679b38248d34147bef9d44c7c375e7866a30"
+          }
+        },
+        {
+          "id": "EVD-0291",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0285, which named the now-retired CLM-0015. Its replacement CLM-0162 (count-free, supported) covers the V&V gap-report element of concept.md. trace down at b163c55 shows every active child supported: 0002, 0003, 0010, 0012, 0014, 0017, 0019, 0037, 0152, 0154, 0157, 0162. Concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:20:45.530942709Z",
+          "seal": {
+            "by": "server",
+            "mac": "5af264a0ba3e2f6a44e3b5e62cbcd236b585bc0d9fa1709b40d8bcdb06f4fa20"
+          }
         }
       ],
       "verdicts": [
@@ -81,13 +141,78 @@
             "by": "server",
             "mac": "b3100d870c8255bfd37fa0f0c6d0f57b659e86422d00f308cd357b6b49e50337"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-adjudicated because a child was retired (CLM-0004) and two added (CLM-0145, CLM-0146); the earlier roll-up EVD-0120 named the retired child. All 12 active children are supported and the replacement covers the same concept element (EVD-0266).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0266"
+          ],
+          "recorded_at": "2026-11-01T21:42:23.422927464Z",
+          "seal": {
+            "by": "server",
+            "mac": "a4ed7694914087f8483afea8511aefd5e4e1b9d5de6f4f465893b01e76240d43"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0145, now retired and replaced by CLM-0152; all active children are supported (EVD-0272).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0272"
+          ],
+          "recorded_at": "2026-11-01T21:53:07.420452863Z",
+          "seal": {
+            "by": "server",
+            "mac": "6888da2822005edbe79aa9259dd798148da42d358fb98a19a2d21cbc2b7b733e"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled: the prior roll-up cited retired CLM-0146; all active children, including CLM-0152 and CLM-0154, are supported (EVD-0276).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0276"
+          ],
+          "recorded_at": "2026-11-01T21:55:05.339008147Z",
+          "seal": {
+            "by": "server",
+            "mac": "9d266d42d435ec6a5653602246f737c6a0e6fb72807716ec00d1b58b559a3f8d"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0016, now retired and replaced by CLM-0157; all active children are supported (EVD-0285).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0285"
+          ],
+          "recorded_at": "2026-11-01T22:18:53.943924548Z",
+          "seal": {
+            "by": "server",
+            "mac": "0bab53c8a8a8e08ef36f8b5d4cadbf90d2dfce512ca65dcc45db8966a9fb840f"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0015, now retired and replaced by CLM-0162; all active children are supported (EVD-0291).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0291"
+          ],
+          "recorded_at": "2026-11-01T22:20:49.930307768Z",
+          "seal": {
+            "by": "server",
+            "mac": "3f193a0c61e291733c299c0a4ffa4a5d603b04d7141e0df18678980ccc8e8a09"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:57:39.152891879Z",
+      "updated_at": "2026-11-01T22:20:49.930307768Z",
       "seal": {
         "by": "server",
-        "mac": "45b7e326c485a6c873a69cbe5f42ffad01828d9a3be3966a305d408103dac76a"
+        "mac": "d74b94cf13595eb4fc836a91267a461b7414b4e92d5713d6dd5485d7d0c22b81"
       }
     },
     {
@@ -310,7 +435,9 @@
         "tools"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Stale: next_steps (c517669) and recheck (f160302) were added after this claim was written, so the server registers 12 tools, not 10 (EVD-0176). Retired on branch claims-mcp/fix-clm-0004, which also adds the missing next_steps row to spec section 4. A replacement claim for the 12-tool surface is recorded in the audit of that change.",
+        "retired_at": "2026-11-01T21:39:11.489301582Z"
       },
       "evidence": [
         {
@@ -402,10 +529,10 @@
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-11-01T15:52:22.448956077Z",
+      "updated_at": "2026-11-01T21:39:11.489301582Z",
       "seal": {
         "by": "server",
-        "mac": "e7b377e30bf2f440790d3869dfefe75c7f1cdb646d542b007be017a1219c3fba"
+        "mac": "5b46d127971b0f26e0cd8b19f75380fbcef24b42e431958f133b7e719d6a1c5c"
       }
     },
     {
@@ -1246,7 +1373,9 @@
         "report"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: stated 'all eight gap categories' with an eight-name list; the report has nine (refuted_without_source_anchor), and spec 4.1 states no count. Replaced by a count-free claim.",
+        "retired_at": "2026-11-01T22:20:29.072910389Z"
       },
       "evidence": [
         {
@@ -1271,6 +1400,62 @@
           "seal": {
             "by": "server",
             "mac": "8c1ac2dd52e3b555dacad4078dd35584dc9a663b94ccf0d0f943d6e402852e27"
+          }
+        },
+        {
+          "id": "EVD-0286",
+          "kind": "inspection",
+          "locator": "src/report.rs:37-58 (struct Gaps)",
+          "summary": "At b163c55 Gaps has nine Vec<ClaimId> fields: the eight names in the statement plus refuted_without_source_anchor. The statement's \"all eight\" with its eight-name list therefore omits a category the report returns.",
+          "stance": "refutes",
+          "anchor": {
+            "file": {
+              "path": "src/report.rs",
+              "lines": {
+                "start": 37,
+                "end": 58
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:19.858289600Z",
+          "seal": {
+            "by": "server",
+            "mac": "4d4696a78e14c2c484760c860428e71cf4ff797c879ca5b5cf1a988e6cbb2f87"
+          }
+        },
+        {
+          "id": "EVD-0287",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:203-217 (spec 4.1 gaps list)",
+          "summary": "Spec 4.1, the claim's source, lists nine gap names under `gaps`, ending with refuted_without_source_anchor, and states no count. The statement's eight-name list is missing that name.",
+          "stance": "refutes",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 203,
+                "end": 217
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:19.885266302Z",
+          "seal": {
+            "by": "server",
+            "mac": "7a951f4df97a504f9f8e8056b2107fbee6a7461d52b228a4371da626b8500ba4"
+          }
+        },
+        {
+          "id": "EVD-0288",
+          "kind": "demonstration",
+          "locator": "mcp audit_report (catalog=/home/pgrace/repos/claims-mcp/.worktrees/issue-40/claims.json, include_matrix false) at b163c55; and python3 .../scratchpad/demo40/keys.py (stdio, copy of the ledger, include_matrix true)",
+          "summary": "The live report's gaps keys are no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links and refuted_without_source_anchor: nine keys. The script compared the sets and found spec 4.1 names == Gaps fields == live gaps keys. The statement's list lacks refuted_without_source_anchor. Top-level keys were gaps, integrity, matrix, totals; the matrix had one row per active claim.",
+          "stance": "refutes",
+          "recorded_at": "2026-11-01T22:20:19.897641565Z",
+          "seal": {
+            "by": "server",
+            "mac": "047e580bc498f3afb18e15d51709ff029ec8f8500186ed025d3123d4ac23e289"
           }
         }
       ],
@@ -1300,13 +1485,28 @@
             "by": "server",
             "mac": "3ffb3cf8580799b5f15fad5912e78bf90cf00c75419bd4fdcf5564b90f8fe6cb"
           }
+        },
+        {
+          "verdict": "refuted",
+          "rationale": "The statement says audit_report returns \"all eight gap categories\" and lists eight names, but the Gaps struct, spec 4.1 and the live report all have nine; refuted_without_source_anchor is missing from the statement (EVD-0286, EVD-0287, EVD-0288). Earlier supported verdicts were true when recorded and went stale when that category was added. Fix: retire this claim and replace it with a count-free claim that audit_report returns every gap category listed in spec 4.1 and a traceability matrix.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0286",
+            "EVD-0287",
+            "EVD-0288"
+          ],
+          "recorded_at": "2026-11-01T22:20:24.033261065Z",
+          "seal": {
+            "by": "server",
+            "mac": "82c9556ce958b52150d57e46f6314e8aa14788eb384427ec14920119fc7a9cdc"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:51:51.068635941Z",
+      "updated_at": "2026-11-01T22:20:29.072910389Z",
       "seal": {
         "by": "server",
-        "mac": "72a0518621cac417204e958f5a3d849a9de1c2ca99ac69da19d6be9120d7291a"
+        "mac": "96319cddbc3110333d88ffa5a5e105450702c48d9750837e5d732957b4cc25fb"
       }
     },
     {
@@ -1327,7 +1527,9 @@
         "skill"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: the statement's count (\"the server's 10 tools\") is not promised by its source, concept.md, and is stale: the server has registered 12 tools since next_steps and recheck were added. Replaced by a count-free claim that SKILL.md references every tool the server registers.",
+        "retired_at": "2026-11-01T22:16:10.472965918Z"
       },
       "evidence": [
         {
@@ -1384,10 +1586,10 @@
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:51:51.086228019Z",
+      "updated_at": "2026-11-01T22:16:10.472965918Z",
       "seal": {
         "by": "server",
-        "mac": "afc64f7a9465c770a57a982a1c1fac27a2c1f7f5101c38002a6838c801e74a12"
+        "mac": "614aad713f3d4d3f4c967290fe0eaa82fca134485e8aa0f45aa5732d0413b68a"
       }
     },
     {
@@ -3538,7 +3740,9 @@
         "integrity"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"each of the six write tools\" states a count that its source (issue #9 acceptance criterion: \"every write tool\") does not promise. Replaced by a count-free claim using the source's wording.",
+        "retired_at": "2026-11-01T22:16:10.501653757Z"
       },
       "evidence": [
         {
@@ -3583,10 +3787,10 @@
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.741020438Z",
+      "updated_at": "2026-11-01T22:16:10.501653757Z",
       "seal": {
         "by": "server",
-        "mac": "be685d9bd81fcba3f0dacedde75d58c908d950e29691322436972dd499ffd7de"
+        "mac": "e180ad000dcf0b6d5cc21d15e4a0170dae263aeaf0af2dad7f9f4f901404c995"
       }
     },
     {
@@ -5369,7 +5573,7 @@
           }
         },
         {
-          "id": "EVD-0290",
+          "id": "EVD-0328",
           "kind": "inspection",
           "locator": "docs/site/src/development.md:20-100",
           "summary": "Re-read after this diff rewrote Releasing: the CI checks list is still present (with two new items) and the page now documents the full release procedure via the three just recipes plus release.yml checks. The earlier anchor over lines 29-64 is 'changed' only because the text was rewritten.",
@@ -5387,7 +5591,7 @@
           "recorded_at": "2026-11-01T21:49:39.250635852Z",
           "seal": {
             "by": "server",
-            "mac": "91c72e3512e88ff24ff4efd49b99377d2f034d2fee47297885cad51b364f5ec3"
+            "mac": "fcc0f764537bc23a7f163365d67155e2a816d4f113e760db8e83da0d5c52e363"
           }
         }
       ],
@@ -5410,12 +5614,12 @@
           "rationale": "Re-audited on head after the Releasing rewrite; the page still documents CI checks and now the release procedure.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0290"
+            "EVD-0328"
           ],
           "recorded_at": "2026-11-01T21:50:19.722708295Z",
           "seal": {
             "by": "server",
-            "mac": "b29346db5c6f7b2201d179568bec87de73f7caf76bc75df85eb2c2e53fb2121c"
+            "mac": "31396705a0319654ee59052748791b081023b823fab49f0dba9ae4b8e524905d"
           }
         }
       ],
@@ -5423,7 +5627,7 @@
       "updated_at": "2026-11-01T21:50:19.722708295Z",
       "seal": {
         "by": "server",
-        "mac": "c55644cd84aec94b636a5b2213ca72ca748e047ea79d45fb2f65cd4084331fcf"
+        "mac": "3c4948a35d85c83d1e78f3667404145ac4a140ed1fecdc6d259bb1897151761e"
       }
     },
     {
@@ -5728,7 +5932,9 @@
         "area:docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"The six recheck statuses\" states a count that concepts/anchors.md does not state, and that goes stale when a status is added. Replaced by a count-free claim that the statuses documented there match the AnchorStatus enum.",
+        "retired_at": "2026-11-01T22:16:10.521174524Z"
       },
       "evidence": [
         {
@@ -5770,10 +5976,10 @@
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.178144670Z",
+      "updated_at": "2026-11-01T22:16:10.521174524Z",
       "seal": {
         "by": "server",
-        "mac": "de3edf89b7f13f6a90023f553d50b2dccab8c028991524de0b2dcddc9bb5969c"
+        "mac": "f57fd6b80368e929c8c9d56a5f73cc02958f1c59add410c6d3922422c62d5836"
       }
     },
     {
@@ -5953,7 +6159,9 @@
         "area:docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"The five verification methods\" states a count that concepts/integrity-and-methods.md does not state, and that goes stale when a method is added. Replaced by a count-free claim that the methods documented there match the VerificationMethod enum.",
+        "retired_at": "2026-11-01T22:16:10.534283540Z"
       },
       "evidence": [
         {
@@ -5995,10 +6203,10 @@
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.205389351Z",
+      "updated_at": "2026-11-01T22:16:10.534283540Z",
       "seal": {
         "by": "server",
-        "mac": "d314adc8fddd4448d4a3a5adc330fa80f9ca04cb151364478017910222a796db"
+        "mac": "a0b48c1d9067349ee5d60e3fa77a78590cf43f2af17c73db1771fe97cc764a85"
       }
     },
     {
@@ -6074,7 +6282,9 @@
         "from-issue:31"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"All 12 MCP tools\" states a count that its source (issue #31: \"on every tool\") does not promise, and that goes stale when a tool is added. Replaced by a count-free claim that every MCP tool accepts an optional catalog argument.",
+        "retired_at": "2026-11-01T22:16:10.487989240Z"
       },
       "evidence": [
         {
@@ -6152,10 +6362,10 @@
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:51.833384425Z",
+      "updated_at": "2026-11-01T22:16:10.487989240Z",
       "seal": {
         "by": "server",
-        "mac": "be3b199aedbcab45004348230db2317dbce2e69d508fabcdd66bb62617d5667e"
+        "mac": "c7a980fb7fda43121b9331623588d159a0893f20f06254089afb077c68a71e71"
       }
     },
     {
@@ -11568,6 +11778,1549 @@
     },
     {
       "id": "CLM-0145",
+      "statement": "tools/list returns exactly the 12 tools of spec section 4: add_claim, add_claims, get_claim, list_claims, update_claim, retire_claim, add_evidence, record_verdict, trace, audit_report, next_steps, recheck",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "tools",
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a count. The maintainer decided on 2026-11-01 that a tool count is not a claim worth keeping, because it goes stale whenever a tool is added (issue #40). brooke-reviews also asked on PR #39 for source = \"spec section 4\". The replacement says tools/list returns exactly the tools listed in the spec's section 4 table.",
+        "retired_at": "2026-11-01T21:52:05.339119137Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0257",
+          "kind": "test",
+          "locator": "cargo test registers_all_twelve_tools (1 passed); src/server.rs:731-757",
+          "summary": "Ran at 4ed898f: 1 passed. Read the assertion: assert_eq! of the sorted names from tool_router.list_all() against the full 12-name vec (add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim), so no extra or missing tool.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 731,
+                "end": 757
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:18.814865087Z",
+          "seal": {
+            "by": "server",
+            "mac": "2e306240b82f850cd27042d548c64b5a6e50cd99034d73d52bfca97db785d87e"
+          }
+        },
+        {
+          "id": "EVD-0258",
+          "kind": "demonstration",
+          "locator": "cargo build; initialize + tools/list over stdio to target/debug/claims-mcp --catalog <tmp>/c.json at 4ed898f",
+          "summary": "Real tools/list response (id 2) held exactly 12 tools: add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim. No others.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:18.835434324Z",
+          "seal": {
+            "by": "server",
+            "mac": "e4501452fffba5fc296757d81d1abca49ac5afc6fde9258926b3d0e6410e5cfb"
+          }
+        },
+        {
+          "id": "EVD-0259",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:177-188",
+          "summary": "Section 4 table at HEAD has 12 rows, one per tool in the claim: add_claim through audit_report (10), then next_steps (187) and recheck (188). The name set equals the tools/list result.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:18.851765855Z",
+          "seal": {
+            "by": "server",
+            "mac": "47850a90b597d8d6885e480bcdbe23ba83c1928e4a4f157131d22b4e133d61b1"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test asserts the exact 12-name set (EVD-0257), the live stdio tools/list returned the same 12 (EVD-0258), and the spec table lists the same 12 (EVD-0259). No refuting evidence.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0257",
+            "EVD-0258",
+            "EVD-0259"
+          ],
+          "recorded_at": "2026-11-01T21:41:21.559875978Z",
+          "seal": {
+            "by": "server",
+            "mac": "e76f09b1194971e17f7587fb2e3b25f5cad423e4448f2f11db6f131086cd821f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:11.764741834Z",
+      "updated_at": "2026-11-01T21:52:05.339119137Z",
+      "seal": {
+        "by": "server",
+        "mac": "fd6b956a34b58dea818577d823bd4d5d97371853943c3c4ec4586179b624d044"
+      }
+    },
+    {
+      "id": "CLM-0146",
+      "statement": "The PR for retiring CLM-0004 does what its description says: the spec matches the 12-tool, per-call-catalog server and the stale claim is retired",
+      "kind": "documentation",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a tool count (replaced by CLM-0154), per issue #40 and the rewritten PR description.",
+        "retired_at": "2026-11-01T21:54:35.882974841Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0265",
+          "kind": "analysis",
+          "locator": "children of CLM-0146",
+          "summary": "The children check each factual statement in the PR description: the section 4 row, the section 4 catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, and the gates. All are supported, so the spec matches the 12-tool, per-call-catalog server and the stale claim is retired.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:42:11.089259488Z",
+          "seal": {
+            "by": "server",
+            "mac": "55260b89a7bfd177b09cf714eed7bcd3366ce18c0d6ac7511b1e8eca4ac8b176"
+          }
+        },
+        {
+          "id": "EVD-0271",
+          "kind": "analysis",
+          "locator": "children of CLM-0146",
+          "summary": "Supersedes EVD-0265 now that CLM-0153 (changelog wording) is a child. The children check the section 4 row, the catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, the gates and the changelog's account of the replacement; all supported.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:53:01.550225032Z",
+          "seal": {
+            "by": "server",
+            "mac": "18ca9a1a45abf909f0a88d89ad0e7690a010a2b302f3d17b83379850e4589995"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All five active children are supported (EVD-0265).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0265"
+          ],
+          "recorded_at": "2026-11-01T21:42:18.006935549Z",
+          "seal": {
+            "by": "server",
+            "mac": "488d799c2968615e0a94be24d4d00d41c782f62a74ea67baab166a30aae8f8e6"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled: all six active children, including new CLM-0153, are supported (EVD-0271).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0271"
+          ],
+          "recorded_at": "2026-11-01T21:53:07.405708988Z",
+          "seal": {
+            "by": "server",
+            "mac": "d571223633e1e7a16867f070357f378eb9ae3981b7278e041fd35054934a09ec"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:35.882974841Z",
+      "seal": {
+        "by": "server",
+        "mac": "71d3e654a479a466c79e5e5ccddcd2cfd824dc1a70b14096877a7d9e93ff9b89"
+      }
+    },
+    {
+      "id": "CLM-0147",
+      "statement": "PR description: spec section 4 gains the missing next_steps row, so its table lists all 12 tools the server registers",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds the missing `next_steps` row, so the table lists all 12 tools the server registers.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0146"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Restated without a tool count (replaced by CLM-0155), per issue #40 and the rewritten PR description.",
+        "retired_at": "2026-11-01T21:54:35.869154178Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0260",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:187; git diff origin/main..HEAD; src/report/next_steps.rs:36-47",
+          "summary": "The diff adds only the next_steps row (line 187); the table at HEAD has 12 rows and matches the 12 tools returned by a live tools/list (EVD-0258). The row's returned keys (integrity, summary, wrong, unproven, other) are the NextSteps struct fields.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.335030693Z",
+          "seal": {
+            "by": "server",
+            "mac": "44e37f176fb036ac06b2c02346278396f8c11630d357d5abd4645a18609ae164"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The diff adds the next_steps row and the table now has 12 rows equal to the live tools/list (EVD-0260).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0260"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.118080938Z",
+          "seal": {
+            "by": "server",
+            "mac": "ca89907081a437c1c9d1fd50f92ae7525afe856f0faac083c0f1fbd723331dcb"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:35.869154178Z",
+      "seal": {
+        "by": "server",
+        "mac": "6e800c1312051d73338149984ce7a3727db2c2f96e2db0b521fe76f58eddf98a"
+      }
+    },
+    {
+      "id": "CLM-0148",
+      "statement": "PR description: spec section 4 gains a paragraph saying every tool takes an optional per-call catalog argument, as added in 0.2.5 (#31), and the paragraph matches the server's behavior",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds a paragraph on the per-call `catalog` argument from 0.2.5 (#31).\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 189,
+          "end": 192
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0261",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:189-192; src/server.rs:37-46,410-416; Cargo.toml version",
+          "summary": "The paragraph says each tool takes an optional catalog (absolute or relative to server cwd), anchors pin HEAD of that repo, no catalog uses --catalog. OnLedger<T> adds optional catalog to every tool, Cargo.toml is 0.2.5, and the ledger for 0.2.5 per-call catalog was merged in PR #34 for issue #31. Verified live: the probe call with catalog failed naming the probe path.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 189,
+                "end": 192
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.371238039Z",
+          "seal": {
+            "by": "server",
+            "mac": "6fb0c82a3e804a0d99b6f9b96bc507f03e90de314bf1fb947cece2f7d549f292"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The added paragraph matches the code (OnLedger on every tool, 0.2.5) per EVD-0261.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0261"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.132367301Z",
+          "seal": {
+            "by": "server",
+            "mac": "99efd3d81f8311b61942a23b42bd799aef307f339ff8ed5c872045a54119510b"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.004558430Z",
+      "seal": {
+        "by": "server",
+        "mac": "cda9a33c9e48fb620b7c322d825d9f8070270a58390e988ccc6f2cf8cc688e88"
+      }
+    },
+    {
+      "id": "CLM-0149",
+      "statement": "PR description: the section 2 non-goal \"multiple catalogs per server instance\" contradicted #34 and now says what still holds (no catalog is selected and held in server state)",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 2: the non-goal 'multiple catalogs per server instance' contradicted #34. It now says what still holds: no catalog is selected and held in server state.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 27,
+          "end": 33
+        },
+        "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0262",
+          "kind": "inspection",
+          "locator": "git show 4ed898f~1:docs/superpowers/specs/2026-10-23-claims-mcp-design.md lines 29-31 vs 4ed898f lines 29-32; src/server.rs:37-46",
+          "summary": "Before: 'Multiple catalogs per server instance. One server serves one catalog file'. Since PR #34 any call can name another ledger, so that was false. After: a non-goal of a catalog selected and held in server state, with a default --catalog and a per-call override lasting that call only. That matches OnLedger<T>, where catalog is a per-call Option with no state kept.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 27,
+                "end": 33
+              },
+              "commit": "4ed898f54413f2bd90723034bd0be6321655d8df"
+            }
+          },
+          "recorded_at": "2026-11-01T21:41:58.388625885Z",
+          "seal": {
+            "by": "server",
+            "mac": "b839ba5ac0dc0d08a564aaa3bd9c9d75cf2bdd176fb47b67e4ad6edfff131d0c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The old non-goal was false after per-call catalog; the new wording matches the per-call, stateless design (EVD-0262).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0262"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.146496154Z",
+          "seal": {
+            "by": "server",
+            "mac": "b4838e57557d04579d87482e6bdcd7c1d7e11972e973131c980b3efe7ac2c6f4"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.019234025Z",
+      "seal": {
+        "by": "server",
+        "mac": "d32eb5b49c83d8c4de12301136f5ce1c25d25d65e5c3eea919d82bee93b93a22"
+      }
+    },
+    {
+      "id": "CLM-0150",
+      "statement": "PR description: CLM-0004 is retired with a reason, and it went stale when next_steps (c517669) and recheck (f160302) were added",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"CLM-0004 says tools/list returns 'exactly the 10 tools'. It went stale when next_steps (c517669) and recheck (f160302) were added ... CLM-0004 is retired with a reason.\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0263",
+          "kind": "inspection",
+          "locator": "get_claim CLM-0004 (status retired, reason); git show c517669 / f160302 -- src/server.rs",
+          "summary": "CLM-0004 status is retired with a reason naming next_steps (c517669) and recheck (f160302). Commit c517669 'feat: next_steps MCP tool' adds the next_steps handler and f160302 adds recheck; both are ancestors of main (618bdfc), so the 10-tool statement was already false before this PR.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:58.402988308Z",
+          "seal": {
+            "by": "server",
+            "mac": "4f2d1f5dd19079963563b2c12002adbe9cb11172d2e520bb4cb2e82bb011f53a"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "CLM-0004 is retired with a reason, and the two commits it cites did add the tools before this PR (EVD-0263).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0263"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.160366996Z",
+          "seal": {
+            "by": "server",
+            "mac": "de7804912fbde32e5a04ee07eca8b9d2b618b4a31bf9976ba66895c161543930"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.033956650Z",
+      "seal": {
+        "by": "server",
+        "mac": "e2af86025eca2431b42386e5c92332de4678b6d22c4ed27faec4280eec19f0ff"
+      }
+    },
+    {
+      "id": "CLM-0151",
+      "statement": "PR description: fmt, clippy -D warnings and the test suite pass (175 passed), and registers_all_twelve_tools passes (1 passed)",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description Validation: \"just fmt, cargo clippy --all-targets -- -D warnings, just test (175 passed), cargo test registers_all_twelve_tools (1 passed)\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0264",
+          "kind": "test",
+          "locator": "cargo fmt --check; cargo clippy --all-targets -- -D warnings; cargo test; cargo test registers_all_twelve_tools (all at 4ed898f)",
+          "summary": "Reran at HEAD 4ed898f: fmt --check exit 0, clippy -D warnings exit 0, cargo test 175 passed 0 failed, registers_all_twelve_tools 1 passed.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:41:58.416478769Z",
+          "seal": {
+            "by": "server",
+            "mac": "fc5234e10e2f069ed0cf5b661c5c06fd5fe3f7b037533e6d3da61e2f21738602"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every gate was rerun at HEAD with the counts the description states (EVD-0264).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0264"
+          ],
+          "recorded_at": "2026-11-01T21:42:08.173543306Z",
+          "seal": {
+            "by": "server",
+            "mac": "bcca88db658417dc736fd76834c5cf8b7d19f764224b7168f708f760fa449c77"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:41:38.269003464Z",
+      "updated_at": "2026-11-01T21:54:31.048115154Z",
+      "seal": {
+        "by": "server",
+        "mac": "9c4829ce336bf5fd098eb33d2b7cdb56e5cd9176f84f1a04a414fc733fed19d4"
+      }
+    },
+    {
+      "id": "CLM-0152",
+      "statement": "tools/list returns exactly the tools listed in the design spec's section 4 table",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "spec section 4",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/server.rs",
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "tools",
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0267",
+          "kind": "test",
+          "locator": "cargo test registers_all_twelve_tools (1 passed) at 400b5c2; src/server.rs:731-757",
+          "summary": "The assertion compares the sorted tool_router names to an explicit name list, so no tool is extra or missing against that list; its list equals the spec table's names (see live set comparison).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 731,
+                "end": 757
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.708974096Z",
+          "seal": {
+            "by": "server",
+            "mac": "df63ba956ebb29b790ac3d7a48dc848fda10f8fcf436e1e86df3f50415463dc2"
+          }
+        },
+        {
+          "id": "EVD-0268",
+          "kind": "demonstration",
+          "locator": "stdio initialize + tools/list to target/debug/claims-mcp at 400b5c2; diff of sorted live names vs names parsed from spec lines 177-188",
+          "summary": "Sorted tool names from the live tools/list response and sorted first-column names of the spec section 4 table rows are identical (diff empty). No tool is in one and not the other.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:52:51.723107328Z",
+          "seal": {
+            "by": "server",
+            "mac": "5ae5236e5fc5a1061b6dc18943e1904d4d020c2195a799e3779b561d8c69995f"
+          }
+        },
+        {
+          "id": "EVD-0269",
+          "kind": "inspection",
+          "locator": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md:177-188",
+          "summary": "The section 4 table rows at HEAD are the tools the claim refers to; the statement and its source (\"spec section 4\") contain no tool count, so adding a tool and its row keeps it true.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.736898990Z",
+          "seal": {
+            "by": "server",
+            "mac": "d516d75e8a33d377659cd888aff6b8cca47587bdb1e13d327d92816b27cf0c88"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The test (EVD-0267) and a live tools/list set comparison against the spec table rows (EVD-0268) both match; the statement is count-free (EVD-0269).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0267",
+            "EVD-0268",
+            "EVD-0269"
+          ],
+          "recorded_at": "2026-11-01T21:53:01.521664495Z",
+          "seal": {
+            "by": "server",
+            "mac": "c31106ce93882ef3a02c553ded32ce2ce19de2b9f6f0e8ef6ef56399dd0b5262"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:52:38.331446662Z",
+      "updated_at": "2026-11-01T21:53:01.521664495Z",
+      "seal": {
+        "by": "server",
+        "mac": "747288fc8f22e4b574e994e83b86b3f3137e2ca8c2cfae106295455a084aa81e"
+      }
+    },
+    {
+      "id": "CLM-0153",
+      "statement": "Changelog entry: the replacement for CLM-0004 says tools/list returns exactly the tools in the spec's section 4 table, with source \"spec section 4\" and a source anchor on that table, and states no count",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "changelog/2026-11-01T21-39-06Z.md at 400b5c2: \"Its replacement says `tools/list` returns exactly the tools listed in the spec's section 4 table, with `source` \\\"spec section 4\\\" and a source anchor on that table. It states no count\"",
+      "source_anchor": {
+        "path": "changelog/2026-11-01T21-39-06Z.md",
+        "lines": {
+          "start": 7,
+          "end": 11
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "changelog/2026-11-01T21-39-06Z.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0270",
+          "kind": "inspection",
+          "locator": "changelog/2026-11-01T21-39-06Z.md:7-11; get_claim CLM-0152",
+          "summary": "The changelog sentence says the replacement states the section 4 table's tools, source \"spec section 4\", anchor on the table, no count. CLM-0152 has exactly that statement (no number), source \"spec section 4\", and source_anchor on spec lines 177-188. The first bullet's \"lists all 12 tools\" refers to the spec table, not the claim.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "changelog/2026-11-01T21-39-06Z.md",
+              "lines": {
+                "start": 7,
+                "end": 11
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:52:51.751003962Z",
+          "seal": {
+            "by": "server",
+            "mac": "c3503dbdcb8db66334488e976ede0307700f3915a972ace5f10e39bee51e5031"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The changelog's description of the replacement matches CLM-0152's statement, source and anchor (EVD-0270).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0270"
+          ],
+          "recorded_at": "2026-11-01T21:53:01.536689982Z",
+          "seal": {
+            "by": "server",
+            "mac": "a73193f62a17d29cc512d554c758f8e50de46245f4f318988a76d43ac20c66b3"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:52:42.153516763Z",
+      "updated_at": "2026-11-01T21:54:31.062117137Z",
+      "seal": {
+        "by": "server",
+        "mac": "2a7dfe9381d23507aa55e8ba14a912e1fec1d7230ffb874cef3f5bd86a5d800d"
+      }
+    },
+    {
+      "id": "CLM-0154",
+      "statement": "The PR for retiring CLM-0004 does what its description says: the spec's section 4 tool table and per-call `catalog` text match the server, and the stale claim is retired",
+      "kind": "documentation",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "maintainer request, 2026-11-01: retire stale CLM-0004 and replace it with a correct tool-surface claim; update the spec it cites",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0275",
+          "kind": "analysis",
+          "locator": "children of CLM-0154",
+          "summary": "Replaces the roll-up of the retired CLM-0146. The children check the section 4 table row, the catalog paragraph, the section 2 non-goal, the CLM-0004 retirement, the gates, the changelog's account of the replacement, and the retirement of the counted claims. All are supported, so the spec's tool table and catalog text match the server and the stale claim is retired.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:55:00.111033099Z",
+          "seal": {
+            "by": "server",
+            "mac": "b194a060f01f9fffbf91bea83354a8c33be06191e5c4f6e72e409d5ac161ba28"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All six active children (0148, 0149, 0150, 0151, 0153, 0155, 0156) are supported (EVD-0275).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0275"
+          ],
+          "recorded_at": "2026-11-01T21:55:05.324700045Z",
+          "seal": {
+            "by": "server",
+            "mac": "56a78a9c61a257b0011a80ba99843d0e295e92ff28151d4b6add70caee1fc126"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:05.324700045Z",
+      "seal": {
+        "by": "server",
+        "mac": "5f072788e1afd70f528bf5ffe4adaabbc2438c38ae39faaa00658dc38d70dd97"
+      }
+    },
+    {
+      "id": "CLM-0155",
+      "statement": "PR description: spec section 4 gains the missing next_steps row, so its table lists every tool the server registers",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"Section 4: adds the missing `next_steps` row, so the table lists every tool the server registers.\"",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 177,
+          "end": 188
+        },
+        "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+      },
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "docs/superpowers/specs/2026-10-23-claims-mcp-design.md"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0273",
+          "kind": "demonstration",
+          "locator": "git diff origin/main..HEAD -- spec (one added table row); live stdio tools/list at 400b5c2 vs spec lines 177-188 names",
+          "summary": "The diff adds exactly one table row, next_steps (line 187). Sorted names of the live tools/list response equal the sorted names of the section 4 table rows (diff empty), so the table lists every registered tool and no other.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+              "lines": {
+                "start": 177,
+                "end": 188
+              },
+              "commit": "400b5c2db9ee68121a03ca7c0229e11ac13e1993"
+            }
+          },
+          "recorded_at": "2026-11-01T21:54:52.230180956Z",
+          "seal": {
+            "by": "server",
+            "mac": "8241b07fc228282ae119e4cb373ab8b5974490681d3ffa4209e7011a3cbd9d7b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The diff adds the next_steps row and the table's names equal the live tools/list set (EVD-0273).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0273"
+          ],
+          "recorded_at": "2026-11-01T21:55:00.086892251Z",
+          "seal": {
+            "by": "server",
+            "mac": "4098b79924b5a4eec05d84aec403668f29916cc9fa8bfe6454bc69da1f44fc89"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:00.086892251Z",
+      "seal": {
+        "by": "server",
+        "mac": "cc368b559bf56a2a9e80f0bbc94eaa2e0c09a12b0579bf2e931c5452e2903281"
+      }
+    },
+    {
+      "id": "CLM-0156",
+      "statement": "PR description: CLM-0145 and the two claims that quoted the description's counts were retired and replaced with versions that state no count",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR description: \"After review, CLM-0145 (the first replacement, which said 'exactly the 12 tools') and the two claims that quoted this description's counts were also retired and replaced with versions that state no count.\"",
+      "derived_from": [
+        "CLM-0154"
+      ],
+      "artifacts": [
+        "claims.json"
+      ],
+      "tags": [
+        "change:fix-clm-0004"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0274",
+          "kind": "inspection",
+          "locator": "list_claims tag change:fix-clm-0004 include_retired; get_claim CLM-0145, CLM-0146, CLM-0147",
+          "summary": "CLM-0145, CLM-0146 and CLM-0147 (the three claims whose statements carried a tool count) are retired, each with a reason naming issue #40. Their count-free replacements CLM-0152, CLM-0154 and CLM-0155 are active, and no active claim with the tag states a tool count in its statement.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:54:52.244074296Z",
+          "seal": {
+            "by": "server",
+            "mac": "4a9e99bd347802174e93e0991aac1ad804d0de79510b4c8cadd7207342c9c1d6"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The three counted claims are retired and count-free replacements are active (EVD-0274).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0274"
+          ],
+          "recorded_at": "2026-11-01T21:55:00.099925559Z",
+          "seal": {
+            "by": "server",
+            "mac": "9f76187507762ac4af9ca40ae1cbad86da94f05f8e708222f3db41f840d11697"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:54:25.404703567Z",
+      "updated_at": "2026-11-01T21:55:00.099925559Z",
+      "seal": {
+        "by": "server",
+        "mac": "db0161d6f66e815464a5bd479f20ff59e4923aae1c38ac59b3f68db89eac0559"
+      }
+    },
+    {
+      "id": "CLM-0157",
+      "statement": "skills/claims-audit/SKILL.md has valid skill frontmatter and references every tool the server registers by name",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "concept.md: 'a skill that is tailor-made to use this mcp'",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "skill",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0277",
+          "kind": "analysis",
+          "locator": "skills/claims-audit/SKILL.md:1-4 frontmatter; for t in <registered tools>: grep -c \"`$t`\" skills/claims-audit/SKILL.md; src/server.rs:731-755 registers_all_twelve_tools",
+          "summary": "At 1acd9d0 SKILL.md lines 1-4 are a --- delimited frontmatter with name: claims-audit and a description. The set of registered tools (from the tool_router list asserted by registers_all_twelve_tools, which passed, and from tools/list over stdio) is add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim. Each appears backticked in SKILL.md (grep -c: 1,4,3,3,1,4,3,7,3,1,1,4); none is missing.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 1,
+                "end": 4
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.590540123Z",
+          "seal": {
+            "by": "server",
+            "mac": "e0eb601901d9a52100782116f31d484b305f391efd3f1dfaf4f389fd532ae094"
+          }
+        },
+        {
+          "id": "EVD-0278",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact server::tests::registers_all_twelve_tools (1 passed)",
+          "summary": "The test compares the router's tool names with an explicit sorted list; it passed on 1acd9d0, so the set I checked SKILL.md against is the registered set.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 730,
+                "end": 755
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.610100750Z",
+          "seal": {
+            "by": "server",
+            "mac": "81e4c73b4333f7fa9ed0d53751528db7bd1568003d75219e4b7f175e447b8ed7"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Frontmatter is valid and every name in the registered tool set, confirmed by the router test, appears backticked in SKILL.md (EVD-0277, EVD-0278).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0277",
+            "EVD-0278"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.304245473Z",
+          "seal": {
+            "by": "server",
+            "mac": "0221be2341651080c48a7dc062a39e91449834b48de74d5eda077a0c7aaf7385"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.304245473Z",
+      "seal": {
+        "by": "server",
+        "mac": "c1e2c577271e73b16f157cf407e86993e0aa55dc70f184dbbc21e9f9b0bb2154"
+      }
+    },
+    {
+      "id": "CLM-0158",
+      "statement": "Every MCP tool accepts an optional catalog argument (absolute path, or relative to the server's cwd) and none requires it",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"An optional `catalog` argument on every tool (absolute path, or relative to the server's cwd)\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0279",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact server::tests::every_tool_advertises_the_catalog_argument (1 passed)",
+          "summary": "Test iterates every tool in the router and asserts input_schema.properties has catalog and that required does not contain it. Passed on 1acd9d0. (It also asserts a count of 12, but the loop covers whatever the router lists.)",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1277,
+                "end": 1298
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.626654627Z",
+          "seal": {
+            "by": "server",
+            "mac": "e9a2e1866cd7be43f78e3a66b45effd56148f8c494551c7790684395ad675d30"
+          }
+        },
+        {
+          "id": "EVD-0280",
+          "kind": "inspection",
+          "locator": "src/server.rs:28-48, 188-400 handlers",
+          "summary": "Every #[tool] handler takes Parameters<OnLedger<...>> (recheck takes OnLedger<NoParams>); catalog is an Option<PathBuf> with a serde default, documented as absolute or relative to the server's working directory, and store_for passes it on.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 28,
+                "end": 48
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.640351184Z",
+          "seal": {
+            "by": "server",
+            "mac": "a995f32f69d4aa7a4fc97d6cdaacb5a495b8d3c103aeaa0cd3a5a25ccebdfeca"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The schema test loops over every router tool asserting catalog is offered and not required, and the handler types show the same for every handler (EVD-0279, EVD-0280).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0279",
+            "EVD-0280"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.318586702Z",
+          "seal": {
+            "by": "server",
+            "mac": "b46cc46a3fba21d9eab47fac1a2dfe358dc5c0b310e084cbc3d774eaebbc868f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.318586702Z",
+      "seal": {
+        "by": "server",
+        "mac": "2cf60389b7245d2ccc70c522a263a2273ff176435b91a93cc39bde7f82136012"
+      }
+    },
+    {
+      "id": "CLM-0159",
+      "statement": "While any integrity check fails, every write tool (those that mutate the catalog) returns an error naming the failing records and the restore-from-git recovery steps, and the catalog file is left unchanged",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 7",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/store.rs",
+        "src/error.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0281",
+          "kind": "demonstration",
+          "locator": "python3 /tmp/claude-1000/-home-pgrace--agents-skills/73799e8a-72f7-4e14-aa98-aa95ddeeba71/scratchpad/demo40/drive.py (stdio, target/debug/claims-mcp built at 1acd9d0, --catalog c.json = tampered COPY of claims.json); tools/list then tools/call for add_claim, add_claims, update_claim, retire_claim, add_evidence, record_verdict; sha256 before/after",
+          "summary": "Tools registered per tools/list: 12; the six that call store.mutate are the six I called, the other six are read tools (get_claim, list_claims, trace, audit_report, next_steps, recheck) checked against src/server.rs. On a copy whose first statement was edited, every write call returned isError true with \"catalog c.json was changed outside claims-mcp, so every write is refused until it is restored. Failed checks: CLM-0001 (seal does not match its content). Never edit the catalog file directly. To recover, restore it from git (`git checkout -- c.json`...\". sha256 of c.json was identical before and after. The worktree's claims.json was not tampered.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:18:04.651294242Z",
+          "seal": {
+            "by": "server",
+            "mac": "a661a05c5e75486d46abcfc7ecfe698089fbb418d079c9e32ce85008167cbb0f"
+          }
+        },
+        {
+          "id": "EVD-0282",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact store::tests::tampered_catalog_refuses_writes_but_allows_reads (1 passed); server::tests::hand_edited_catalog_turns_writes_into_explained_tool_errors (1 passed)",
+          "summary": "Both tests passed on 1acd9d0: the store refuses writes on a tampered catalog but allows reads, and the server test asserts the tool error contains \"changed outside claims-mcp\", the failing record id, \"git checkout\" and \"Never edit\".",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 413,
+                "end": 440
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.668507421Z",
+          "seal": {
+            "by": "server",
+            "mac": "1a00bb54027f7c6005a917d800b25a1f08ac728fefb738b33807c115bb578a14"
+          }
+        },
+        {
+          "id": "EVD-0292",
+          "kind": "demonstration",
+          "locator": "Rerunnable from the repo root at 7b490e4. (1) cargo build. (2) TMP=$(mktemp -d); cp claims.json $TMP/c.json. (3) Tamper: jq '.claims[0].statement = \"TAMPERED\"' $TMP/c.json > $TMP/t.json && mv $TMP/t.json $TMP/c.json. (4) sha256sum $TMP/c.json (before). (5) Pipe into `target/debug/claims-mcp --catalog $TMP/c.json` these JSON-RPC lines (one per line, then keep stdin open ~2s): {\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"clientInfo\":{\"name\":\"rerun\",\"version\":\"1\"}}} ; {\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"} ; then tools/call lines id 1..6: {\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"add_claim\",\"arguments\":{\"statement\":\"x\",\"kind\":\"functional\",\"level\":\"unit\",\"integrity_level\":1,\"verification_method\":\"inspection\",\"source\":\"s\"}}} ; id 2 add_claims {\"claims\":[<same claim object>]} ; id 3 update_claim {\"id\":\"CLM-0001\",\"tags\":[\"t\"]} ; id 4 retire_claim {\"id\":\"CLM-0001\",\"reason\":\"r\"} ; id 5 add_evidence {\"claim_id\":\"CLM-0001\",\"kind\":\"inspection\",\"locator\":\"l\",\"summary\":\"s\",\"stance\":\"supports\"} ; id 6 record_verdict {\"claim_id\":\"CLM-0001\",\"verdict\":\"supported\",\"rationale\":\"r\",\"auditor\":\"a\",\"evidence_ids\":[\"EVD-0001\"]}. (6) sha256sum $TMP/c.json (after). The six mutating tools are those whose handlers call self.mutate in src/server.rs.",
+          "summary": "Observed on a rerun of exactly these steps: all six responses (ids 1-6) had isError true and the text \"catalog $TMP/c.json was changed outside claims-mcp, so every write is refused until it is restored. Failed checks: CLM-0001 (seal does not match its content). Never edit the catalog file directly. To recover, restore it from git (`git checkout -- $TMP/c.json`, or revert the commit that edited it), then redo the intended change through the claims tools. Reads and audit_report still work.\" sha256 prefix before and after were identical (728da7b36d04e917). Only the lock sidecar was added next to c.json. The repo's claims.json was not touched. Supersedes EVD-0281, whose locator pointed at an uncommitted scratch script.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T23:06:40.609466001Z",
+          "seal": {
+            "by": "server",
+            "mac": "0a3a31c86ce3ce57b2db974eccd469da21d676da9896269bf576b67a87757467"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every write tool (the set that calls mutate) was called on a tampered copy; each returned the error naming the failing record and the git restore steps, and the file hash was unchanged (EVD-0281). The unit and server tests agree (EVD-0282).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0281",
+            "EVD-0282"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.332086448Z",
+          "seal": {
+            "by": "server",
+            "mac": "21412612cf211a8b08aaa8d4038b735a5c5c4962264f47ccb31b5a0db1fd7f1b"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "The self-contained rerun (EVD-0292) called every mutating tool on a tampered copy; each refused with the failing record and git restore steps and the file hash was unchanged. The committed tests agree (EVD-0282). This verdict relies on EVD-0292 and EVD-0282, not on EVD-0281.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0292",
+            "EVD-0282"
+          ],
+          "recorded_at": "2026-11-01T23:06:49.010563184Z",
+          "seal": {
+            "by": "server",
+            "mac": "8cfabcc57d03354f7478c46f739a385ea32e6ec306b7ff778fbf3959aa18c94e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T23:06:49.010563184Z",
+      "seal": {
+        "by": "server",
+        "mac": "960a4bf6f10c354b8d4797d0dcc0f78368d53b185d0be0a2a76d6a48929bc984"
+      }
+    },
+    {
+      "id": "CLM-0160",
+      "statement": "The recheck statuses documented in concepts/anchors.md match the AnchorStatus enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/anchors.md lines 32-39 (recheck status table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/anchors.md",
+        "lines": {
+          "start": 32,
+          "end": 39
+        },
+        "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/anchors.md",
+        "src/recheck.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "retired",
+        "reason": "Issue #40 review (brooke-reviews, PR #42): 'match the AnchorStatus enum' is false read strictly, because the docs omit Current by design. Restated precisely.",
+        "retired_at": "2026-11-01T23:07:11.067002243Z"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0283",
+          "kind": "inspection",
+          "locator": "src/recheck.rs:19-35 (enum AnchorStatus); docs/site/src/concepts/anchors.md:32-39",
+          "summary": "AnchorStatus variants: Current, Moved, Changed, Overturned, Missing, CommitMissing, Unpinned. The docs table lists moved, changed, overturned, missing, commit_missing and unpinned: exactly the non-current variants, which are the ones recheck reports; the page says current anchors are not listed. The set differs from the enum only by Current, by design. The page states no count.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/recheck.rs",
+              "lines": {
+                "start": 19,
+                "end": 35
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.683020651Z",
+          "seal": {
+            "by": "server",
+            "mac": "90156ccde05b92472d26ad26cf31086b21154adc957b3e4aefc0e10508140f28"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The documented statuses are exactly AnchorStatus's non-current variants (EVD-0283).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0283"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.345669095Z",
+          "seal": {
+            "by": "server",
+            "mac": "fad4bcfa4e38b18382130da87b620d4d6ccc359591d497d75d66d81bcf72e949"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T23:07:11.067002243Z",
+      "seal": {
+        "by": "server",
+        "mac": "32b241bed01026dfa0bf19462abe1a32c4b725cd2e709b3fe7cd0b32ee4d87b0"
+      }
+    },
+    {
+      "id": "CLM-0161",
+      "statement": "The verification methods documented in concepts/integrity-and-methods.md, including formal_proof, match the VerificationMethod enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/integrity-and-methods.md lines 24-30 (verification method table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/integrity-and-methods.md",
+        "lines": {
+          "start": 24,
+          "end": 30
+        },
+        "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/integrity-and-methods.md",
+        "src/model.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0284",
+          "kind": "inspection",
+          "locator": "src/model.rs:168-184 (enum VerificationMethod); docs/site/src/concepts/integrity-and-methods.md:24-30",
+          "summary": "VerificationMethod variants (snake_case): inspection, analysis, demonstration, test, formal_proof. The docs table lists exactly those names with matching meanings, formal_proof included. The page states no count in that table.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/model.rs",
+              "lines": {
+                "start": 168,
+                "end": 184
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.697658671Z",
+          "seal": {
+            "by": "server",
+            "mac": "55d889b1dc76ed31fe90eb0ea32a80ea652a8e823c10d0bfead8db112de30f3d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The documented methods are exactly the VerificationMethod variants (EVD-0284).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0284"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.359845704Z",
+          "seal": {
+            "by": "server",
+            "mac": "8d4c11b2514aadad1548d0dc7d1c66a6a907e1b63006c16aaae0d253858c6f01"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.359845704Z",
+      "seal": {
+        "by": "server",
+        "mac": "daa4a0b99ec97b79a8899b10e78b5ba04d4727cbf687d2edac134fd6109a548c"
+      }
+    },
+    {
+      "id": "CLM-0162",
+      "statement": "audit_report returns every gap category listed in spec 4.1 and a traceability matrix",
+      "kind": "functional",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "spec 4.1",
+      "source_anchor": {
+        "path": "docs/superpowers/specs/2026-10-23-claims-mcp-design.md",
+        "lines": {
+          "start": 203,
+          "end": 217
+        },
+        "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+      },
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "src/report.rs"
+      ],
+      "tags": [
+        "report",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0289",
+          "kind": "demonstration",
+          "locator": "mcp audit_report (catalog=.../issue-40/claims.json) at b163c55, and python3 /tmp/claude-1000/-home-pgrace--agents-skills/73799e8a-72f7-4e14-aa98-aa95ddeeba71/scratchpad/demo40/keys.py (stdio, include_matrix true, ledger copy)",
+          "summary": "The script extracted the names from spec 4.1's gaps list, the Gaps struct fields in src/report.rs, and the live gaps keys, and asserted the three sets are equal (True). The live response also had a matrix with one row per active claim, as spec 4.1 describes. No set difference in either direction.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:20:34.982235297Z",
+          "seal": {
+            "by": "server",
+            "mac": "4ecf0fb74cda855983d1c7bd463739c65a6a237e9548cb94fa056c2298de4699"
+          }
+        },
+        {
+          "id": "EVD-0290",
+          "kind": "inspection",
+          "locator": "src/report.rs:37-58 (struct Gaps); docs/superpowers/specs/2026-10-23-claims-mcp-design.md:203-217",
+          "summary": "Gaps fields: no_evidence, unverified, refuted, not_enough_info, stale, rigor, decomposition, dangling_links, refuted_without_source_anchor. Spec 4.1 lists the same names, and the matrix bullet follows at line 217.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/report.rs",
+              "lines": {
+                "start": 37,
+                "end": 58
+              },
+              "commit": "b163c5507c447a98f068d0e6b5595a9c21483f63"
+            }
+          },
+          "recorded_at": "2026-11-01T22:20:35.000644490Z",
+          "seal": {
+            "by": "server",
+            "mac": "ab409b89fca61c3e20f532a2c026844a0e096c9da057a100ecbac5fb04076b57"
+          }
+        },
+        {
+          "id": "EVD-0293",
+          "kind": "demonstration",
+          "locator": "Rerunnable from the repo root at 7b490e4 (bash, needs jq): cargo build; TMP=$(mktemp -d); cp claims.json $TMP/c.json; SPEC=docs/superpowers/specs/2026-10-23-claims-mcp-design.md; sed -n '203,216p' $SPEC | grep -oE '^  - `[a-z_]+`' | sed -E 's/^  - `([a-z_]+)`/\\1/' | sort > $TMP/spec.txt; sed -n '/pub struct Gaps/,/^}/p' src/report.rs | grep -oE 'pub [a-z_]+: Vec<ClaimId>' | sed -E 's/^pub ([a-z_]+):.*/\\1/' | sort > $TMP/struct.txt; (printf '%s\\n' '{\"jsonrpc\":\"2.0\",\"id\":0,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{},\"clientInfo\":{\"name\":\"rerun\",\"version\":\"1\"}}}' '{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}' '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"audit_report\",\"arguments\":{\"include_matrix\":true}}}'; sleep 2) | target/debug/claims-mcp --catalog $TMP/c.json 2>/dev/null | jq -c 'select(.id==1)|.result.content[0].text|fromjson' > $TMP/report.json; jq -r '.gaps|keys[]' $TMP/report.json | sort > $TMP/live.txt; diff $TMP/spec.txt $TMP/struct.txt && diff $TMP/struct.txt $TMP/live.txt && echo SETS_EQUAL; jq -c '{top:keys, matrix_rows:(.matrix|length), active:.totals.active_claims}' $TMP/report.json",
+          "summary": "Observed on rerun: both diffs empty and SETS_EQUAL printed. All three lists are the same set of nine names: dangling_links, decomposition, no_evidence, not_enough_info, refuted, refuted_without_source_anchor, rigor, stale, unverified. The last command printed {\"top\":[\"gaps\",\"integrity\",\"matrix\",\"totals\"],\"matrix_rows\":142,\"active\":142}, so the report carries a matrix with one row per active claim. Supersedes EVD-0288 and EVD-0289, which referred to a home-directory path and an uncommitted script.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T23:07:11.048411317Z",
+          "seal": {
+            "by": "server",
+            "mac": "4883a2eea4d526c394bc28b648a58343ae8deeff811c948d0409430d746e7a47"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Spec 4.1's gap names, the Gaps fields and the live report's gap keys are the same set, and the live report carried a matrix (EVD-0289, EVD-0290).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0289",
+            "EVD-0290"
+          ],
+          "recorded_at": "2026-11-01T22:20:39.069046969Z",
+          "seal": {
+            "by": "server",
+            "mac": "640f27ae596b8e4bd5982c5de72955baf4bc1f0e5ab0ce4ae9c73e1406799c17"
+          }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-judged on rerunnable evidence: a repeatable command compared spec 4.1's gap names, the Gaps fields and the live audit_report gap keys as sets and they are equal; the report also carried a matrix (EVD-0293, EVD-0290). This verdict does not rely on EVD-0288 or EVD-0289.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0293",
+            "EVD-0290"
+          ],
+          "recorded_at": "2026-11-01T23:07:30.216432426Z",
+          "seal": {
+            "by": "server",
+            "mac": "66b2cb20545a71b165cafd7ae7bb9b010ad5cbc5998f4367abd329999e7c5728"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:20:29.091321122Z",
+      "updated_at": "2026-11-01T23:07:30.216432426Z",
+      "seal": {
+        "by": "server",
+        "mac": "b04ab387785af34961b99dc58b46aa577ba35f6ba7e701c02cc98dfcbb226f71"
+      }
+    },
+    {
+      "id": "CLM-0163",
+      "statement": "The recheck statuses documented in concepts/anchors.md are exactly the non-current AnchorStatus variants",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/anchors.md lines 32-39 (recheck status table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/anchors.md",
+        "lines": {
+          "start": 32,
+          "end": 39
+        },
+        "commit": "f3dbb15cc6a29769cc8bd61b34e440eb38989926"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/anchors.md",
+        "src/recheck.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0294",
+          "kind": "analysis",
+          "locator": "Rerunnable from the repo root (bash): TMP=$(mktemp -d); sed -n '32,39p' docs/site/src/concepts/anchors.md | grep -oE '^\\| `[a-z_]+`' | sed -E 's/^\\| `([a-z_]+)`/\\1/' | sort > $TMP/docs.txt; sed -n '/pub enum AnchorStatus/,/^}/p' src/recheck.rs | grep -oE '^    [A-Z][A-Za-z]+,' | tr -d ' ,' | sed -E 's/([a-z])([A-Z])/\\1_\\2/g' | tr A-Z a-z | sort > $TMP/enum.txt; diff $TMP/docs.txt <(grep -vx current $TMP/enum.txt) && echo DOCS_EQ_ENUM_MINUS_CURRENT",
+          "summary": "Observed on a run: docs set = changed, commit_missing, missing, moved, overturned, unpinned. Enum set (snake_case, as serde renders it) = those plus current. The diff against the enum minus `current` was empty and DOCS_EQ_ENUM_MINUS_CURRENT printed. The omission of `current` is deliberate: the page says recheck prints only anchors that are not current (docs/site/src/concepts/anchors.md:41).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/recheck.rs",
+              "lines": {
+                "start": 19,
+                "end": 35
+              },
+              "commit": "f3dbb15cc6a29769cc8bd61b34e440eb38989926"
+            }
+          },
+          "recorded_at": "2026-11-01T23:07:22.234983874Z",
+          "seal": {
+            "by": "server",
+            "mac": "d34c756d201687d397812796c1c0193fa93b4bf6fec7218afdfc1417ce36f199"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The set of statuses in the docs table equals the AnchorStatus variants minus Current, compared as sets by a repeatable command, and the page says current anchors are not printed (EVD-0294).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0294"
+          ],
+          "recorded_at": "2026-11-01T23:07:30.200306810Z",
+          "seal": {
+            "by": "server",
+            "mac": "ba73873eea9e7eb916827f921063a543b9cbd910d30e0438c3465899e838a258"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T23:07:11.088186249Z",
+      "updated_at": "2026-11-01T23:07:30.200306810Z",
+      "seal": {
+        "by": "server",
+        "mac": "34fb5ac4d657ed8acbef8e6ba96b6733e01550003276a82d5fc263b39d131eda"
+      }
+    },
+    {
+      "id": "CLM-0164",
       "statement": "The change delivers issue #37: releases are cut mechanically by just release-prepare, release-ship and release-abort with notes generated from git history",
       "kind": "functional",
       "level": "system",
@@ -11591,7 +13344,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0291",
+          "id": "EVD-0329",
           "kind": "analysis",
           "locator": "children of CLM-0145",
           "summary": "Every child (prepare, release.toml, ship checks and flow, review gating, main-moved, merge and tag, abort, notes, byte-identical notes, static audit notes, CI, tests, docs, end-to-end acceptance) is supported by passing tests plus code reading and mutation checks. Residual: the real GitHub, review bot and published release workflow are never run, only a fake gh and a reproduced release.yml command.",
@@ -11599,7 +13352,7 @@
           "recorded_at": "2026-11-01T21:49:39.266315231Z",
           "seal": {
             "by": "server",
-            "mac": "e59121b4260bc784d4dc34c3f073760a9d27d37014d92df1f344623fcaa42f6b"
+            "mac": "6daf8cc56141392a7763ab3e3b7d5ac8b0f7be804f1204a8ec110adcb47cbe22"
           }
         }
       ],
@@ -11609,12 +13362,12 @@
           "rationale": "All children are supported; see the decomposition evidence.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0291"
+            "EVD-0329"
           ],
           "recorded_at": "2026-11-01T21:50:19.737316189Z",
           "seal": {
             "by": "server",
-            "mac": "6557291856484b80a0e79a703c9f3e4d1f3928ac94b5bd00c9234de72ca7042c"
+            "mac": "915f331f6cd5b1b9e7323c4f673fe34de1f1c076572a134335d60b32ed8e5639"
           }
         }
       ],
@@ -11622,11 +13375,11 @@
       "updated_at": "2026-11-01T21:50:19.737316189Z",
       "seal": {
         "by": "server",
-        "mac": "b2c2332d1d0304507395e8094fde75b745cb57d0aa2a33a0ec8cd66744fc96cd"
+        "mac": "d9d5cf9cf10abcd8722cbfbd246605fd5e06c87e9112c532d70ae98c683bd675"
       }
     },
     {
-      "id": "CLM-0146",
+      "id": "CLM-0165",
       "statement": "release-prepare refuses a bad level, running off main, a dirty tree, and a local main that is not exactly origin/main after a fetch, then runs cargo release <level> --execute --no-confirm",
       "kind": "functional",
       "level": "component",
@@ -11634,7 +13387,7 @@
       "verification_method": "test",
       "source": "Issue #37, Proposed design, just release-prepare: 'Refuses to run off main, with a dirty tree, or when local main is not exactly origin/main (after git fetch). Runs cargo release <level> --execute --no-confirm'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-prepare.sh",
@@ -11648,7 +13401,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0257",
+          "id": "EVD-0295",
           "kind": "test",
           "locator": "just release-test (test_prepare_refusals, scripts/release-test.sh:298-327)",
           "summary": "Ran just release-test on head: 'ok prepare: refuses a bad level, off main, a dirty tree, and main not at origin/main' (18 passed). Assertions check the exact diagnostics for no level, bad level, non-main branch, dirty tree, local main ahead of and behind origin.",
@@ -11666,11 +13419,11 @@
           "recorded_at": "2026-11-01T21:48:49.153810075Z",
           "seal": {
             "by": "server",
-            "mac": "f41a291c714e89810f06cbe01ad9480295fb4daa4a6ac419da57d874e38ea818"
+            "mac": "cd4a4c1daedc27dcf0d2797d57467d9a2b1943c35e3df394aa17a7a577540f11"
           }
         },
         {
-          "id": "EVD-0258",
+          "id": "EVD-0296",
           "kind": "inspection",
           "locator": "scripts/release-prepare.sh:18-30",
           "summary": "Read the script: validates level against patch|minor|major|X.Y.Z, calls require_clean_main, fetches origin main and compares HEAD with origin/main, then execs cargo release LEVEL --execute --no-confirm.",
@@ -11688,7 +13441,7 @@
           "recorded_at": "2026-11-01T21:48:49.172132001Z",
           "seal": {
             "by": "server",
-            "mac": "819b0091df8a6a44aa7d417e842d53efe6deefa2d2fb5c78f1c96ae27575b74f"
+            "mac": "30f035be86a9121becaf504e39e2917df5b7e0cdf4c402178b55746f59750905"
           }
         }
       ],
@@ -11698,13 +13451,13 @@
           "rationale": "Code and passing refusal test cover each refusal and the cargo release invocation.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0257",
-            "EVD-0258"
+            "EVD-0295",
+            "EVD-0296"
           ],
           "recorded_at": "2026-11-01T21:50:19.384670132Z",
           "seal": {
             "by": "server",
-            "mac": "87c10de5a08030de19aabb5711dbaea696a0a20ed173344eb7bf1de1099fbb75"
+            "mac": "1ee1c995cf330f990c8349196ca85002580c4700af6b777362e87a9c13799e04"
           }
         }
       ],
@@ -11712,11 +13465,11 @@
       "updated_at": "2026-11-01T21:50:19.384670132Z",
       "seal": {
         "by": "server",
-        "mac": "5c1631003367008968275068a0eef287d236cfc393df50f23176b2080788307e"
+        "mac": "9d2fed20a182549c0aadff06932a2b3b2f41ca2d87722145c3c216c51a72c7d3"
       }
     },
     {
-      "id": "CLM-0147",
+      "id": "CLM-0166",
       "statement": "release.toml sets publish=false, push=false, verify=false, allow-branch=[main], tag-name v{{version}}, the commit message 'chore: Release v{{version}}', a replacement of version in report/audit-notes.toml, and a pre-release-hook that writes the changelog entry",
       "kind": "constraint",
       "level": "component",
@@ -11724,7 +13477,7 @@
       "verification_method": "test",
       "source": "Issue #37, Proposed design, release.toml bullet list",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "release.toml",
@@ -11738,7 +13491,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0259",
+          "id": "EVD-0297",
           "kind": "inspection",
           "locator": "release.toml:5-28",
           "summary": "Read the file: allow-branch=[main], tag-name, pre-release-commit-message, a pre-release-replacements entry on report/audit-notes.toml (exactly=1), pre-release-hook scripts/release-changelog.sh, publish/push/verify all false. The regex matched exactly one line in the real audit-notes.toml (grep -c '^version = ' gives 1).",
@@ -11756,11 +13509,11 @@
           "recorded_at": "2026-11-01T21:48:49.190013426Z",
           "seal": {
             "by": "server",
-            "mac": "4e426b2c2b645bcbe108154d2b676b468310fb21c9ca2ba378d8a2522a246c22"
+            "mac": "f88a33fd6b90d8eeb2a369dca2cfb428f85720bc7cdd5c1adbed7a7fe146f5b2"
           }
         },
         {
-          "id": "EVD-0260",
+          "id": "EVD-0298",
           "kind": "test",
           "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:332-373)",
           "summary": "Ran the end-to-end test with the real cargo-release (installed locally; no skip line): it passed, so release.toml parses and produces the commit message, tag v1.2.3, bumped audit-notes version and changelog entry.",
@@ -11778,7 +13531,7 @@
           "recorded_at": "2026-11-01T21:48:49.208385262Z",
           "seal": {
             "by": "server",
-            "mac": "9a64494f6ba3bf1e9562e71c984fb55cbfcbe2c845e8456b02a584cc7b8e667c"
+            "mac": "168f2cf15d4b0be5d231f5b5f47dc627ff9c1bb6ba4014543b34ffaf5887461d"
           }
         }
       ],
@@ -11788,13 +13541,13 @@
           "rationale": "release.toml has every listed setting and the real cargo-release end-to-end run accepts and applies it.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0259",
-            "EVD-0260"
+            "EVD-0297",
+            "EVD-0298"
           ],
           "recorded_at": "2026-11-01T21:50:19.397227839Z",
           "seal": {
             "by": "server",
-            "mac": "03e4ca6f25688311e6c5cf1623afa69f1e98070515cb1fdc5949d73197e25f16"
+            "mac": "f30cfac322b43ce159782d342ab06ff32ddadb169339b17e442da101cd5987e2"
           }
         }
       ],
@@ -11802,11 +13555,11 @@
       "updated_at": "2026-11-01T21:50:19.397227839Z",
       "seal": {
         "by": "server",
-        "mac": "d9950214e4e52f0e93ded75709f7641b6b795dbf6d79cfc5870f0048ad575c6e"
+        "mac": "3bfbc0441e82f4baded7d12f0ae38a1d92b8e67c6b5855b6ee8dd6e9e235f2d4"
       }
     },
     {
-      "id": "CLM-0148",
+      "id": "CLM-0167",
       "statement": "release-prepare leaves one local release commit and a local annotated tag containing the bumped versions and the changelog entry, and pushes nothing",
       "kind": "functional",
       "level": "component",
@@ -11814,7 +13567,7 @@
       "verification_method": "test",
       "source": "Issue #37: 'The result is one local commit and a local annotated tag. Nothing is pushed.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-prepare.sh",
@@ -11829,7 +13582,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0261",
+          "id": "EVD-0299",
           "kind": "test",
           "locator": "just release-test (scripts/release-test.sh:341-373)",
           "summary": "End-to-end test with real cargo-release passed. It asserts: HEAD subject 'chore: Release v1.2.3', HEAD^ equals the old origin/main (one commit), v1.2.3 is an annotated tag on HEAD, Cargo.toml, Cargo.lock and audit-notes.toml bumped, changelog entry in the commit, tree clean, origin main and tag unchanged.",
@@ -11847,7 +13600,7 @@
           "recorded_at": "2026-11-01T21:48:49.226707819Z",
           "seal": {
             "by": "server",
-            "mac": "d5dc9fcd8b6eec346a1c82b1c4f16e2d25ea3f1d2c98ba56cc34e1da6f3ac629"
+            "mac": "7cccddca3b2cc1cc623ffd3c507980868f8017a9fdb6e91cee059bc48d784fae"
           }
         }
       ],
@@ -11857,12 +13610,12 @@
           "rationale": "The end-to-end test asserts one commit, an annotated tag on it, bumped files, changelog in the commit, and nothing pushed.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0261"
+            "EVD-0299"
           ],
           "recorded_at": "2026-11-01T21:50:19.411218032Z",
           "seal": {
             "by": "server",
-            "mac": "599088ebcc3271c6db3530a2890a1fd4e519e74130c431f14be62ea252b36305"
+            "mac": "ecfcda8c556b1736fd21335c545df75743264715a935ed30756f6915b49938f7"
           }
         }
       ],
@@ -11870,11 +13623,11 @@
       "updated_at": "2026-11-01T21:50:19.411218032Z",
       "seal": {
         "by": "server",
-        "mac": "95b3b0a88cf3ee71713ddf8c4ecae93c3b5b2fef829f530385108fab58fb2995"
+        "mac": "03f8d7653d9c96ba24318a82056a30fce74e2744785c7131eccd803386ff0748"
       }
     },
     {
-      "id": "CLM-0149",
+      "id": "CLM-0168",
       "statement": "release-ship refuses unless HEAD carries v<Cargo.toml version>, the tag is absent from origin (git ls-remote --exit-code: exit 2 is absent, any other non-zero exit fails), and HEAD is a single-parent commit directly on current origin/main",
       "kind": "functional",
       "level": "component",
@@ -11882,7 +13635,7 @@
       "verification_method": "test",
       "source": "Issue #37, release-ship Checks; PR body: 'checks that HEAD carries v<Cargo.toml version>, that the tag is not on origin (git ls-remote --exit-code; exit 2 means absent, any other non-zero exit fails), and that HEAD is a single-parent commit directly on current origin/main'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-ship.sh",
@@ -11896,7 +13649,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0262",
+          "id": "EVD-0300",
           "kind": "test",
           "locator": "just release-test (test_ship_refusals, ..._refuses_tag_on_origin, ..._refuses_merge_head, ..._refuses_stale_release; scripts/release-test.sh:389-459)",
           "summary": "All four ship-check tests passed on head, asserting diagnostics for untagged HEAD, a tag other than the version, tag already on origin, merge-commit HEAD, HEAD not directly on current origin/main, and an unreachable origin. Mutation: changing '2) return 1' to '*) return 1' in a scratch copy of release-lib.sh made the 'unreachable origin' test fail (exit 1), so the exit-2 distinction is covered.",
@@ -11914,11 +13667,11 @@
           "recorded_at": "2026-11-01T21:48:49.246117519Z",
           "seal": {
             "by": "server",
-            "mac": "459b56c751cfbccaa0e935dcd9f0949db8607715c53327e9bc8ce46b057bd3ac"
+            "mac": "03e733c3af4b9f676706f2f4a2ca9c8f44f21db89ae68f3cf8ca4a3ae7cadca3"
           }
         },
         {
-          "id": "EVD-0263",
+          "id": "EVD-0301",
           "kind": "inspection",
           "locator": "scripts/release-lib.sh:35-43; scripts/release-ship.sh:39-53",
           "summary": "origin_has_ref uses git ls-remote --exit-code and maps 0 to present, 2 to absent and anything else to fail; ship checks the tag named by the Cargo.toml version is on HEAD, not on origin, HEAD has no second parent, and HEAD^ equals refs/remotes/origin/main after a fetch.",
@@ -11936,7 +13689,7 @@
           "recorded_at": "2026-11-01T21:48:49.263929473Z",
           "seal": {
             "by": "server",
-            "mac": "5231c325a76a4a631fbbc2b8805d018b033900f61a612fb1644beaf33a1d2a87"
+            "mac": "9c0c89803448c7a3d180f5e2a7fc23b70828c3193599b745462ede6410464b2e"
           }
         }
       ],
@@ -11946,13 +13699,13 @@
           "rationale": "Code implements each check, tests assert each refusal, and a mutation of the exit-2 handling is caught.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0262",
-            "EVD-0263"
+            "EVD-0300",
+            "EVD-0301"
           ],
           "recorded_at": "2026-11-01T21:50:19.426484899Z",
           "seal": {
             "by": "server",
-            "mac": "31d62fb5240a7f4ea665e2d021f93f84da6fac5758ae270233bab58c258b36b7"
+            "mac": "fc46a3d42544974218f9f907513e307c0dc2b8e83d5b42dac995d3424ce5f157"
           }
         }
       ],
@@ -11960,11 +13713,11 @@
       "updated_at": "2026-11-01T21:50:19.426484899Z",
       "seal": {
         "by": "server",
-        "mac": "93d687a307182d0e443424a1ac07c83a8b6b33d6330f854542c32463774f5c41"
+        "mac": "4efeb8562b36bbe2c2b466487127545b9fbb26cf18d1acbe04af31fc5748750d"
       }
     },
     {
-      "id": "CLM-0150",
+      "id": "CLM-0169",
       "statement": "release-ship pushes HEAD to release/vX.Y.Z, opens a PR titled 'chore: Release vX.Y.Z', waits for checks to register, runs gh pr checks --watch --fail-fast, and on failure stops with the PR open and nothing tagged",
       "kind": "functional",
       "level": "component",
@@ -11972,7 +13725,7 @@
       "verification_method": "test",
       "source": "Issue #37, release-ship: 'Pushes HEAD to release/vX.Y.Z and opens a PR titled chore: Release vX.Y.Z. Waits for checks to register, then gh pr checks --watch --fail-fast. On failure, it stops and leaves the PR open with nothing tagged.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-ship.sh"
@@ -11985,7 +13738,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0264",
+          "id": "EVD-0302",
           "kind": "test",
           "locator": "just release-test (test_ship_stops_on_failed_checks, assert_ship_stops_open; scripts/release-test.sh:460-483, 508-520)",
           "summary": "Passed on head: failing or missing checks stop ship with the PR open and nothing tagged; the success test asserts 'pr create --base main --head release/v1.2.3 --title chore: Release v1.2.3'. Mutation: removing '--fail-fast' from release-ship.sh in a scratch copy made the suite fail ('checks were not watched with --fail-fast').",
@@ -12003,11 +13756,11 @@
           "recorded_at": "2026-11-01T21:48:49.282022288Z",
           "seal": {
             "by": "server",
-            "mac": "f6f898917baf6ab81720ba2eed71b08713ec976b9324eaf6d9fb253d0e3c1e62"
+            "mac": "a16c1cd2053b9e6438303107fab44638d1a920d261bde85df6bf9b11aa6b4a8d"
           }
         },
         {
-          "id": "EVD-0265",
+          "id": "EVD-0303",
           "kind": "inspection",
           "locator": "scripts/release-ship.sh:55-90",
           "summary": "Pushes HEAD to refs/heads/release/vX.Y.Z, gh pr create --title 'chore: Release vX.Y.Z', polls until gh pr checks lists a check, then gh pr checks --watch --fail-fast; failure calls fail naming the open PR and that nothing was tagged.",
@@ -12025,7 +13778,7 @@
           "recorded_at": "2026-11-01T21:48:49.299609392Z",
           "seal": {
             "by": "server",
-            "mac": "34d867ec489501962922ffbda8499fd30908f665bb7ca2a3b9ea7cbe6fc14fd6"
+            "mac": "fd53ff93fcd8e376a017ddff8f360241b606ea24ab5ab9504871aaf96aa1788c"
           }
         }
       ],
@@ -12035,13 +13788,13 @@
           "rationale": "Code does the push, PR, wait and watch; tests cover failure leaving the PR open; --fail-fast mutation is caught.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0264",
-            "EVD-0265"
+            "EVD-0302",
+            "EVD-0303"
           ],
           "recorded_at": "2026-11-01T21:50:19.440750893Z",
           "seal": {
             "by": "server",
-            "mac": "d36a6df4c280c95ae58d9b0df8237f79d5829824efad612522e71eba8119dd77"
+            "mac": "9fdaa6466426504304c87a2a37602bfb3d7c7d2510b44d1f79336149be4b7882"
           }
         }
       ],
@@ -12049,11 +13802,11 @@
       "updated_at": "2026-11-01T21:50:19.440750893Z",
       "seal": {
         "by": "server",
-        "mac": "94cf9dbf8fa80b896b5029c948ce27dc628a489c926d550908118b2db2251c42"
+        "mac": "4b3729c9b0342c5dbf5c943ef996d89b4060b635fad2dfba4448793fc577af4b"
       }
     },
     {
-      "id": "CLM-0151",
+      "id": "CLM-0170",
       "statement": "release-ship waits for the review bot's review and stops, leaving the PR open and nothing tagged, when any review thread is unresolved (GraphQL reviewThreads.isResolved)",
       "kind": "functional",
       "level": "component",
@@ -12061,7 +13814,7 @@
       "verification_method": "test",
       "source": "Issue #37, release-ship differences from bolt: 'the script waits for that review. If any review thread is unresolved (GraphQL reviewThreads.isResolved), it stops and leaves the PR open for a person.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-ship.sh"
@@ -12074,7 +13827,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0266",
+          "id": "EVD-0304",
           "kind": "test",
           "locator": "just release-test (test_ship_stops_on_review, scripts/release-test.sh:484-490)",
           "summary": "Passed on head: 2 unresolved threads give '... has 2 unresolved review thread(s)' with PR open and nothing tagged; a missing bot review gives 'a review by brooke-reviews did not arrive'. Mutation: replacing the UNRESOLVED_THREADS==0 guard with 'true' in a scratch copy made the suite fail.",
@@ -12092,11 +13845,11 @@
           "recorded_at": "2026-11-01T21:48:49.316772394Z",
           "seal": {
             "by": "server",
-            "mac": "a48130b02aa14848d3e976559ea946feed2bfa66595115b521cdf38ed5e38458"
+            "mac": "d6ad7dc98234c992b1beb41ac19f6fd078de2b40e08a37637095b41c15de739f"
           }
         },
         {
-          "id": "EVD-0267",
+          "id": "EVD-0305",
           "kind": "inspection",
           "locator": "scripts/release-ship.sh:94-110",
           "summary": "Waits for a review by the bot login (RELEASE_REVIEWER, default brooke-reviews), then queries GraphQL reviewThreads(first: 100) isResolved and fails unless the unresolved count is 0. Note: first:100 would miss threads beyond 100, an unlikely limit for a release PR.",
@@ -12114,7 +13867,7 @@
           "recorded_at": "2026-11-01T21:48:49.333816046Z",
           "seal": {
             "by": "server",
-            "mac": "45cc8ea989ea8e52d4df3bb0a9332a6e81637ef99e456bb768a82c19bf69df89"
+            "mac": "acd453458aa8bd83fe7284d233e1f733991ab1fa4f16b6840c7e7aca654363c7"
           }
         }
       ],
@@ -12124,13 +13877,13 @@
           "rationale": "Code queries isResolved threads after waiting for the bot review; test and mutation confirm it stops.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0266",
-            "EVD-0267"
+            "EVD-0304",
+            "EVD-0305"
           ],
           "recorded_at": "2026-11-01T21:50:19.455038497Z",
           "seal": {
             "by": "server",
-            "mac": "be0ca3c110d9d431e8f3cc38e81f397830c80d36e004948fc4594ac73c033156"
+            "mac": "8ecfd3ff22dd9127d62476bdae5679278f7a743d4abaec183b3d0bcd819778fa"
           }
         }
       ],
@@ -12138,11 +13891,11 @@
       "updated_at": "2026-11-01T21:50:19.455038497Z",
       "seal": {
         "by": "server",
-        "mac": "777bf53ba6b150fdc87655125205dde341b292f84cf256fe1b64a89d386877f0"
+        "mac": "210f2003d9dd1a33cfd492eedfb6b688084d75ccdce74cd83914ff90b85d024c"
       }
     },
     {
-      "id": "CLM-0152",
+      "id": "CLM-0171",
       "statement": "release-ship fetches main again and, if it moved, closes the PR with --delete-branch and stops without merging or tagging",
       "kind": "functional",
       "level": "component",
@@ -12150,7 +13903,7 @@
       "verification_method": "test",
       "source": "Issue #37: 'Fetches main again. If it moved, it closes the PR (--delete-branch) and stops.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-ship.sh"
@@ -12163,7 +13916,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0268",
+          "id": "EVD-0306",
           "kind": "test",
           "locator": "just release-test (test_ship_closes_when_main_moves, scripts/release-test.sh:492-506)",
           "summary": "Passed on head: after upstream main moves, ship fails 'main moved while the release pull request waited', the log has 'pr close <url> --delete-branch', no 'pr merge', and no tag on the remote. Mutation: dropping --delete-branch from the gh pr close in a scratch copy made the suite fail.",
@@ -12181,11 +13934,11 @@
           "recorded_at": "2026-11-01T21:48:49.352179282Z",
           "seal": {
             "by": "server",
-            "mac": "79f9634c72d3830f1bb2f9ec2bd0e49c08c43f4fab8ade64060fdb454fdfa790"
+            "mac": "6910bf54bfaa50db48f914636e379437564d643139883474dd7047b9962ffc22"
           }
         },
         {
-          "id": "EVD-0289",
+          "id": "EVD-0327",
           "kind": "inspection",
           "locator": "scripts/release-ship.sh:114-120",
           "summary": "After the checks and review, fetches origin main, compares with the value taken before the push, and if different runs gh pr close --delete-branch with a comment, then fails; the merge call comes only after this block.",
@@ -12203,7 +13956,7 @@
           "recorded_at": "2026-11-01T21:49:39.232052652Z",
           "seal": {
             "by": "server",
-            "mac": "969e3ca81bf55a3c6d5a0e284a615608eb3cd74a6b2c26afefa52031236ef3b8"
+            "mac": "9961255f0dd747f7171e6a39daf587b17fefbd91b8055975a1d1297db521f4bd"
           }
         }
       ],
@@ -12213,13 +13966,13 @@
           "rationale": "Code and test show the PR closed with --delete-branch, no merge, no tag when main moves.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0268",
-            "EVD-0289"
+            "EVD-0306",
+            "EVD-0327"
           ],
           "recorded_at": "2026-11-01T21:50:19.470817136Z",
           "seal": {
             "by": "server",
-            "mac": "50e1ed1f99b8f289b9c8265b0dd0a0f0d9497ff739065a062505f3cc1a1a4b29"
+            "mac": "e94374cbc99f0736e8fe20d3e4ca2665260367ab0c54bf715d3e24c009c4dfe6"
           }
         }
       ],
@@ -12227,11 +13980,11 @@
       "updated_at": "2026-11-01T21:50:19.470817136Z",
       "seal": {
         "by": "server",
-        "mac": "ccd9aebe43a97a5ba494b22c2d1f19a5a37f52fddd1216fea31ddc476ea1ad83"
+        "mac": "6182fdd5d87dc9dc4eb9719f76bb311d3c7e7502bab8e8dec69623dbd8530e7a"
       }
     },
     {
-      "id": "CLM-0153",
+      "id": "CLM-0172",
       "statement": "release-ship merges with gh pr merge --merge --delete-branch, re-tags the PR's merge commit locally with git tag --force --annotate before pushing the tag, pushes the tag, and fast-forwards local main",
       "kind": "functional",
       "level": "component",
@@ -12239,7 +13992,7 @@
       "verification_method": "test",
       "source": "Issue #37: 'gh pr merge --merge --delete-branch ... Re-tags the PR's merge commit locally (git tag --force --annotate, before anything is pushed), pushes the tag, and fast-forwards local main.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-ship.sh"
@@ -12252,7 +14005,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0269",
+          "id": "EVD-0307",
           "kind": "test",
           "locator": "just release-test (test_ship_tags_merge_commit, scripts/release-test.sh:508-535)",
           "summary": "Passed on head: asserts 'pr merge <url> --merge --delete-branch', the pushed tag points at main's tip merge commit (has a second parent), is annotated with message kept, and local main equals the tagged commit. Mutations in scratch copies: tagging HEAD instead of MERGE_COMMIT, and --squash instead of --merge, each failed the suite.",
@@ -12270,11 +14023,11 @@
           "recorded_at": "2026-11-01T21:48:49.371246061Z",
           "seal": {
             "by": "server",
-            "mac": "e405b0f2e93013667a8764deb389c57425bf7560ecb1aeaf5c27e4ad7835e658"
+            "mac": "04662847141e91a9a0f2a22ae8b22acdd2df046c03a5196ead271c058ee37c9e"
           }
         },
         {
-          "id": "EVD-0270",
+          "id": "EVD-0308",
           "kind": "inspection",
           "locator": "scripts/release-ship.sh:122-136",
           "summary": "gh pr merge --merge --delete-branch; reads mergeCommit oid, verifies it contains HEAD, git tag --force --annotate at the merge commit locally, then git push of the tag, then git merge --ff-only origin/main. The tag is moved before any push, as the issue requires.",
@@ -12292,7 +14045,7 @@
           "recorded_at": "2026-11-01T21:48:49.389383347Z",
           "seal": {
             "by": "server",
-            "mac": "fab59919dc23527d6a5684d5c346a29225f4a03355674189952c545ea4da6788"
+            "mac": "2bfe5266739590bcaa65bf4aac4110378330d440510f67060ef960650ad9aa6a"
           }
         }
       ],
@@ -12302,13 +14055,13 @@
           "rationale": "Code orders merge, local re-tag, tag push, fast-forward correctly; the test asserts the tag is on the merge commit and mutations (squash, wrong commit) are caught.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0269",
-            "EVD-0270"
+            "EVD-0307",
+            "EVD-0308"
           ],
           "recorded_at": "2026-11-01T21:50:19.485093710Z",
           "seal": {
             "by": "server",
-            "mac": "fbaa19bed3eaaf48d4f06d339d6286fb32f4193c890f63aa658cc4c5d6bbe86c"
+            "mac": "8956d326162e47ab5c45f552fe7f44082ba150e1a60597266aad858f543fecad"
           }
         }
       ],
@@ -12316,11 +14069,11 @@
       "updated_at": "2026-11-01T21:50:19.485093710Z",
       "seal": {
         "by": "server",
-        "mac": "82e904ccfdfd1d30e01c5ab2379dd69d384bc12ab357165eba5a4250daaa88c8"
+        "mac": "7f4d02c603681b0ebf6cc1332675d136fa61b543d32cc9a3acaf5fd6d5eced9a"
       }
     },
     {
-      "id": "CLM-0154",
+      "id": "CLM-0173",
       "statement": "release-abort closes the release PR and deletes its branch if they exist, deletes the local tag and resets local main to origin/main, and refuses off main, with a dirty tree, when HEAD lacks the version's tag, when the tag is on origin or the release PR merged, and when main has other unpublished commits",
       "kind": "functional",
       "level": "component",
@@ -12328,7 +14081,7 @@
       "verification_method": "test",
       "source": "Issue #37, just release-abort section",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-abort.sh"
@@ -12341,7 +14094,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0271",
+          "id": "EVD-0309",
           "kind": "test",
           "locator": "just release-test (test_abort_refusals, test_abort_refuses_other_local_commits, test_abort_cleans_up; scripts/release-test.sh:551-639)",
           "summary": "All three abort tests passed on head: refusals for untagged HEAD, non-main branch, dirty tree (untracked file kept), merged PR, tag on origin; refusal when main has other local commits; cleanup closes an open PR or deletes the branch, drops the tag and resets main. Mutation: replacing the ((UNPUBLISHED_COMMITS <= 1)) guard with true in a scratch copy made the suite fail.",
@@ -12359,11 +14112,11 @@
           "recorded_at": "2026-11-01T21:49:29.270581589Z",
           "seal": {
             "by": "server",
-            "mac": "52d775bac6d8b05f083b87d4321c72fc9be17c58d2e6d4ce3b7001ca340402de"
+            "mac": "25b97839fc4c349a09f105f2abda793e8f9cbb5fb9dbeb43fdcba7959b5ca177"
           }
         },
         {
-          "id": "EVD-0272",
+          "id": "EVD-0310",
           "kind": "inspection",
           "locator": "scripts/release-abort.sh:17-59",
           "summary": "Read: require_clean_main, tag-on-HEAD check, origin tag and merged-PR refusals, at most one commit ahead of origin/main, closes open PR with --delete-branch or deletes the remote branch, deletes the tag, resets hard to origin/main.",
@@ -12381,7 +14134,7 @@
           "recorded_at": "2026-11-01T21:49:29.288676857Z",
           "seal": {
             "by": "server",
-            "mac": "ad7f0c8cbe112533e4787b652b723f9527b84d03e3eeee00a5a0f74af52ef650"
+            "mac": "8a603539374446e62a18e762de6f0f7e74c60e9da90578903638e18ab5de1ef5"
           }
         }
       ],
@@ -12391,13 +14144,13 @@
           "rationale": "Code implements every listed action and refusal; abort tests pass and the extra-commits guard mutation is caught.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0271",
-            "EVD-0272"
+            "EVD-0309",
+            "EVD-0310"
           ],
           "recorded_at": "2026-11-01T21:50:19.499823266Z",
           "seal": {
             "by": "server",
-            "mac": "6a354921c60d489f97b12c61dd6934bdb4975db3828c2e7d7a2d9d211bc4d531"
+            "mac": "b5f3766d7b6dc901face59fb8d18a3faa477927473fbfa5d562154c5b228e840"
           }
         }
       ],
@@ -12405,11 +14158,11 @@
       "updated_at": "2026-11-01T21:50:19.499823266Z",
       "seal": {
         "by": "server",
-        "mac": "e19be5f9aa32c8b81908b222c677eb977e3117b6d25a31f57d84d0cc2cb29a2f"
+        "mac": "ab1c8ebd0378a3a6424c443b667cea706502a9a4a78730ce6cdfd1cc35c5cd5d"
       }
     },
     {
-      "id": "CLM-0155",
+      "id": "CLM-0174",
       "statement": "scripts/release-notes.sh prints Markdown from the first-parent merge commits in the range, grouped Breaking (!), Features, Fixes, Documentation, Dependencies (build(deps)) and Other as written, each line linking its PR, omitting the 'chore: Release' PR",
       "kind": "functional",
       "level": "component",
@@ -12417,7 +14170,7 @@
       "verification_method": "test",
       "source": "Issue #37, Release notes: generated, one source; PR body: 'scripts/release-notes.sh <from> <to>: Markdown from the first-parent merge commits in the range, grouped into Breaking (!), Features, Fixes, Documentation, Dependencies (build(deps)) and Other (as written), each line linked to its PR; the chore: Release PR is left out.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-notes.sh"
@@ -12430,7 +14183,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0273",
+          "id": "EVD-0311",
           "kind": "test",
           "locator": "just release-test (test_notes_grouping_and_range, scripts/release-test.sh:205-283)",
           "summary": "Passed on head: expected output shows Breaking (feat(api)!), Features, Fixes, Documentation, Dependencies, Other (plain title, chore title and a non-PR merge as written), PR links, nested merges excluded via first-parent, chore: Release PR omitted, one trailing newline, range narrowing, and an all-release range rejected.",
@@ -12448,11 +14201,11 @@
           "recorded_at": "2026-11-01T21:49:29.306934786Z",
           "seal": {
             "by": "server",
-            "mac": "fb3fb769ba38e05f342238a6ab26a785fc734c316e963dc90522e0fc9951493b"
+            "mac": "8951f66e01322a84c7a96700352976bfc50848921fa2f184885244b93559a959"
           }
         },
         {
-          "id": "EVD-0274",
+          "id": "EVD-0312",
           "kind": "inspection",
           "locator": "scripts/release-notes.sh:47-96",
           "summary": "add_entry buckets by conventional-commit regex (! breaking, build(deps), feat, fix, docs, else other as written); git log --first-parent --merges drives it; titles starting 'chore: Release ' are skipped; lines link /pull/N.",
@@ -12470,7 +14223,7 @@
           "recorded_at": "2026-11-01T21:49:29.322088103Z",
           "seal": {
             "by": "server",
-            "mac": "116030025525a467fdd93d743fe8b4ae12d0443601da25bb87d513801a0944cc"
+            "mac": "710e0adc95bc1974b9f4f48a094e84ed98941e008daf9bcae5b821cdab614a4b"
           }
         }
       ],
@@ -12480,13 +14233,13 @@
           "rationale": "Script and a test with exact expected output cover grouping, links, first-parent and release exclusion.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0273",
-            "EVD-0274"
+            "EVD-0311",
+            "EVD-0312"
           ],
           "recorded_at": "2026-11-01T21:50:19.514687191Z",
           "seal": {
             "by": "server",
-            "mac": "52059c44b5b6f70f6dca0066e55ccc49c81d33d1c088a621f8e0e73be131a1fb"
+            "mac": "e1f9f578e9a1e68c9c84989e59426c7f237c3e565e8febdbb35f4804d7690e6d"
           }
         }
       ],
@@ -12494,11 +14247,11 @@
       "updated_at": "2026-11-01T21:50:19.514687191Z",
       "seal": {
         "by": "server",
-        "mac": "7364a64b001221fd75f49a3c0323d81c83cf52b75aec2d640a651c5c47ea9a81"
+        "mac": "600f8bd508a54ee81ffc4aa28f4bb101c80b96942ed132a1a5c0fb2ef9c45b8f"
       }
     },
     {
-      "id": "CLM-0156",
+      "id": "CLM-0175",
       "statement": "The GitHub release body (release.yml, previous tag to the tag, via --notes-file) and the release's changelog entry (written by release-prepare) are byte-identical notes from scripts/release-notes.sh",
       "kind": "functional",
       "level": "system",
@@ -12506,7 +14259,7 @@
       "verification_method": "test",
       "source": "Issue #37 Acceptance criteria: 'The GitHub release body and the release's changelog/ entry are byte-identical notes from scripts/release-notes.sh.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-notes.sh",
@@ -12521,7 +14274,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0275",
+          "id": "EVD-0313",
           "kind": "test",
           "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:375-387)",
           "summary": "Passed with real cargo-release: the changelog entry minus its 2-line heading is cmp-identical to release-notes.sh output for describe(tag^)..tag, the same range release.yml uses. The test reproduces the workflow's command rather than executing release.yml.",
@@ -12539,11 +14292,11 @@
           "recorded_at": "2026-11-01T21:49:29.336904188Z",
           "seal": {
             "by": "server",
-            "mac": "82f6a6c0a040aeef18ffec56f9109b1cfdff79e7df73bf87952ae86ef094c7e1"
+            "mac": "1e988bc977b2de451134fbfe4a41b98ac4480dc08c8482aeb478bea94fb8a22c"
           }
         },
         {
-          "id": "EVD-0276",
+          "id": "EVD-0314",
           "kind": "inspection",
           "locator": ".github/workflows/release.yml:119-149; scripts/release-changelog.sh:1-42",
           "summary": "The workflow computes previous_release_tag of tag^ and runs release-notes.sh previous..tag into notes.md used by --notes-file; the changelog hook writes '# Release vX' plus release-notes.sh previous..HEAD byte for byte. Both use the same fixed repository URL and exclude the release PR, so they cover the same PRs.",
@@ -12561,7 +14314,7 @@
           "recorded_at": "2026-11-01T21:49:29.354992816Z",
           "seal": {
             "by": "server",
-            "mac": "4e669f99c82e4e80231b33cad19572f1fe7ab012406856453bc99927d36bb853"
+            "mac": "7818c85d1e57c3ca07c292c7e2fb730c120d1d010658285e2b49871c65f6744e"
           }
         }
       ],
@@ -12571,13 +14324,13 @@
           "rationale": "The e2e test compares the committed entry with the notes for the range the workflow uses, byte for byte, and the workflow code uses that same command. Not executed on real Actions.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0275",
-            "EVD-0276"
+            "EVD-0313",
+            "EVD-0314"
           ],
           "recorded_at": "2026-11-01T21:50:19.528601354Z",
           "seal": {
             "by": "server",
-            "mac": "9ed09ebd95027b1ff4ff1c33ad28b4ba56a0c74af8701768e8b00c7ae903580f"
+            "mac": "e74c5e5392ac88ebc5fe07cac28fe9bb14b2d17687b3d09af493879f8e8ceffd"
           }
         }
       ],
@@ -12585,11 +14338,11 @@
       "updated_at": "2026-11-01T21:50:19.528601354Z",
       "seal": {
         "by": "server",
-        "mac": "2a900e6a89a54d6c9def309908098d2f7efdfe290acebf7411b80a21283fc4ea"
+        "mac": "2344699e6cddbb0c431a2972cd19556e13f080b5e5949454bba634b56705daf0"
       }
     },
     {
-      "id": "CLM-0157",
+      "id": "CLM-0176",
       "statement": "release.yml's publish step checks out full history and passes the notes (previous tag to the tag) as --notes-file, replacing --generate-notes",
       "kind": "functional",
       "level": "artifact",
@@ -12597,7 +14350,7 @@
       "verification_method": "inspection",
       "source": "PR body: 'release.yml publish step: checks out full history and passes those notes (previous tag to the tag) as --notes-file, replacing --generate-notes.'",
       "derived_from": [
-        "CLM-0156"
+        "CLM-0175"
       ],
       "artifacts": [
         ".github/workflows/release.yml"
@@ -12610,7 +14363,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0277",
+          "id": "EVD-0315",
           "kind": "inspection",
           "locator": ".github/workflows/release.yml:119-149",
           "summary": "Publish job has actions/checkout with fetch-depth: 0 before download-artifact, a 'release notes' step writing $RUNNER_TEMP/notes.md for previous tag..tag, and gh release create ... --notes-file; git grep generate-notes finds no other use in the workflow.",
@@ -12628,7 +14381,7 @@
           "recorded_at": "2026-11-01T21:49:29.373812157Z",
           "seal": {
             "by": "server",
-            "mac": "92949652356ed538a1728e678b6751be016e24b42f14842b2d6e045fba07c346"
+            "mac": "318503f3086cc8e5d75ecb672865bc51b217ab18354138a9268072f13bfe2bfd"
           }
         }
       ],
@@ -12638,12 +14391,12 @@
           "rationale": "The workflow shows fetch-depth 0, the notes step and --notes-file with no --generate-notes.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0277"
+            "EVD-0315"
           ],
           "recorded_at": "2026-11-01T21:50:19.543794341Z",
           "seal": {
             "by": "server",
-            "mac": "b525a3603c1edaf74c87b8d040c365e20e4b9b0d3f8e0635a926427da0ee5db4"
+            "mac": "615f7f6c03e48db52d3587bc09a2574c2921f0f15a4d62def54cb64b00574e41"
           }
         }
       ],
@@ -12651,11 +14404,11 @@
       "updated_at": "2026-11-01T21:50:19.543794341Z",
       "seal": {
         "by": "server",
-        "mac": "819bd7ef893d5225b22222bccf90f2c8b665cb81ebe7e35a82e470ed50c5494f"
+        "mac": "9763956be6dbcf427b0108679d930b6ecafb6be423822e09a17f9e9f83ef7d03"
       }
     },
     {
-      "id": "CLM-0158",
+      "id": "CLM-0177",
       "statement": "report/audit-notes.toml's per-version paragraphs are dropped and the assessment is fixed, so a release edits only its version field via release-prepare",
       "kind": "functional",
       "level": "component",
@@ -12663,7 +14416,7 @@
       "verification_method": "test",
       "source": "Issue #37, Audit notes become static; Acceptance: 'audit-notes.toml needs no edit other than the version that release-prepare writes.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "report/audit-notes.toml",
@@ -12677,7 +14430,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0278",
+          "id": "EVD-0316",
           "kind": "inspection",
           "locator": "report/audit-notes.toml:1-30; release.toml:15-17",
           "summary": "The per-version paragraphs for 0.2.0 to 0.2.5 are gone, one fixed closing paragraph remains, and the real file has exactly one 'version = ' line, which release.toml's exactly=1 regex replacement targets. The e2e test asserts audit-notes.toml is bumped; just report rendered with the new notes.",
@@ -12695,7 +14448,7 @@
           "recorded_at": "2026-11-01T21:49:29.391557564Z",
           "seal": {
             "by": "server",
-            "mac": "3fa759132ea1cd32b0131db07a4015eb8998e4d6b6e4c1cf9f64796c0a235e93"
+            "mac": "e2e23d251220cb5c89065f90b2e2bc16f7b43c7c0197cf8630f00e18725b4aa8"
           }
         }
       ],
@@ -12705,12 +14458,12 @@
           "rationale": "Static assessment, single version line targeted by release.toml, e2e bump test passes.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0278"
+            "EVD-0316"
           ],
           "recorded_at": "2026-11-01T21:50:19.558459126Z",
           "seal": {
             "by": "server",
-            "mac": "6413c06722915079b6ae25e1773b161320b6f0c3ef11721e8acf49de0db2367a"
+            "mac": "0336cb7478b93695d251958c143dca76f1d4e412e929b6c5ad72bbe82ebcc1cb"
           }
         }
       ],
@@ -12718,11 +14471,11 @@
       "updated_at": "2026-11-01T21:50:19.558459126Z",
       "seal": {
         "by": "server",
-        "mac": "96d201dfdb0e06df29acdb2e3d8d0bea5db3a77392d2d646657a6c8086c33b83"
+        "mac": "b004a73069ecdc8d4b423cb0e7f2b72ca2b2b708adbca37abd6e15d72677c2bb"
       }
     },
     {
-      "id": "CLM-0159",
+      "id": "CLM-0178",
       "statement": "The audit-notes sentence is worded 'Since 0.2.5, changes are audited as claims in the pull requests that make them; dependency updates are not', with the 0.2.0 to 0.2.5 exceptions named, instead of the issue's sentence",
       "kind": "documentation",
       "level": "artifact",
@@ -12730,7 +14483,7 @@
       "verification_method": "inspection",
       "source": "PR body, report/audit-notes.toml bullet",
       "derived_from": [
-        "CLM-0158"
+        "CLM-0177"
       ],
       "artifacts": [
         "report/audit-notes.toml"
@@ -12743,7 +14496,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0279",
+          "id": "EVD-0317",
           "kind": "inspection",
           "locator": "report/audit-notes.toml:24-28",
           "summary": "The text reads 'Since 0.2.5, changes are audited as claims in the pull requests that make them; dependency updates are not', preceded by the named exceptions CLM-0037, CLM-0067 to CLM-0077 and CLM-0078 to CLM-0130. This is a documented, accurate deviation from the issue's wording.",
@@ -12761,7 +14514,7 @@
           "recorded_at": "2026-11-01T21:49:29.408150867Z",
           "seal": {
             "by": "server",
-            "mac": "786069d1eaf50660db9b49709a6c68d848fdf9cff53a99eedb72e1af76e6a150"
+            "mac": "443881f1cd27094ed5bb954c9bc0957087ce3157dcfb7c4c2a47cf1b730afe36"
           }
         }
       ],
@@ -12771,12 +14524,12 @@
           "rationale": "The file contains the stated wording and the named exceptions.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0279"
+            "EVD-0317"
           ],
           "recorded_at": "2026-11-01T21:50:19.573236752Z",
           "seal": {
             "by": "server",
-            "mac": "6dfaa5d9c055832ec23cb99a2cede73f490f3004ad0d47c8af9ffe54e71f2479"
+            "mac": "aafafddece11d939354061e86cebe432354dea510d90fc8486d8bfc72674e554"
           }
         }
       ],
@@ -12784,11 +14537,11 @@
       "updated_at": "2026-11-01T21:50:19.573236752Z",
       "seal": {
         "by": "server",
-        "mac": "69b44275900e6bb28fb461d182619ac93b1d426c2661511711a1fefa8cfa7465"
+        "mac": "243ac59d11c7743a1c38ef73abfa8d18195e251fe477ffda1f3de2590ea9a67f"
       }
     },
     {
-      "id": "CLM-0160",
+      "id": "CLM-0179",
       "statement": "ci.yml gains a 'release scripts' job that runs shellcheck and just release-test with cargo-release 0.25.18, and a 'release branch matches Cargo.toml' job that fails a release/v* PR whose branch does not name its version",
       "kind": "functional",
       "level": "component",
@@ -12796,7 +14549,7 @@
       "verification_method": "inspection",
       "source": "Issue #37, CI and Tests ('also a CI job'); PR body CI bullet",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         ".github/workflows/ci.yml",
@@ -12810,7 +14563,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0280",
+          "id": "EVD-0318",
           "kind": "inspection",
           "locator": ".github/workflows/ci.yml:92-120; scripts/release-branch-check.sh:1-21",
           "summary": "release-scripts job installs cargo-release@0.25.18 with REQUIRE_CARGO_RELEASE=1 and runs shellcheck -x scripts/*.sh and just release-test; release-branch job runs on head_ref release/v* and calls release-branch-check.sh, which fails unless the branch equals release/v plus the Cargo.toml version (covered by test 'branch check').",
@@ -12828,7 +14581,7 @@
           "recorded_at": "2026-11-01T21:49:29.426658566Z",
           "seal": {
             "by": "server",
-            "mac": "aa86b5b735d30834f76fb92d680ecea37cad51be6219d1d9a49630cd14717473"
+            "mac": "633d2601aa29ce4842c66d051f5a15f0b4dfc7c7c8aaf3a5001e4e2be0d13c54"
           }
         }
       ],
@@ -12838,12 +14591,12 @@
           "rationale": "Both jobs are present as described. Not run on real Actions; inspection only, level 2.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0280"
+            "EVD-0318"
           ],
           "recorded_at": "2026-11-01T21:50:19.588517439Z",
           "seal": {
             "by": "server",
-            "mac": "23379cb6116cc93edccf364f75c08098a6ba4a4a91b0aeec4cbead292fb8bcc9"
+            "mac": "70a91e2b99f02a482cafa985cf37d743ad7f6a832389eeb543d8791607a8137c"
           }
         }
       ],
@@ -12851,11 +14604,11 @@
       "updated_at": "2026-11-01T21:50:19.588517439Z",
       "seal": {
         "by": "server",
-        "mac": "743baa199337855a26fd5acae673c66b9de52ce6db021977e5facd0f5f7b002b"
+        "mac": "76d6a3f704a77f7889c8fc6b38a8b0492902a79ebbe3363fe4ec98a158e36574"
       }
     },
     {
-      "id": "CLM-0161",
+      "id": "CLM-0180",
       "statement": "scripts/release-test.sh has 18 tests, run by just release-test against throwaway git repos and a fake gh, and each refusal in prepare, ship and abort, notes grouping and ranges, tagging the merge commit, main moving mid-ship and unresolved review threads has a test that fails when the behavior is removed",
       "kind": "functional",
       "level": "component",
@@ -12863,7 +14616,7 @@
       "verification_method": "test",
       "source": "Issue #37 Acceptance: 'Every refusal above has a test in just release-test, which runs in CI.'; PR body: '18 tests against throwaway git repos and a fake gh, covering notes grouping and ranges, every refusal in prepare, ship and abort, tagging the merge commit, main moving mid-ship, unresolved review threads, and an end-to-end prepare and ship with the real cargo-release'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-test.sh",
@@ -12877,7 +14630,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0281",
+          "id": "EVD-0319",
           "kind": "test",
           "locator": "just release-test; scripts/release-test.sh mutation runs in a scratch copy",
           "summary": "just release-test printed 'release tests passed (18)' (18 ok lines). Seven single-line mutations in a scratch copy each failed the suite (exit 1): unresolved-threads guard removed, ls-remote exit-2 mapping loosened, tagging HEAD instead of the merge commit, no --delete-branch on close, abort's commit-count guard removed, squash merge, no --fail-fast. The unmutated copy exited 0. Every refusal listed in the issue has a named test (prepare 298, ship 389-459, abort 565-607).",
@@ -12895,7 +14648,7 @@
           "recorded_at": "2026-11-01T21:49:29.444920425Z",
           "seal": {
             "by": "server",
-            "mac": "e7732a9bd4157563de6915252c336f32ec3c19a32003c7fe05e4be1f9abe470c"
+            "mac": "ae057ebf05b9372d2903470bbfd0b3388afab2dbeccb3591350ccf22a63777be"
           }
         }
       ],
@@ -12905,12 +14658,12 @@
           "rationale": "18 tests pass and seven mutations of distinct behaviors were each caught, showing the tests assert the behaviors.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0281"
+            "EVD-0319"
           ],
           "recorded_at": "2026-11-01T21:50:19.604614450Z",
           "seal": {
             "by": "server",
-            "mac": "46ad09302908f7ec34a4ee5289c4d2e045feb9b8ef86398f2f3a4789b353eb1b"
+            "mac": "621d03212fc3c0ad9816e71927cf66f11d11c1f6cab839cd59d9f43668af6518"
           }
         }
       ],
@@ -12918,11 +14671,11 @@
       "updated_at": "2026-11-01T21:50:19.604614450Z",
       "seal": {
         "by": "server",
-        "mac": "185ac0978544cf8586c96cff0b63b040ffcd89ed7dfdc6828924974a19c67f1c"
+        "mac": "cc875148fbfcef1d6a8c1af21ae600ec25dbe43ebf85ecfc475fd726c5b1ecd2"
       }
     },
     {
-      "id": "CLM-0162",
+      "id": "CLM-0181",
       "statement": "docs/site/src/development.md Releasing describes the three commands and what each refuses",
       "kind": "documentation",
       "level": "artifact",
@@ -12930,7 +14683,7 @@
       "verification_method": "inspection",
       "source": "Issue #37, Docs: 'Replace Releasing in docs/site/src/development.md with the three commands and what each refuses.'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "docs/site/src/development.md"
@@ -12943,7 +14696,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0282",
+          "id": "EVD-0320",
           "kind": "inspection",
           "locator": "docs/site/src/development.md:46-100",
           "summary": "Releasing now documents release-prepare, release-ship and release-abort with the refusals of each (off main, dirty tree, main not origin/main, HEAD tag, tag on origin, single-parent on origin/main, merged PR, extra local commits); mdbook build docs/site succeeded.",
@@ -12961,7 +14714,7 @@
           "recorded_at": "2026-11-01T21:49:29.460188673Z",
           "seal": {
             "by": "server",
-            "mac": "45298dc964cdf9501c1872e1e0c1318dc4f64a040e0c14c0a8ab49ecedb3ed9c"
+            "mac": "75d81a0482d511f17c934c52cf9e648422637293ccecf18649332adcea79a56b"
           }
         }
       ],
@@ -12971,12 +14724,12 @@
           "rationale": "Docs cover all three commands and their refusals.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0282"
+            "EVD-0320"
           ],
           "recorded_at": "2026-11-01T21:50:19.619265725Z",
           "seal": {
             "by": "server",
-            "mac": "4f8c7fe590fff9029eea6716258962f1b0c3f4bdb90e31495a694f2d2654037a"
+            "mac": "46da4bf9107f30131a2ea390974cf67d45a76fcf91a0379297ed36669aac71d8"
           }
         }
       ],
@@ -12984,11 +14737,11 @@
       "updated_at": "2026-11-01T21:50:19.619265725Z",
       "seal": {
         "by": "server",
-        "mac": "50f0a5d4ff618eae397c870d691359e05f38f83bef6b973e596e1c09346041dd"
+        "mac": "e36a0f9fc60ee67edac0f56fe71f9b36220df828e4ed87b3ea2fee167ddfaaf7"
       }
     },
     {
-      "id": "CLM-0163",
+      "id": "CLM-0182",
       "statement": "just release-prepare patch && just release-ship cuts the next release with no hand edits: one PR, a merge commit, and the tag on it",
       "kind": "functional",
       "level": "system",
@@ -12996,7 +14749,7 @@
       "verification_method": "test",
       "source": "Issue #37 Acceptance criteria, first bullet",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-prepare.sh",
@@ -13010,7 +14763,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0283",
+          "id": "EVD-0321",
           "kind": "test",
           "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:332-387)",
           "summary": "The test runs release-prepare.sh patch then release-ship.sh against a throwaway origin and fake gh with the real cargo-release, with no manual edits in between: one release commit, one PR created and merged with a merge commit, tag on the merge commit. Real GitHub and the live review bot are not exercised, only the fake gh.",
@@ -13028,7 +14781,7 @@
           "recorded_at": "2026-11-01T21:49:29.477943929Z",
           "seal": {
             "by": "server",
-            "mac": "101639d7ecd038946ef88f00ceb5fa0c07c053098605eb078d2f9e2f2c155f5e"
+            "mac": "3f93a432be004c9f22f97ad470fe0e7241e6ff56d3d88bccbacf3c71eea238e9"
           }
         }
       ],
@@ -13038,12 +14791,12 @@
           "rationale": "The e2e test runs prepare then ship with no edits and checks the outcome (against a fake gh).",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0283"
+            "EVD-0321"
           ],
           "recorded_at": "2026-11-01T21:50:19.634205641Z",
           "seal": {
             "by": "server",
-            "mac": "6b392bde5ff92dac52976a6616020c404b148fed0047518b11c8fc748500117e"
+            "mac": "4433481c03935fb87df91e64540ee3d55a5cab656f80ab506b3c02f281ec9af9"
           }
         }
       ],
@@ -13051,11 +14804,11 @@
       "updated_at": "2026-11-01T21:50:19.634205641Z",
       "seal": {
         "by": "server",
-        "mac": "808125656f6211fa614873ed828f2d70c8e769a40e29fa013b1ed6e7e10519eb"
+        "mac": "1a88c37070a5eca43d71326744cd44af65531fb94931bab17237b1a25a293e81"
       }
     },
     {
-      "id": "CLM-0164",
+      "id": "CLM-0183",
       "statement": "just test passes 175 tests",
       "kind": "functional",
       "level": "artifact",
@@ -13063,7 +14816,7 @@
       "verification_method": "test",
       "source": "PR body Validation: 'just test (175 passed)'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [],
       "tags": [
@@ -13074,7 +14827,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0284",
+          "id": "EVD-0322",
           "kind": "test",
           "locator": "just test",
           "summary": "Ran on head: 'test result: ok. 175 passed; 0 failed'.",
@@ -13082,7 +14835,7 @@
           "recorded_at": "2026-11-01T21:49:29.491767321Z",
           "seal": {
             "by": "server",
-            "mac": "79e88604e04b2aac27050d88b6cbda2a14518c41b54aa48bb0b2f103ef896951"
+            "mac": "c7d6d8b5bc9ca3936472584e1750f5e3848290725d036f8beef86a195e96dace"
           }
         }
       ],
@@ -13092,12 +14845,12 @@
           "rationale": "Reran: 175 passed.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0284"
+            "EVD-0322"
           ],
           "recorded_at": "2026-11-01T21:50:19.649137378Z",
           "seal": {
             "by": "server",
-            "mac": "d7a44605389308abff6dc85950f186aeca558d91aa44f38f9ce3d10ea0e7d83a"
+            "mac": "3fc730e7a23330f46fa1ee97a629829efd5381faec9eef4f4a9da1b1bd3be462"
           }
         }
       ],
@@ -13105,11 +14858,11 @@
       "updated_at": "2026-11-01T21:50:19.649137378Z",
       "seal": {
         "by": "server",
-        "mac": "3dbaebf667468e67e1443b225718a4083186b0fef1160d28e9af85adb0e731b4"
+        "mac": "97fbd7f8a42f93a7f5f6993024dcc0401842ca02c769616e195bbb332caf6140"
       }
     },
     {
-      "id": "CLM-0165",
+      "id": "CLM-0184",
       "statement": "just release-test passes 18 tests, including the end-to-end case with the real cargo-release",
       "kind": "functional",
       "level": "artifact",
@@ -13117,7 +14870,7 @@
       "verification_method": "test",
       "source": "PR body Validation: 'just release-test (18 passed, including the end-to-end case with cargo-release 0.25.18)'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [
         "scripts/release-test.sh"
@@ -13130,7 +14883,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0285",
+          "id": "EVD-0323",
           "kind": "test",
           "locator": "just release-test",
           "summary": "Ran on head: 18 'ok' lines then 'release tests passed (18)'; no skip line, so the end-to-end case ran with the installed cargo-release. Local cargo-release version was not checked against 0.25.18.",
@@ -13138,7 +14891,7 @@
           "recorded_at": "2026-11-01T21:49:29.505787444Z",
           "seal": {
             "by": "server",
-            "mac": "f5a1a2f452ab6e7c7c3279df68504e11d49eddc439f4816bbb5d13f830660df2"
+            "mac": "3e1db54afea70c6a646314a3af5c4efb546a6b942fe1952a6bfa82b04ce8e628"
           }
         }
       ],
@@ -13148,12 +14901,12 @@
           "rationale": "Reran: 18 passed including e2e.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0285"
+            "EVD-0323"
           ],
           "recorded_at": "2026-11-01T21:50:19.663630042Z",
           "seal": {
             "by": "server",
-            "mac": "4d871f9f4b55802500b7633d73c9f2967ac8fa5bb5d9a360b535177dfa7664c0"
+            "mac": "9ab50a77151f3b8594f8cb8d4ffd60334ec5071ca1515aa9840038335280b1a0"
           }
         }
       ],
@@ -13161,11 +14914,11 @@
       "updated_at": "2026-11-01T21:50:19.663630042Z",
       "seal": {
         "by": "server",
-        "mac": "6c63e044162714e83542f547e87ca9e15e471dd9f4af07886f3e55ddf03225eb"
+        "mac": "0b6c56fcb2fee6f6b9755ea2d04070026617adc4e85921c526f1063ebb90a935"
       }
     },
     {
-      "id": "CLM-0166",
+      "id": "CLM-0185",
       "statement": "cargo clippy --all-targets -- -D warnings, just fmt, and shellcheck -x scripts/*.sh are clean",
       "kind": "functional",
       "level": "artifact",
@@ -13173,7 +14926,7 @@
       "verification_method": "test",
       "source": "PR body Validation: just fmt, cargo clippy --all-targets -- -D warnings, shellcheck -x scripts/*.sh",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [],
       "tags": [
@@ -13184,7 +14937,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0286",
+          "id": "EVD-0324",
           "kind": "test",
           "locator": "just fmt; cargo clippy --all-targets -- -D warnings; shellcheck -x scripts/*.sh",
           "summary": "just fmt left git status clean; clippy finished without warnings; shellcheck printed nothing and exited 0.",
@@ -13192,7 +14945,7 @@
           "recorded_at": "2026-11-01T21:49:29.519604236Z",
           "seal": {
             "by": "server",
-            "mac": "c711cdd6f7d5651b36649f2c99acb7d75c08d3c7a1ca41dc8ee23457f97c4bb3"
+            "mac": "83424f489a27d47d34bbf7f8b1d93af459e8c4faa596ef6683d01c5481dc8dd5"
           }
         }
       ],
@@ -13202,12 +14955,12 @@
           "rationale": "Reran all three; clean.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0286"
+            "EVD-0324"
           ],
           "recorded_at": "2026-11-01T21:50:19.678819969Z",
           "seal": {
             "by": "server",
-            "mac": "7eccb575dac9ccc9d343121b17c98394e4544cc19a28b2cf2ad84e59daed0ce6"
+            "mac": "0bcbfc85b8c979dce8df6e4f2310766c33c2b702bc58e78b4b73ebe0e5ebfbe9"
           }
         }
       ],
@@ -13215,11 +14968,11 @@
       "updated_at": "2026-11-01T21:50:19.678819969Z",
       "seal": {
         "by": "server",
-        "mac": "574ccc6464c32ae4dd94f44732b22c0ed9adf50f03787487cccda3018588fe55"
+        "mac": "93690e54b59397ab932b927326c9b587a7081699cdc5ccd8754e37035447788a"
       }
     },
     {
-      "id": "CLM-0167",
+      "id": "CLM-0186",
       "statement": "just report renders with the new audit notes and mdbook build docs/site succeeds",
       "kind": "functional",
       "level": "artifact",
@@ -13227,7 +14980,7 @@
       "verification_method": "demonstration",
       "source": "PR body Validation: 'just report renders with the new audit notes; mdbook build docs/site'",
       "derived_from": [
-        "CLM-0145"
+        "CLM-0164"
       ],
       "artifacts": [],
       "tags": [
@@ -13238,7 +14991,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0287",
+          "id": "EVD-0325",
           "kind": "demonstration",
           "locator": "just report; mdbook build docs/site",
           "summary": "just report ran its verify, recheck and typst compile steps without error; mdbook build wrote the HTML book. Both left the tracked tree unchanged.",
@@ -13246,7 +14999,7 @@
           "recorded_at": "2026-11-01T21:49:29.533598319Z",
           "seal": {
             "by": "server",
-            "mac": "ec33d7a59159da3ee7024b70c75d57b0bcedf61e2c40ebdfdd452d983d89f15c"
+            "mac": "db437d9741e6e2d7f380408ea5167226d9b108ab8dc39cf41843af710a79e0df"
           }
         }
       ],
@@ -13256,12 +15009,12 @@
           "rationale": "Reran both; no errors.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0287"
+            "EVD-0325"
           ],
           "recorded_at": "2026-11-01T21:50:19.693716455Z",
           "seal": {
             "by": "server",
-            "mac": "5f444745f5390a578ec1c1518f7e88e023fa82e39361a0442f709f990acf25c9"
+            "mac": "eaef171ee53381b9f9872852742e756147635e35fd6e3a2d5083968c1e1795b1"
           }
         }
       ],
@@ -13269,11 +15022,11 @@
       "updated_at": "2026-11-01T21:50:19.693716455Z",
       "seal": {
         "by": "server",
-        "mac": "8f204d3a7f7b9392b5076690a135fc935f33f02a598311fad09300fbab665636"
+        "mac": "0f0e1b09440081f365e7a2c9b567c5e21958b02921c7681f868df765db3c3dd7"
       }
     },
     {
-      "id": "CLM-0168",
+      "id": "CLM-0187",
       "statement": "scripts/release-notes.sh v0.2.4 v0.2.5 prints Features #34 #35, Fixes #30, Dependencies #24, Other #33 #36",
       "kind": "functional",
       "level": "artifact",
@@ -13281,7 +15034,7 @@
       "verification_method": "demonstration",
       "source": "PR body Manual Test Plan",
       "derived_from": [
-        "CLM-0155"
+        "CLM-0174"
       ],
       "artifacts": [
         "scripts/release-notes.sh"
@@ -13294,7 +15047,7 @@
       },
       "evidence": [
         {
-          "id": "EVD-0288",
+          "id": "EVD-0326",
           "kind": "demonstration",
           "locator": "scripts/release-notes.sh v0.2.4 v0.2.5",
           "summary": "Output: Features #34 #35; Fixes #30; Dependencies #24; Other #33 #36 (the 0.2.5 prep PR #36 appears under Other because its title is 'chore: prepare 0.2.5 release').",
@@ -13302,7 +15055,7 @@
           "recorded_at": "2026-11-01T21:49:29.547595692Z",
           "seal": {
             "by": "server",
-            "mac": "aa2422622464455085b3d3c09a24ecfc5380039b0930fdac57f6262db8124a47"
+            "mac": "e2f8377546d9843206d1bd713eed06093ae4350908322ac3f4df17fe6eed18e7"
           }
         }
       ],
@@ -13312,12 +15065,12 @@
           "rationale": "Ran the command; output matches the stated PR groupings.",
           "auditor": "claude-sonnet-5-5",
           "evidence_ids": [
-            "EVD-0288"
+            "EVD-0326"
           ],
           "recorded_at": "2026-11-01T21:50:19.708634762Z",
           "seal": {
             "by": "server",
-            "mac": "38503602b1fd1ac4395dda05b7c98218a0f1563b70a1d74cea17da2d96a69c3e"
+            "mac": "2b89db0c14071289b66f630a9f7cbfef847525c8e974e07ea58327ebe3132487"
           }
         }
       ],
@@ -13325,7 +15078,7 @@
       "updated_at": "2026-11-01T21:50:19.708634762Z",
       "seal": {
         "by": "server",
-        "mac": "fb7aeb331907e981d5c38f2b8c893d455430d815c374e8d040ee9fb258e3acd0"
+        "mac": "a9c7b8e4725dc4fe9e04c14801b8d530d1224962c081aba329179f5805becee2"
       }
     }
   ]
