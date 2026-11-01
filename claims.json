@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 145,
+  "next_claim_seq": 169,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "43af11dffd2ca2da443a5641a6d28a3e2d912026db23ee36b7532b6229444d03"
+    "mac": "4d98832b314cc13865772b922b4ec78811cf52f24c83d185cdd6d29a66c3c321"
   },
-  "next_evidence_seq": 257,
+  "next_evidence_seq": 292,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "2e4f4c4272b1c4cca09d0648bc400e713171466fc56fd3569deb686a758645b3"
+    "mac": "9b41840a79b022edd9d66c4c471b62b5f7349cdf154a5e226a1fd435d367544f"
   },
   "claims": [
     {
@@ -5367,6 +5367,28 @@
             "by": "server",
             "mac": "501519d99698491369ec006926c4a0063cf0da0b0d8fd91a20196ae044c6bc27"
           }
+        },
+        {
+          "id": "EVD-0290",
+          "kind": "inspection",
+          "locator": "docs/site/src/development.md:20-100",
+          "summary": "Re-read after this diff rewrote Releasing: the CI checks list is still present (with two new items) and the page now documents the full release procedure via the three just recipes plus release.yml checks. The earlier anchor over lines 29-64 is 'changed' only because the text was rewritten.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/development.md",
+              "lines": {
+                "start": 20,
+                "end": 100
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:39.250635852Z",
+          "seal": {
+            "by": "server",
+            "mac": "91c72e3512e88ff24ff4efd49b99377d2f034d2fee47297885cad51b364f5ec3"
+          }
         }
       ],
       "verdicts": [
@@ -5382,13 +5404,26 @@
             "by": "server",
             "mac": "77cb71bcd8a7fdc2aa5517a3226a961d5a5df84d2a2705006b54609e30ca73e8"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head after the Releasing rewrite; the page still documents CI checks and now the release procedure.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0290"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.722708295Z",
+          "seal": {
+            "by": "server",
+            "mac": "b29346db5c6f7b2201d179568bec87de73f7caf76bc75df85eb2c2e53fb2121c"
+          }
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.245310164Z",
+      "updated_at": "2026-11-01T21:50:19.722708295Z",
       "seal": {
         "by": "server",
-        "mac": "f076dc230b39c4470d1e2345651f671cad23967b873b553ab32d591f982e68e8"
+        "mac": "c55644cd84aec94b636a5b2213ca72ca748e047ea79d45fb2f65cd4084331fcf"
       }
     },
     {
@@ -11529,6 +11564,1768 @@
       "seal": {
         "by": "server",
         "mac": "556981d1060d9facd6d4125d3781984880ff9441b879fb29fcd04eecccfcbcbd"
+      }
+    },
+    {
+      "id": "CLM-0145",
+      "statement": "The change delivers issue #37: releases are cut mechanically by just release-prepare, release-ship and release-abort with notes generated from git history",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/37 title: Mechanical releases: just release-prepare / release-ship / release-abort with generated notes",
+      "derived_from": [],
+      "artifacts": [
+        "scripts/release-prepare.sh",
+        "scripts/release-ship.sh",
+        "scripts/release-abort.sh",
+        "scripts/release-notes.sh",
+        "release.toml",
+        "justfile"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0291",
+          "kind": "analysis",
+          "locator": "children of CLM-0145",
+          "summary": "Every child (prepare, release.toml, ship checks and flow, review gating, main-moved, merge and tag, abort, notes, byte-identical notes, static audit notes, CI, tests, docs, end-to-end acceptance) is supported by passing tests plus code reading and mutation checks. Residual: the real GitHub, review bot and published release workflow are never run, only a fake gh and a reproduced release.yml command.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:39.266315231Z",
+          "seal": {
+            "by": "server",
+            "mac": "e59121b4260bc784d4dc34c3f073760a9d27d37014d92df1f344623fcaa42f6b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All children are supported; see the decomposition evidence.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0291"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.737316189Z",
+          "seal": {
+            "by": "server",
+            "mac": "6557291856484b80a0e79a703c9f3e4d1f3928ac94b5bd00c9234de72ca7042c"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.737316189Z",
+      "seal": {
+        "by": "server",
+        "mac": "b2c2332d1d0304507395e8094fde75b745cb57d0aa2a33a0ec8cd66744fc96cd"
+      }
+    },
+    {
+      "id": "CLM-0146",
+      "statement": "release-prepare refuses a bad level, running off main, a dirty tree, and a local main that is not exactly origin/main after a fetch, then runs cargo release <level> --execute --no-confirm",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, Proposed design, just release-prepare: 'Refuses to run off main, with a dirty tree, or when local main is not exactly origin/main (after git fetch). Runs cargo release <level> --execute --no-confirm'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-prepare.sh",
+        "scripts/release-lib.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0257",
+          "kind": "test",
+          "locator": "just release-test (test_prepare_refusals, scripts/release-test.sh:298-327)",
+          "summary": "Ran just release-test on head: 'ok prepare: refuses a bad level, off main, a dirty tree, and main not at origin/main' (18 passed). Assertions check the exact diagnostics for no level, bad level, non-main branch, dirty tree, local main ahead of and behind origin.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 298,
+                "end": 327
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.153810075Z",
+          "seal": {
+            "by": "server",
+            "mac": "f41a291c714e89810f06cbe01ad9480295fb4daa4a6ac419da57d874e38ea818"
+          }
+        },
+        {
+          "id": "EVD-0258",
+          "kind": "inspection",
+          "locator": "scripts/release-prepare.sh:18-30",
+          "summary": "Read the script: validates level against patch|minor|major|X.Y.Z, calls require_clean_main, fetches origin main and compares HEAD with origin/main, then execs cargo release LEVEL --execute --no-confirm.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-prepare.sh",
+              "lines": {
+                "start": 18,
+                "end": 30
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.172132001Z",
+          "seal": {
+            "by": "server",
+            "mac": "819b0091df8a6a44aa7d417e842d53efe6deefa2d2fb5c78f1c96ae27575b74f"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code and passing refusal test cover each refusal and the cargo release invocation.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0257",
+            "EVD-0258"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.384670132Z",
+          "seal": {
+            "by": "server",
+            "mac": "87c10de5a08030de19aabb5711dbaea696a0a20ed173344eb7bf1de1099fbb75"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.384670132Z",
+      "seal": {
+        "by": "server",
+        "mac": "5c1631003367008968275068a0eef287d236cfc393df50f23176b2080788307e"
+      }
+    },
+    {
+      "id": "CLM-0147",
+      "statement": "release.toml sets publish=false, push=false, verify=false, allow-branch=[main], tag-name v{{version}}, the commit message 'chore: Release v{{version}}', a replacement of version in report/audit-notes.toml, and a pre-release-hook that writes the changelog entry",
+      "kind": "constraint",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, Proposed design, release.toml bullet list",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "release.toml",
+        "scripts/release-changelog.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0259",
+          "kind": "inspection",
+          "locator": "release.toml:5-28",
+          "summary": "Read the file: allow-branch=[main], tag-name, pre-release-commit-message, a pre-release-replacements entry on report/audit-notes.toml (exactly=1), pre-release-hook scripts/release-changelog.sh, publish/push/verify all false. The regex matched exactly one line in the real audit-notes.toml (grep -c '^version = ' gives 1).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "release.toml",
+              "lines": {
+                "start": 5,
+                "end": 28
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.190013426Z",
+          "seal": {
+            "by": "server",
+            "mac": "4e426b2c2b645bcbe108154d2b676b468310fb21c9ca2ba378d8a2522a246c22"
+          }
+        },
+        {
+          "id": "EVD-0260",
+          "kind": "test",
+          "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:332-373)",
+          "summary": "Ran the end-to-end test with the real cargo-release (installed locally; no skip line): it passed, so release.toml parses and produces the commit message, tag v1.2.3, bumped audit-notes version and changelog entry.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 332,
+                "end": 373
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.208385262Z",
+          "seal": {
+            "by": "server",
+            "mac": "9a64494f6ba3bf1e9562e71c984fb55cbfcbe2c845e8456b02a584cc7b8e667c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "release.toml has every listed setting and the real cargo-release end-to-end run accepts and applies it.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0259",
+            "EVD-0260"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.397227839Z",
+          "seal": {
+            "by": "server",
+            "mac": "03e4ca6f25688311e6c5cf1623afa69f1e98070515cb1fdc5949d73197e25f16"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.397227839Z",
+      "seal": {
+        "by": "server",
+        "mac": "d9950214e4e52f0e93ded75709f7641b6b795dbf6d79cfc5870f0048ad575c6e"
+      }
+    },
+    {
+      "id": "CLM-0148",
+      "statement": "release-prepare leaves one local release commit and a local annotated tag containing the bumped versions and the changelog entry, and pushes nothing",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37: 'The result is one local commit and a local annotated tag. Nothing is pushed.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-prepare.sh",
+        "scripts/release-changelog.sh",
+        "release.toml"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0261",
+          "kind": "test",
+          "locator": "just release-test (scripts/release-test.sh:341-373)",
+          "summary": "End-to-end test with real cargo-release passed. It asserts: HEAD subject 'chore: Release v1.2.3', HEAD^ equals the old origin/main (one commit), v1.2.3 is an annotated tag on HEAD, Cargo.toml, Cargo.lock and audit-notes.toml bumped, changelog entry in the commit, tree clean, origin main and tag unchanged.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 341,
+                "end": 373
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.226707819Z",
+          "seal": {
+            "by": "server",
+            "mac": "d5dc9fcd8b6eec346a1c82b1c4f16e2d25ea3f1d2c98ba56cc34e1da6f3ac629"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The end-to-end test asserts one commit, an annotated tag on it, bumped files, changelog in the commit, and nothing pushed.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0261"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.411218032Z",
+          "seal": {
+            "by": "server",
+            "mac": "599088ebcc3271c6db3530a2890a1fd4e519e74130c431f14be62ea252b36305"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.411218032Z",
+      "seal": {
+        "by": "server",
+        "mac": "95b3b0a88cf3ee71713ddf8c4ecae93c3b5b2fef829f530385108fab58fb2995"
+      }
+    },
+    {
+      "id": "CLM-0149",
+      "statement": "release-ship refuses unless HEAD carries v<Cargo.toml version>, the tag is absent from origin (git ls-remote --exit-code: exit 2 is absent, any other non-zero exit fails), and HEAD is a single-parent commit directly on current origin/main",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, release-ship Checks; PR body: 'checks that HEAD carries v<Cargo.toml version>, that the tag is not on origin (git ls-remote --exit-code; exit 2 means absent, any other non-zero exit fails), and that HEAD is a single-parent commit directly on current origin/main'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-ship.sh",
+        "scripts/release-lib.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0262",
+          "kind": "test",
+          "locator": "just release-test (test_ship_refusals, ..._refuses_tag_on_origin, ..._refuses_merge_head, ..._refuses_stale_release; scripts/release-test.sh:389-459)",
+          "summary": "All four ship-check tests passed on head, asserting diagnostics for untagged HEAD, a tag other than the version, tag already on origin, merge-commit HEAD, HEAD not directly on current origin/main, and an unreachable origin. Mutation: changing '2) return 1' to '*) return 1' in a scratch copy of release-lib.sh made the 'unreachable origin' test fail (exit 1), so the exit-2 distinction is covered.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 389,
+                "end": 459
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.246117519Z",
+          "seal": {
+            "by": "server",
+            "mac": "459b56c751cfbccaa0e935dcd9f0949db8607715c53327e9bc8ce46b057bd3ac"
+          }
+        },
+        {
+          "id": "EVD-0263",
+          "kind": "inspection",
+          "locator": "scripts/release-lib.sh:35-43; scripts/release-ship.sh:39-53",
+          "summary": "origin_has_ref uses git ls-remote --exit-code and maps 0 to present, 2 to absent and anything else to fail; ship checks the tag named by the Cargo.toml version is on HEAD, not on origin, HEAD has no second parent, and HEAD^ equals refs/remotes/origin/main after a fetch.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-ship.sh",
+              "lines": {
+                "start": 39,
+                "end": 53
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.263929473Z",
+          "seal": {
+            "by": "server",
+            "mac": "5231c325a76a4a631fbbc2b8805d018b033900f61a612fb1644beaf33a1d2a87"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code implements each check, tests assert each refusal, and a mutation of the exit-2 handling is caught.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0262",
+            "EVD-0263"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.426484899Z",
+          "seal": {
+            "by": "server",
+            "mac": "31d62fb5240a7f4ea665e2d021f93f84da6fac5758ae270233bab58c258b36b7"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.426484899Z",
+      "seal": {
+        "by": "server",
+        "mac": "93d687a307182d0e443424a1ac07c83a8b6b33d6330f854542c32463774f5c41"
+      }
+    },
+    {
+      "id": "CLM-0150",
+      "statement": "release-ship pushes HEAD to release/vX.Y.Z, opens a PR titled 'chore: Release vX.Y.Z', waits for checks to register, runs gh pr checks --watch --fail-fast, and on failure stops with the PR open and nothing tagged",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, release-ship: 'Pushes HEAD to release/vX.Y.Z and opens a PR titled chore: Release vX.Y.Z. Waits for checks to register, then gh pr checks --watch --fail-fast. On failure, it stops and leaves the PR open with nothing tagged.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-ship.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0264",
+          "kind": "test",
+          "locator": "just release-test (test_ship_stops_on_failed_checks, assert_ship_stops_open; scripts/release-test.sh:460-483, 508-520)",
+          "summary": "Passed on head: failing or missing checks stop ship with the PR open and nothing tagged; the success test asserts 'pr create --base main --head release/v1.2.3 --title chore: Release v1.2.3'. Mutation: removing '--fail-fast' from release-ship.sh in a scratch copy made the suite fail ('checks were not watched with --fail-fast').",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 460,
+                "end": 483
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.282022288Z",
+          "seal": {
+            "by": "server",
+            "mac": "f6f898917baf6ab81720ba2eed71b08713ec976b9324eaf6d9fb253d0e3c1e62"
+          }
+        },
+        {
+          "id": "EVD-0265",
+          "kind": "inspection",
+          "locator": "scripts/release-ship.sh:55-90",
+          "summary": "Pushes HEAD to refs/heads/release/vX.Y.Z, gh pr create --title 'chore: Release vX.Y.Z', polls until gh pr checks lists a check, then gh pr checks --watch --fail-fast; failure calls fail naming the open PR and that nothing was tagged.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-ship.sh",
+              "lines": {
+                "start": 55,
+                "end": 90
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.299609392Z",
+          "seal": {
+            "by": "server",
+            "mac": "34d867ec489501962922ffbda8499fd30908f665bb7ca2a3b9ea7cbe6fc14fd6"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code does the push, PR, wait and watch; tests cover failure leaving the PR open; --fail-fast mutation is caught.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0264",
+            "EVD-0265"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.440750893Z",
+          "seal": {
+            "by": "server",
+            "mac": "d36a6df4c280c95ae58d9b0df8237f79d5829824efad612522e71eba8119dd77"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.440750893Z",
+      "seal": {
+        "by": "server",
+        "mac": "94cf9dbf8fa80b896b5029c948ce27dc628a489c926d550908118b2db2251c42"
+      }
+    },
+    {
+      "id": "CLM-0151",
+      "statement": "release-ship waits for the review bot's review and stops, leaving the PR open and nothing tagged, when any review thread is unresolved (GraphQL reviewThreads.isResolved)",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, release-ship differences from bolt: 'the script waits for that review. If any review thread is unresolved (GraphQL reviewThreads.isResolved), it stops and leaves the PR open for a person.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-ship.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0266",
+          "kind": "test",
+          "locator": "just release-test (test_ship_stops_on_review, scripts/release-test.sh:484-490)",
+          "summary": "Passed on head: 2 unresolved threads give '... has 2 unresolved review thread(s)' with PR open and nothing tagged; a missing bot review gives 'a review by brooke-reviews did not arrive'. Mutation: replacing the UNRESOLVED_THREADS==0 guard with 'true' in a scratch copy made the suite fail.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 484,
+                "end": 490
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.316772394Z",
+          "seal": {
+            "by": "server",
+            "mac": "a48130b02aa14848d3e976559ea946feed2bfa66595115b521cdf38ed5e38458"
+          }
+        },
+        {
+          "id": "EVD-0267",
+          "kind": "inspection",
+          "locator": "scripts/release-ship.sh:94-110",
+          "summary": "Waits for a review by the bot login (RELEASE_REVIEWER, default brooke-reviews), then queries GraphQL reviewThreads(first: 100) isResolved and fails unless the unresolved count is 0. Note: first:100 would miss threads beyond 100, an unlikely limit for a release PR.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-ship.sh",
+              "lines": {
+                "start": 94,
+                "end": 110
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.333816046Z",
+          "seal": {
+            "by": "server",
+            "mac": "45cc8ea989ea8e52d4df3bb0a9332a6e81637ef99e456bb768a82c19bf69df89"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code queries isResolved threads after waiting for the bot review; test and mutation confirm it stops.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0266",
+            "EVD-0267"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.455038497Z",
+          "seal": {
+            "by": "server",
+            "mac": "be0ca3c110d9d431e8f3cc38e81f397830c80d36e004948fc4594ac73c033156"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.455038497Z",
+      "seal": {
+        "by": "server",
+        "mac": "777bf53ba6b150fdc87655125205dde341b292f84cf256fe1b64a89d386877f0"
+      }
+    },
+    {
+      "id": "CLM-0152",
+      "statement": "release-ship fetches main again and, if it moved, closes the PR with --delete-branch and stops without merging or tagging",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37: 'Fetches main again. If it moved, it closes the PR (--delete-branch) and stops.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-ship.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0268",
+          "kind": "test",
+          "locator": "just release-test (test_ship_closes_when_main_moves, scripts/release-test.sh:492-506)",
+          "summary": "Passed on head: after upstream main moves, ship fails 'main moved while the release pull request waited', the log has 'pr close <url> --delete-branch', no 'pr merge', and no tag on the remote. Mutation: dropping --delete-branch from the gh pr close in a scratch copy made the suite fail.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 492,
+                "end": 506
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.352179282Z",
+          "seal": {
+            "by": "server",
+            "mac": "79f9634c72d3830f1bb2f9ec2bd0e49c08c43f4fab8ade64060fdb454fdfa790"
+          }
+        },
+        {
+          "id": "EVD-0289",
+          "kind": "inspection",
+          "locator": "scripts/release-ship.sh:114-120",
+          "summary": "After the checks and review, fetches origin main, compares with the value taken before the push, and if different runs gh pr close --delete-branch with a comment, then fails; the merge call comes only after this block.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-ship.sh",
+              "lines": {
+                "start": 114,
+                "end": 122
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:39.232052652Z",
+          "seal": {
+            "by": "server",
+            "mac": "969e3ca81bf55a3c6d5a0e284a615608eb3cd74a6b2c26afefa52031236ef3b8"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code and test show the PR closed with --delete-branch, no merge, no tag when main moves.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0268",
+            "EVD-0289"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.470817136Z",
+          "seal": {
+            "by": "server",
+            "mac": "50e1ed1f99b8f289b9c8265b0dd0a0f0d9497ff739065a062505f3cc1a1a4b29"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.470817136Z",
+      "seal": {
+        "by": "server",
+        "mac": "ccd9aebe43a97a5ba494b22c2d1f19a5a37f52fddd1216fea31ddc476ea1ad83"
+      }
+    },
+    {
+      "id": "CLM-0153",
+      "statement": "release-ship merges with gh pr merge --merge --delete-branch, re-tags the PR's merge commit locally with git tag --force --annotate before pushing the tag, pushes the tag, and fast-forwards local main",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37: 'gh pr merge --merge --delete-branch ... Re-tags the PR's merge commit locally (git tag --force --annotate, before anything is pushed), pushes the tag, and fast-forwards local main.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-ship.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0269",
+          "kind": "test",
+          "locator": "just release-test (test_ship_tags_merge_commit, scripts/release-test.sh:508-535)",
+          "summary": "Passed on head: asserts 'pr merge <url> --merge --delete-branch', the pushed tag points at main's tip merge commit (has a second parent), is annotated with message kept, and local main equals the tagged commit. Mutations in scratch copies: tagging HEAD instead of MERGE_COMMIT, and --squash instead of --merge, each failed the suite.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 508,
+                "end": 535
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.371246061Z",
+          "seal": {
+            "by": "server",
+            "mac": "e405b0f2e93013667a8764deb389c57425bf7560ecb1aeaf5c27e4ad7835e658"
+          }
+        },
+        {
+          "id": "EVD-0270",
+          "kind": "inspection",
+          "locator": "scripts/release-ship.sh:122-136",
+          "summary": "gh pr merge --merge --delete-branch; reads mergeCommit oid, verifies it contains HEAD, git tag --force --annotate at the merge commit locally, then git push of the tag, then git merge --ff-only origin/main. The tag is moved before any push, as the issue requires.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-ship.sh",
+              "lines": {
+                "start": 122,
+                "end": 136
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:48:49.389383347Z",
+          "seal": {
+            "by": "server",
+            "mac": "fab59919dc23527d6a5684d5c346a29225f4a03355674189952c545ea4da6788"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code orders merge, local re-tag, tag push, fast-forward correctly; the test asserts the tag is on the merge commit and mutations (squash, wrong commit) are caught.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0269",
+            "EVD-0270"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.485093710Z",
+          "seal": {
+            "by": "server",
+            "mac": "fbaa19bed3eaaf48d4f06d339d6286fb32f4193c890f63aa658cc4c5d6bbe86c"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.485093710Z",
+      "seal": {
+        "by": "server",
+        "mac": "82e904ccfdfd1d30e01c5ab2379dd69d384bc12ab357165eba5a4250daaa88c8"
+      }
+    },
+    {
+      "id": "CLM-0154",
+      "statement": "release-abort closes the release PR and deletes its branch if they exist, deletes the local tag and resets local main to origin/main, and refuses off main, with a dirty tree, when HEAD lacks the version's tag, when the tag is on origin or the release PR merged, and when main has other unpublished commits",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, just release-abort section",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-abort.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0271",
+          "kind": "test",
+          "locator": "just release-test (test_abort_refusals, test_abort_refuses_other_local_commits, test_abort_cleans_up; scripts/release-test.sh:551-639)",
+          "summary": "All three abort tests passed on head: refusals for untagged HEAD, non-main branch, dirty tree (untracked file kept), merged PR, tag on origin; refusal when main has other local commits; cleanup closes an open PR or deletes the branch, drops the tag and resets main. Mutation: replacing the ((UNPUBLISHED_COMMITS <= 1)) guard with true in a scratch copy made the suite fail.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 551,
+                "end": 639
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.270581589Z",
+          "seal": {
+            "by": "server",
+            "mac": "52d775bac6d8b05f083b87d4321c72fc9be17c58d2e6d4ce3b7001ca340402de"
+          }
+        },
+        {
+          "id": "EVD-0272",
+          "kind": "inspection",
+          "locator": "scripts/release-abort.sh:17-59",
+          "summary": "Read: require_clean_main, tag-on-HEAD check, origin tag and merged-PR refusals, at most one commit ahead of origin/main, closes open PR with --delete-branch or deletes the remote branch, deletes the tag, resets hard to origin/main.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-abort.sh",
+              "lines": {
+                "start": 17,
+                "end": 59
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.288676857Z",
+          "seal": {
+            "by": "server",
+            "mac": "ad7f0c8cbe112533e4787b652b723f9527b84d03e3eeee00a5a0f74af52ef650"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Code implements every listed action and refusal; abort tests pass and the extra-commits guard mutation is caught.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0271",
+            "EVD-0272"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.499823266Z",
+          "seal": {
+            "by": "server",
+            "mac": "6a354921c60d489f97b12c61dd6934bdb4975db3828c2e7d7a2d9d211bc4d531"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.499823266Z",
+      "seal": {
+        "by": "server",
+        "mac": "e19be5f9aa32c8b81908b222c677eb977e3117b6d25a31f57d84d0cc2cb29a2f"
+      }
+    },
+    {
+      "id": "CLM-0155",
+      "statement": "scripts/release-notes.sh prints Markdown from the first-parent merge commits in the range, grouped Breaking (!), Features, Fixes, Documentation, Dependencies (build(deps)) and Other as written, each line linking its PR, omitting the 'chore: Release' PR",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37, Release notes: generated, one source; PR body: 'scripts/release-notes.sh <from> <to>: Markdown from the first-parent merge commits in the range, grouped into Breaking (!), Features, Fixes, Documentation, Dependencies (build(deps)) and Other (as written), each line linked to its PR; the chore: Release PR is left out.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-notes.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0273",
+          "kind": "test",
+          "locator": "just release-test (test_notes_grouping_and_range, scripts/release-test.sh:205-283)",
+          "summary": "Passed on head: expected output shows Breaking (feat(api)!), Features, Fixes, Documentation, Dependencies, Other (plain title, chore title and a non-PR merge as written), PR links, nested merges excluded via first-parent, chore: Release PR omitted, one trailing newline, range narrowing, and an all-release range rejected.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 205,
+                "end": 283
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.306934786Z",
+          "seal": {
+            "by": "server",
+            "mac": "fb3fb769ba38e05f342238a6ab26a785fc734c316e963dc90522e0fc9951493b"
+          }
+        },
+        {
+          "id": "EVD-0274",
+          "kind": "inspection",
+          "locator": "scripts/release-notes.sh:47-96",
+          "summary": "add_entry buckets by conventional-commit regex (! breaking, build(deps), feat, fix, docs, else other as written); git log --first-parent --merges drives it; titles starting 'chore: Release ' are skipped; lines link /pull/N.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-notes.sh",
+              "lines": {
+                "start": 47,
+                "end": 96
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.322088103Z",
+          "seal": {
+            "by": "server",
+            "mac": "116030025525a467fdd93d743fe8b4ae12d0443601da25bb87d513801a0944cc"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Script and a test with exact expected output cover grouping, links, first-parent and release exclusion.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0273",
+            "EVD-0274"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.514687191Z",
+          "seal": {
+            "by": "server",
+            "mac": "52059c44b5b6f70f6dca0066e55ccc49c81d33d1c088a621f8e0e73be131a1fb"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.514687191Z",
+      "seal": {
+        "by": "server",
+        "mac": "7364a64b001221fd75f49a3c0323d81c83cf52b75aec2d640a651c5c47ea9a81"
+      }
+    },
+    {
+      "id": "CLM-0156",
+      "statement": "The GitHub release body (release.yml, previous tag to the tag, via --notes-file) and the release's changelog entry (written by release-prepare) are byte-identical notes from scripts/release-notes.sh",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37 Acceptance criteria: 'The GitHub release body and the release's changelog/ entry are byte-identical notes from scripts/release-notes.sh.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-notes.sh",
+        "scripts/release-changelog.sh",
+        ".github/workflows/release.yml"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0275",
+          "kind": "test",
+          "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:375-387)",
+          "summary": "Passed with real cargo-release: the changelog entry minus its 2-line heading is cmp-identical to release-notes.sh output for describe(tag^)..tag, the same range release.yml uses. The test reproduces the workflow's command rather than executing release.yml.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 375,
+                "end": 387
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.336904188Z",
+          "seal": {
+            "by": "server",
+            "mac": "82f6a6c0a040aeef18ffec56f9109b1cfdff79e7df73bf87952ae86ef094c7e1"
+          }
+        },
+        {
+          "id": "EVD-0276",
+          "kind": "inspection",
+          "locator": ".github/workflows/release.yml:119-149; scripts/release-changelog.sh:1-42",
+          "summary": "The workflow computes previous_release_tag of tag^ and runs release-notes.sh previous..tag into notes.md used by --notes-file; the changelog hook writes '# Release vX' plus release-notes.sh previous..HEAD byte for byte. Both use the same fixed repository URL and exclude the release PR, so they cover the same PRs.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": ".github/workflows/release.yml",
+              "lines": {
+                "start": 119,
+                "end": 149
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.354992816Z",
+          "seal": {
+            "by": "server",
+            "mac": "4e669f99c82e4e80231b33cad19572f1fe7ab012406856453bc99927d36bb853"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The e2e test compares the committed entry with the notes for the range the workflow uses, byte for byte, and the workflow code uses that same command. Not executed on real Actions.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0275",
+            "EVD-0276"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.528601354Z",
+          "seal": {
+            "by": "server",
+            "mac": "9ed09ebd95027b1ff4ff1c33ad28b4ba56a0c74af8701768e8b00c7ae903580f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.528601354Z",
+      "seal": {
+        "by": "server",
+        "mac": "2a900e6a89a54d6c9def309908098d2f7efdfe290acebf7411b80a21283fc4ea"
+      }
+    },
+    {
+      "id": "CLM-0157",
+      "statement": "release.yml's publish step checks out full history and passes the notes (previous tag to the tag) as --notes-file, replacing --generate-notes",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "PR body: 'release.yml publish step: checks out full history and passes those notes (previous tag to the tag) as --notes-file, replacing --generate-notes.'",
+      "derived_from": [
+        "CLM-0156"
+      ],
+      "artifacts": [
+        ".github/workflows/release.yml"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0277",
+          "kind": "inspection",
+          "locator": ".github/workflows/release.yml:119-149",
+          "summary": "Publish job has actions/checkout with fetch-depth: 0 before download-artifact, a 'release notes' step writing $RUNNER_TEMP/notes.md for previous tag..tag, and gh release create ... --notes-file; git grep generate-notes finds no other use in the workflow.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": ".github/workflows/release.yml",
+              "lines": {
+                "start": 119,
+                "end": 149
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.373812157Z",
+          "seal": {
+            "by": "server",
+            "mac": "92949652356ed538a1728e678b6751be016e24b42f14842b2d6e045fba07c346"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The workflow shows fetch-depth 0, the notes step and --notes-file with no --generate-notes.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0277"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.543794341Z",
+          "seal": {
+            "by": "server",
+            "mac": "b525a3603c1edaf74c87b8d040c365e20e4b9b0d3f8e0635a926427da0ee5db4"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.543794341Z",
+      "seal": {
+        "by": "server",
+        "mac": "819bd7ef893d5225b22222bccf90f2c8b665cb81ebe7e35a82e470ed50c5494f"
+      }
+    },
+    {
+      "id": "CLM-0158",
+      "statement": "report/audit-notes.toml's per-version paragraphs are dropped and the assessment is fixed, so a release edits only its version field via release-prepare",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "Issue #37, Audit notes become static; Acceptance: 'audit-notes.toml needs no edit other than the version that release-prepare writes.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "report/audit-notes.toml",
+        "release.toml"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0278",
+          "kind": "inspection",
+          "locator": "report/audit-notes.toml:1-30; release.toml:15-17",
+          "summary": "The per-version paragraphs for 0.2.0 to 0.2.5 are gone, one fixed closing paragraph remains, and the real file has exactly one 'version = ' line, which release.toml's exactly=1 regex replacement targets. The e2e test asserts audit-notes.toml is bumped; just report rendered with the new notes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "report/audit-notes.toml",
+              "lines": {
+                "start": 1,
+                "end": 30
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.391557564Z",
+          "seal": {
+            "by": "server",
+            "mac": "3fa759132ea1cd32b0131db07a4015eb8998e4d6b6e4c1cf9f64796c0a235e93"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Static assessment, single version line targeted by release.toml, e2e bump test passes.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0278"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.558459126Z",
+          "seal": {
+            "by": "server",
+            "mac": "6413c06722915079b6ae25e1773b161320b6f0c3ef11721e8acf49de0db2367a"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.558459126Z",
+      "seal": {
+        "by": "server",
+        "mac": "96d201dfdb0e06df29acdb2e3d8d0bea5db3a77392d2d646657a6c8086c33b83"
+      }
+    },
+    {
+      "id": "CLM-0159",
+      "statement": "The audit-notes sentence is worded 'Since 0.2.5, changes are audited as claims in the pull requests that make them; dependency updates are not', with the 0.2.0 to 0.2.5 exceptions named, instead of the issue's sentence",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR body, report/audit-notes.toml bullet",
+      "derived_from": [
+        "CLM-0158"
+      ],
+      "artifacts": [
+        "report/audit-notes.toml"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0279",
+          "kind": "inspection",
+          "locator": "report/audit-notes.toml:24-28",
+          "summary": "The text reads 'Since 0.2.5, changes are audited as claims in the pull requests that make them; dependency updates are not', preceded by the named exceptions CLM-0037, CLM-0067 to CLM-0077 and CLM-0078 to CLM-0130. This is a documented, accurate deviation from the issue's wording.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "report/audit-notes.toml",
+              "lines": {
+                "start": 24,
+                "end": 28
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.408150867Z",
+          "seal": {
+            "by": "server",
+            "mac": "786069d1eaf50660db9b49709a6c68d848fdf9cff53a99eedb72e1af76e6a150"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The file contains the stated wording and the named exceptions.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0279"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.573236752Z",
+          "seal": {
+            "by": "server",
+            "mac": "6dfaa5d9c055832ec23cb99a2cede73f490f3004ad0d47c8af9ffe54e71f2479"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.573236752Z",
+      "seal": {
+        "by": "server",
+        "mac": "69b44275900e6bb28fb461d182619ac93b1d426c2661511711a1fefa8cfa7465"
+      }
+    },
+    {
+      "id": "CLM-0160",
+      "statement": "ci.yml gains a 'release scripts' job that runs shellcheck and just release-test with cargo-release 0.25.18, and a 'release branch matches Cargo.toml' job that fails a release/v* PR whose branch does not name its version",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "Issue #37, CI and Tests ('also a CI job'); PR body CI bullet",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        ".github/workflows/ci.yml",
+        "scripts/release-branch-check.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0280",
+          "kind": "inspection",
+          "locator": ".github/workflows/ci.yml:92-120; scripts/release-branch-check.sh:1-21",
+          "summary": "release-scripts job installs cargo-release@0.25.18 with REQUIRE_CARGO_RELEASE=1 and runs shellcheck -x scripts/*.sh and just release-test; release-branch job runs on head_ref release/v* and calls release-branch-check.sh, which fails unless the branch equals release/v plus the Cargo.toml version (covered by test 'branch check').",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": ".github/workflows/ci.yml",
+              "lines": {
+                "start": 92,
+                "end": 120
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.426658566Z",
+          "seal": {
+            "by": "server",
+            "mac": "aa86b5b735d30834f76fb92d680ecea37cad51be6219d1d9a49630cd14717473"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Both jobs are present as described. Not run on real Actions; inspection only, level 2.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0280"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.588517439Z",
+          "seal": {
+            "by": "server",
+            "mac": "23379cb6116cc93edccf364f75c08098a6ba4a4a91b0aeec4cbead292fb8bcc9"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.588517439Z",
+      "seal": {
+        "by": "server",
+        "mac": "743baa199337855a26fd5acae673c66b9de52ce6db021977e5facd0f5f7b002b"
+      }
+    },
+    {
+      "id": "CLM-0161",
+      "statement": "scripts/release-test.sh has 18 tests, run by just release-test against throwaway git repos and a fake gh, and each refusal in prepare, ship and abort, notes grouping and ranges, tagging the merge commit, main moving mid-ship and unresolved review threads has a test that fails when the behavior is removed",
+      "kind": "functional",
+      "level": "component",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37 Acceptance: 'Every refusal above has a test in just release-test, which runs in CI.'; PR body: '18 tests against throwaway git repos and a fake gh, covering notes grouping and ranges, every refusal in prepare, ship and abort, tagging the merge commit, main moving mid-ship, unresolved review threads, and an end-to-end prepare and ship with the real cargo-release'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-test.sh",
+        "justfile"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0281",
+          "kind": "test",
+          "locator": "just release-test; scripts/release-test.sh mutation runs in a scratch copy",
+          "summary": "just release-test printed 'release tests passed (18)' (18 ok lines). Seven single-line mutations in a scratch copy each failed the suite (exit 1): unresolved-threads guard removed, ls-remote exit-2 mapping loosened, tagging HEAD instead of the merge commit, no --delete-branch on close, abort's commit-count guard removed, squash merge, no --fail-fast. The unmutated copy exited 0. Every refusal listed in the issue has a named test (prepare 298, ship 389-459, abort 565-607).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 640,
+                "end": 661
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.444920425Z",
+          "seal": {
+            "by": "server",
+            "mac": "e7732a9bd4157563de6915252c336f32ec3c19a32003c7fe05e4be1f9abe470c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "18 tests pass and seven mutations of distinct behaviors were each caught, showing the tests assert the behaviors.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0281"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.604614450Z",
+          "seal": {
+            "by": "server",
+            "mac": "46ad09302908f7ec34a4ee5289c4d2e045feb9b8ef86398f2f3a4789b353eb1b"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.604614450Z",
+      "seal": {
+        "by": "server",
+        "mac": "185ac0978544cf8586c96cff0b63b040ffcd89ed7dfdc6828924974a19c67f1c"
+      }
+    },
+    {
+      "id": "CLM-0162",
+      "statement": "docs/site/src/development.md Releasing describes the three commands and what each refuses",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "Issue #37, Docs: 'Replace Releasing in docs/site/src/development.md with the three commands and what each refuses.'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "docs/site/src/development.md"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0282",
+          "kind": "inspection",
+          "locator": "docs/site/src/development.md:46-100",
+          "summary": "Releasing now documents release-prepare, release-ship and release-abort with the refusals of each (off main, dirty tree, main not origin/main, HEAD tag, tag on origin, single-parent on origin/main, merged PR, extra local commits); mdbook build docs/site succeeded.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/development.md",
+              "lines": {
+                "start": 46,
+                "end": 100
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.460188673Z",
+          "seal": {
+            "by": "server",
+            "mac": "45298dc964cdf9501c1872e1e0c1318dc4f64a040e0c14c0a8ab49ecedb3ed9c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Docs cover all three commands and their refusals.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0282"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.619265725Z",
+          "seal": {
+            "by": "server",
+            "mac": "4f8c7fe590fff9029eea6716258962f1b0c3f4bdb90e31495a694f2d2654037a"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.619265725Z",
+      "seal": {
+        "by": "server",
+        "mac": "50f0a5d4ff618eae397c870d691359e05f38f83bef6b973e596e1c09346041dd"
+      }
+    },
+    {
+      "id": "CLM-0163",
+      "statement": "just release-prepare patch && just release-ship cuts the next release with no hand edits: one PR, a merge commit, and the tag on it",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "Issue #37 Acceptance criteria, first bullet",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-prepare.sh",
+        "scripts/release-ship.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0283",
+          "kind": "test",
+          "locator": "just release-test (test_prepare_and_ship_end_to_end, scripts/release-test.sh:332-387)",
+          "summary": "The test runs release-prepare.sh patch then release-ship.sh against a throwaway origin and fake gh with the real cargo-release, with no manual edits in between: one release commit, one PR created and merged with a merge commit, tag on the merge commit. Real GitHub and the live review bot are not exercised, only the fake gh.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "scripts/release-test.sh",
+              "lines": {
+                "start": 332,
+                "end": 387
+              },
+              "commit": "ce386714ed31b9c33b753bd07fe33edfb73ce00b"
+            }
+          },
+          "recorded_at": "2026-11-01T21:49:29.477943929Z",
+          "seal": {
+            "by": "server",
+            "mac": "101639d7ecd038946ef88f00ceb5fa0c07c053098605eb078d2f9e2f2c155f5e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The e2e test runs prepare then ship with no edits and checks the outcome (against a fake gh).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0283"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.634205641Z",
+          "seal": {
+            "by": "server",
+            "mac": "6b392bde5ff92dac52976a6616020c404b148fed0047518b11c8fc748500117e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.634205641Z",
+      "seal": {
+        "by": "server",
+        "mac": "808125656f6211fa614873ed828f2d70c8e769a40e29fa013b1ed6e7e10519eb"
+      }
+    },
+    {
+      "id": "CLM-0164",
+      "statement": "just test passes 175 tests",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR body Validation: 'just test (175 passed)'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0284",
+          "kind": "test",
+          "locator": "just test",
+          "summary": "Ran on head: 'test result: ok. 175 passed; 0 failed'.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:29.491767321Z",
+          "seal": {
+            "by": "server",
+            "mac": "79e88604e04b2aac27050d88b6cbda2a14518c41b54aa48bb0b2f103ef896951"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Reran: 175 passed.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0284"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.649137378Z",
+          "seal": {
+            "by": "server",
+            "mac": "d7a44605389308abff6dc85950f186aeca558d91aa44f38f9ce3d10ea0e7d83a"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.649137378Z",
+      "seal": {
+        "by": "server",
+        "mac": "3dbaebf667468e67e1443b225718a4083186b0fef1160d28e9af85adb0e731b4"
+      }
+    },
+    {
+      "id": "CLM-0165",
+      "statement": "just release-test passes 18 tests, including the end-to-end case with the real cargo-release",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR body Validation: 'just release-test (18 passed, including the end-to-end case with cargo-release 0.25.18)'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [
+        "scripts/release-test.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0285",
+          "kind": "test",
+          "locator": "just release-test",
+          "summary": "Ran on head: 18 'ok' lines then 'release tests passed (18)'; no skip line, so the end-to-end case ran with the installed cargo-release. Local cargo-release version was not checked against 0.25.18.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:29.505787444Z",
+          "seal": {
+            "by": "server",
+            "mac": "f5a1a2f452ab6e7c7c3279df68504e11d49eddc439f4816bbb5d13f830660df2"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Reran: 18 passed including e2e.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0285"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.663630042Z",
+          "seal": {
+            "by": "server",
+            "mac": "4d871f9f4b55802500b7633d73c9f2967ac8fa5bb5d9a360b535177dfa7664c0"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.663630042Z",
+      "seal": {
+        "by": "server",
+        "mac": "6c63e044162714e83542f547e87ca9e15e471dd9f4af07886f3e55ddf03225eb"
+      }
+    },
+    {
+      "id": "CLM-0166",
+      "statement": "cargo clippy --all-targets -- -D warnings, just fmt, and shellcheck -x scripts/*.sh are clean",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "test",
+      "source": "PR body Validation: just fmt, cargo clippy --all-targets -- -D warnings, shellcheck -x scripts/*.sh",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0286",
+          "kind": "test",
+          "locator": "just fmt; cargo clippy --all-targets -- -D warnings; shellcheck -x scripts/*.sh",
+          "summary": "just fmt left git status clean; clippy finished without warnings; shellcheck printed nothing and exited 0.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:29.519604236Z",
+          "seal": {
+            "by": "server",
+            "mac": "c711cdd6f7d5651b36649f2c99acb7d75c08d3c7a1ca41dc8ee23457f97c4bb3"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Reran all three; clean.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0286"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.678819969Z",
+          "seal": {
+            "by": "server",
+            "mac": "7eccb575dac9ccc9d343121b17c98394e4544cc19a28b2cf2ad84e59daed0ce6"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.678819969Z",
+      "seal": {
+        "by": "server",
+        "mac": "574ccc6464c32ae4dd94f44732b22c0ed9adf50f03787487cccda3018588fe55"
+      }
+    },
+    {
+      "id": "CLM-0167",
+      "statement": "just report renders with the new audit notes and mdbook build docs/site succeeds",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "demonstration",
+      "source": "PR body Validation: 'just report renders with the new audit notes; mdbook build docs/site'",
+      "derived_from": [
+        "CLM-0145"
+      ],
+      "artifacts": [],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0287",
+          "kind": "demonstration",
+          "locator": "just report; mdbook build docs/site",
+          "summary": "just report ran its verify, recheck and typst compile steps without error; mdbook build wrote the HTML book. Both left the tracked tree unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:29.533598319Z",
+          "seal": {
+            "by": "server",
+            "mac": "ec33d7a59159da3ee7024b70c75d57b0bcedf61e2c40ebdfdd452d983d89f15c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Reran both; no errors.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0287"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.693716455Z",
+          "seal": {
+            "by": "server",
+            "mac": "5f444745f5390a578ec1c1518f7e88e023fa82e39361a0442f709f990acf25c9"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.693716455Z",
+      "seal": {
+        "by": "server",
+        "mac": "8f204d3a7f7b9392b5076690a135fc935f33f02a598311fad09300fbab665636"
+      }
+    },
+    {
+      "id": "CLM-0168",
+      "statement": "scripts/release-notes.sh v0.2.4 v0.2.5 prints Features #34 #35, Fixes #30, Dependencies #24, Other #33 #36",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "demonstration",
+      "source": "PR body Manual Test Plan",
+      "derived_from": [
+        "CLM-0155"
+      ],
+      "artifacts": [
+        "scripts/release-notes.sh"
+      ],
+      "tags": [
+        "from-issue:37"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0288",
+          "kind": "demonstration",
+          "locator": "scripts/release-notes.sh v0.2.4 v0.2.5",
+          "summary": "Output: Features #34 #35; Fixes #30; Dependencies #24; Other #33 #36 (the 0.2.5 prep PR #36 appears under Other because its title is 'chore: prepare 0.2.5 release').",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:49:29.547595692Z",
+          "seal": {
+            "by": "server",
+            "mac": "aa2422622464455085b3d3c09a24ecfc5380039b0930fdac57f6262db8124a47"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Ran the command; output matches the stated PR groupings.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0288"
+          ],
+          "recorded_at": "2026-11-01T21:50:19.708634762Z",
+          "seal": {
+            "by": "server",
+            "mac": "38503602b1fd1ac4395dda05b7c98218a0f1563b70a1d74cea17da2d96a69c3e"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:48:00.249873393Z",
+      "updated_at": "2026-11-01T21:50:19.708634762Z",
+      "seal": {
+        "by": "server",
+        "mac": "fb7aeb331907e981d5c38f2b8c893d455430d815c374e8d040ee9fb258e3acd0"
       }
     }
   ]
