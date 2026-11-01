@@ -16,7 +16,9 @@ content and its place in the catalog, under a key built into the binary.
   commit that edited it), then redo the change through the tools.
 - **Not affected:** reformatting the file or reordering its keys (seals cover content, not
   layout), and git merges of branches that changed *different* claims. Each counter has its
-  own seal, so a branch that added a claim merges cleanly with one that added evidence.
+  own seal, so a branch that added a claim merges cleanly with one that added evidence. Two
+  branches that both added claims, or both added evidence, hand out the same ids; replay one
+  onto the other with [`claims-mcp rebase`](../guides/parallel-branches.md).
 
 ## How a seal binds a record
 

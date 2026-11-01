@@ -4,6 +4,7 @@ mod anchor;
 mod catalog;
 mod error;
 mod model;
+mod rebase;
 mod recheck;
 mod report;
 mod schema;
@@ -23,6 +24,7 @@ use tracing_subscriber::EnvFilter;
 
 use crate::anchor::GitCli;
 use crate::model::short_commit;
+use crate::rebase::IdMapping;
 use crate::recheck::RecheckReport;
 use crate::report::files::{self, InitAction};
 use crate::report::next_steps::{self, AreaCount, NextSteps, Tier};
@@ -85,6 +87,21 @@ enum Command {
         #[arg(long)]
         json: bool,
     },
+    /// Replay the records this branch added to the catalog onto another branch's copy under
+    /// new ids, rewriting the catalog in place, and print the old-to-new id mapping.
+    Rebase {
+        /// The other branch's catalog, such as `git show origin/main:claims.json > main.json`.
+        #[arg(long)]
+        onto: PathBuf,
+        /// This branch's catalog at the merge base, such as
+        /// `git show $(git merge-base HEAD origin/main):claims.json > base.json`. A missing
+        /// file means the branch created the catalog.
+        #[arg(long)]
+        base: PathBuf,
+        /// Print the id mapping as JSON.
+        #[arg(long)]
+        json: bool,
+    },
     /// Seal records that have no seal, for maintainers migrating a catalog.
     Seal {
         /// Seal every unsealed record as adopted. Required: adoption is the only sealing
@@ -132,6 +149,9 @@ async fn main() -> ExitCode {
             tldr(&store, limit, json).await.map(|()| ExitCode::SUCCESS)
         }
         Some(Command::Recheck { json }) => recheck(&store, json).await,
+        Some(Command::Rebase { onto, base, json }) => rebase_catalog(&store, onto, base, json)
+            .await
+            .map(|()| ExitCode::SUCCESS),
         Some(Command::Seal { adopt: _ }) => adopt(&store).await.map(|()| ExitCode::SUCCESS),
         Some(Command::Report {
             action: ReportCommand::Init { dir },
@@ -415,6 +435,66 @@ fn truncated(text: &str, max_chars: usize) -> Cow<'_, str> {
     }
 }
 
+/// Rebases the catalog onto `onto` (see `src/rebase.rs`) and prints the id mapping.
+///
+/// The branch's catalog is locked, verified, and replaced atomically like any write; `onto`
+/// and `base` are only read.
+async fn rebase_catalog(
+    store: &CatalogStore,
+    onto: PathBuf,
+    base: PathBuf,
+    json: bool,
+) -> anyhow::Result<()> {
+    let onto_path = onto.display().to_string();
+    let mapping = store
+        .mutate(move |branch| {
+            let base = store::load_file(&base)?;
+            let onto = store::load_file(&onto)?;
+            let (rebased, mapping) = rebase::rebase(&base, branch, &onto)?;
+            *branch = rebased;
+            Ok(mapping)
+        })
+        .await
+        .context("failed to rebase the catalog")?;
+    let mut out = std::io::stdout().lock();
+    if json {
+        serde_json::to_writer(&mut out, &mapping)?;
+        writeln!(out)?;
+    } else {
+        write_mapping(
+            &mut out,
+            &store.path().display().to_string(),
+            &onto_path,
+            &mapping,
+        )?;
+    }
+    Ok(())
+}
+
+/// Human-readable form of a rebase's id mapping: one `old -> new` line per replayed record.
+fn write_mapping(
+    out: &mut impl Write,
+    path: &str,
+    onto: &str,
+    mapping: &IdMapping,
+) -> std::io::Result<()> {
+    let claims = mapping.claims.len();
+    let evidence = mapping.evidence.len();
+    writeln!(
+        out,
+        "rebased {path} onto {onto}: {claims} new {}, {evidence} new evidence {}",
+        plural(claims, "claim", "claims"),
+        plural(evidence, "item", "items")
+    )?;
+    for entry in &mapping.claims {
+        writeln!(out, "  {} -> {}", entry.from, entry.to)?;
+    }
+    for entry in &mapping.evidence {
+        writeln!(out, "  {} -> {}", entry.from, entry.to)?;
+    }
+    Ok(())
+}
+
 /// Seals unsealed records as adopted and lists them.
 async fn adopt(store: &CatalogStore) -> anyhow::Result<()> {
     let adopted = store.adopt().await.context("seal --adopt failed")?;
@@ -449,9 +529,31 @@ fn report_init(dir: &std::path::Path) -> anyhow::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{ClaimId, CurrentVerdict, IntegrityLevel};
+    use crate::model::{ClaimId, CurrentVerdict, EvidenceId, IntegrityLevel};
+    use crate::rebase::Renumbered;
     use crate::report::next_steps::{NextStep, NextStepsSummary};
     use crate::seal::IntegrityProblem;
+
+    #[test]
+    fn mapping_lists_claims_then_evidence() {
+        let mapping = IdMapping {
+            claims: vec![Renumbered {
+                from: ClaimId::new(3),
+                to: ClaimId::new(5),
+            }],
+            evidence: vec![Renumbered {
+                from: EvidenceId::new(1),
+                to: EvidenceId::new(2),
+            }],
+        };
+        let mut out = Vec::new();
+        write_mapping(&mut out, "claims.json", "main.json", &mapping).expect("write to memory");
+        assert_eq!(
+            String::from_utf8(out).expect("UTF-8"),
+            "rebased claims.json onto main.json: 1 new claim, 1 new evidence item\n  \
+             CLM-0003 -> CLM-0005\n  EVD-0001 -> EVD-0002\n"
+        );
+    }
 
     fn rendered(report: &IntegrityReport) -> String {
         let mut out = Vec::new();

@@ -23,6 +23,7 @@
 - [Install](guides/install.md)
 - [Your first audit](guides/first-audit.md)
 - [Checking in CI](guides/ci.md)
+- [Branches that both write the ledger](guides/parallel-branches.md)
 - [PDF reports](guides/reports.md)
 - [Migrating with seal --adopt](guides/migrating.md)
 

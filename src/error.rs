@@ -115,6 +115,12 @@ pub enum ClaimsError {
         problems: Vec<IntegrityProblem>,
     },
 
+    /// `claims-mcp rebase` cannot replay the branch's records onto the other ledger: an input
+    /// fails its integrity check, the inputs do not descend from `--base`, or both sides
+    /// changed the same claim differently.
+    #[error("cannot rebase: {0}")]
+    Rebase(String),
+
     /// A git command needed for an anchor or a recheck failed.
     #[error("git {command} failed: {message}")]
     Git {

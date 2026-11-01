@@ -34,5 +34,6 @@ evidence, hand out the same ids. Git does not always see a conflict: two branche
 one evidence item to different claims merge cleanly into a ledger with two records of the same
 id, and the server then refuses to read it. Run `claims-mcp verify` on the result of the merge,
 which GitHub's `pull_request` event checks out by default, so a PR that would break the ledger
-fails before it merges. To fix such a branch, take the main branch's `claims.json` and record the
-branch's findings again through the tools; never edit or merge the file by hand.
+fails before it merges. To fix such a branch, replay its records onto main's ledger with
+`claims-mcp rebase` (see [Branches that both write the ledger](parallel-branches.md)); never
+edit or merge the file by hand.

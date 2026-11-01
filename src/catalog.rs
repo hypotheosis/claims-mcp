@@ -237,6 +237,53 @@ impl Catalog {
         self.next_claim_seq
     }
 
+    /// The next evidence sequence number to be assigned.
+    pub fn next_evidence_seq(&self) -> u32 {
+        self.next_evidence_seq
+    }
+
+    /// Mutable access to one claim, for replaying another ledger's records onto it
+    /// (`src/rebase.rs`). Its id must not change.
+    pub(crate) fn claim_mut(&mut self, id: ClaimId) -> Option<&mut Claim> {
+        self.index_of(id).map(|index| &mut self.claims[index])
+    }
+
+    /// Appends a claim replayed from another ledger, which must already carry the next claim
+    /// id, and advances the claim counter past it.
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::Validation`] if the claim's id is not the next one, or the id space is
+    /// exhausted.
+    pub(crate) fn append_replayed_claim(&mut self, claim: Claim) -> Result<()> {
+        if claim.id != ClaimId::new(self.next_claim_seq) {
+            return Err(ClaimsError::Validation(format!(
+                "replayed claim {} is not the next claim id {}",
+                claim.id,
+                ClaimId::new(self.next_claim_seq)
+            )));
+        }
+        self.next_claim_seq = self
+            .next_claim_seq
+            .checked_add(1)
+            .ok_or_else(|| ClaimsError::Validation("claim id space exhausted".to_owned()))?;
+        self.claims.push(claim);
+        Ok(())
+    }
+
+    /// Advances the evidence counter past `count` ids handed to replayed evidence.
+    ///
+    /// # Errors
+    ///
+    /// [`ClaimsError::Validation`] if the id space is exhausted.
+    pub(crate) fn advance_evidence_seq(&mut self, count: u32) -> Result<()> {
+        self.next_evidence_seq = self
+            .next_evidence_seq
+            .checked_add(count)
+            .ok_or_else(|| ClaimsError::Validation("evidence id space exhausted".to_owned()))?;
+        Ok(())
+    }
+
     /// Each id counter with its name, value, and integrity seal.
     pub fn counter_seals(&self) -> [(&'static str, u32, Option<&Seal>); 2] {
         [
@@ -738,7 +785,7 @@ impl Catalog {
 
     /// Returns `true` if walking `derived_from` links upward from `start` reaches `target`
     /// (or `start == target`). Depth-first with a visited set: O(n + e).
-    fn reaches(&self, start: ClaimId, target: ClaimId) -> bool {
+    pub(crate) fn reaches(&self, start: ClaimId, target: ClaimId) -> bool {
         let mut stack = vec![start];
         let mut visited = HashSet::new();
         while let Some(current) = stack.pop() {
@@ -851,7 +898,7 @@ pub(crate) mod tests {
         }
     }
 
-    fn child_of(statement: &str, parent: ClaimRef) -> NewClaim {
+    pub(crate) fn child_of(statement: &str, parent: ClaimRef) -> NewClaim {
         NewClaim {
             derived_from: vec![parent],
             ..new_claim(statement)
