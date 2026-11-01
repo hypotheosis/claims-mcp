@@ -56,12 +56,14 @@ def main():
     parser.add_argument("arguments", nargs="?", default="{}", help="tool arguments as JSON")
     args = parser.parse_args()
 
-    if args.tool:
-        calls = [{"tool": args.tool, "arguments": json.loads(args.arguments)}]
-    else:
-        calls = json.load(sys.stdin)
-    if not isinstance(calls, list):
-        parser.error("stdin must hold a JSON list of {\"tool\", \"arguments\"} objects")
+    # parser.error prints the usage and exits 2, so bad input is never mistaken for a failed call.
+    try:
+        if args.tool:
+            calls = [{"tool": args.tool, "arguments": json.loads(args.arguments)}]
+        else:
+            calls = json.load(sys.stdin)
+    except ValueError as error:
+        parser.error(f"invalid JSON: {error}")
 
     # An absolute path, so the server's cwd cannot change which ledger it opens. The server
     # pins anchors to HEAD of the git repository that holds the ledger, not of the cwd.
