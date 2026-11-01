@@ -35,10 +35,11 @@ stored in the server, agents sharing one connection can each work on their own l
 same time.
 
 Servers before 0.2.5 don't have `catalog` and ignore it without an error, writing the session's
-ledger instead. To check the server you're connected to, call a read tool with `catalog` set to a ledger
-in a directory that doesn't exist, such as `/nonexistent-claims-probe/claims.json`: a server that
-supports the parameter fails to open it, and an older one answers as if it weren't there. The tool schema your client shows isn't proof, because a client can keep the
-schema from before the server was upgraded.
+ledger instead. To check the server you're connected to, call a read tool with `catalog` set to
+a ledger in a directory that doesn't exist, such as `/nonexistent-claims-probe/claims.json`: a
+server that supports the parameter fails to open it, and an older one answers as if it weren't
+there. The tool schema your client shows isn't proof, because a client can keep the schema from
+before the server was upgraded.
 
 ## add_claim
 
