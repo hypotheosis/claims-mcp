@@ -81,13 +81,13 @@ wait_for_count() {
         [[ "${count:-0}" == 0 ]] || return 0
         sleep "${POLL_SECONDS}"
     done
-    fail "${what} did not arrive on ${PR_URL}; it is still open, and nothing was tagged"
+    fail "${what} did not arrive on ${PR_URL}; it is still open, and no tag was pushed"
 }
 
 # Checks take a moment to register on a new pull request; until then `gh pr checks` lists none.
 wait_for_count "checks" count_checks
 gh pr checks "${PR_URL}" --watch --fail-fast --interval "${POLL_SECONDS}" >/dev/null \
-    || fail "checks failed on ${PR_URL}; it is still open, and nothing was tagged"
+    || fail "checks failed on ${PR_URL}; it is still open, and no tag was pushed"
 
 # main's ruleset requires review threads to be resolved, and the review bot reviews every pull
 # request. A thread needs a person, so the release stops for one.
@@ -107,7 +107,7 @@ UNRESOLVED_THREADS="$(
 readonly UNRESOLVED_THREADS
 [[ "${UNRESOLVED_THREADS}" == 0 ]] \
     || fail "${PR_URL} has ${UNRESOLVED_THREADS} unresolved review thread(s); \
-it is still open, and nothing was tagged"
+it is still open, and no tag was pushed"
 
 # main must not have moved since the release commit was checked against it: a change merged
 # meanwhile would ship in a release whose changelog entry never saw it.

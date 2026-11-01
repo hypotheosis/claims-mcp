@@ -465,7 +465,7 @@ assert_ship_stops_open() {
     prepare_release "${work}"
     run_script "${work}" env "$@" TEST_GH_LOG="${gh_log}" scripts/release-ship.sh
     assert_rejected "${name}" "${diagnostic}"
-    [[ "${RUN_OUTPUT}" == *'it is still open, and nothing was tagged'* ]] \
+    [[ "${RUN_OUTPUT}" == *'it is still open, and no tag was pushed'* ]] \
         || fail "${name}: the diagnostic does not say the pull request is left open"
     ! grep -qE '^pr (merge|close)' "${gh_log}" \
         || fail "${name}: the release pull request was merged or closed: $(<"${gh_log}")"

@@ -68,7 +68,8 @@ then:
 4. merges it with a merge commit, moves the local tag to that merge commit, pushes the tag, and
    fast-forwards local `main`. The tag starts `release.yml`, which publishes the release.
 
-When it stops, the pull request stays open and nothing is tagged. It refuses to start unless
+When it stops on a check or a review, the pull request stays open and no tag is pushed (the
+local tag from `just release-prepare` stays where it is). It refuses to start unless
 `HEAD` carries the tag for the `Cargo.toml` version, that tag is not on `origin`, and `HEAD` is a
 single-parent commit directly on the current `origin/main`.
 
