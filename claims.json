@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 157,
+  "next_claim_seq": 162,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "1470611817038642beb3705576eeee350a211de41aca8ab25aef984b6c9b943a"
+    "mac": "f5151560662cc983176eb0f3f502102c79aaec8e996120852b5691be378e420b"
   },
-  "next_evidence_seq": 277,
+  "next_evidence_seq": 286,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "2e22e9cc0d344aae1b54229e6fe49d9fe0552b11dbc16f6272e4e0c39a9b3fa6"
+    "mac": "88cc2a2510d4d151b13d52459988474e0e3c77e5a98ea1effb0c03ea3ea9c712"
   },
   "claims": [
     {
@@ -89,6 +89,18 @@
             "by": "server",
             "mac": "48c25ab6e1e838ff7aa427dd526291f7d420b72292d7f42c0e6420b2c6b400d9"
           }
+        },
+        {
+          "id": "EVD-0285",
+          "kind": "analysis",
+          "locator": "children of CLM-0001",
+          "summary": "Supersedes EVD-0276, which named the now-retired CLM-0016. The skill element of concept.md is covered by CLM-0157 (supported, count-free). trace down at 1acd9d0 shows every active child supported: 0002, 0003, 0010, 0012, 0014, 0015, 0017, 0019, 0037, 0152, 0154, 0157. Concept coverage is unchanged.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:18:50.312580834Z",
+          "seal": {
+            "by": "server",
+            "mac": "55d1641207f3a59f958603b300d5679b38248d34147bef9d44c7c375e7866a30"
+          }
         }
       ],
       "verdicts": [
@@ -156,13 +168,26 @@
             "by": "server",
             "mac": "9d266d42d435ec6a5653602246f737c6a0e6fb72807716ec00d1b58b559a3f8d"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-rolled because the prior roll-up cited CLM-0016, now retired and replaced by CLM-0157; all active children are supported (EVD-0285).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0285"
+          ],
+          "recorded_at": "2026-11-01T22:18:53.943924548Z",
+          "seal": {
+            "by": "server",
+            "mac": "0bab53c8a8a8e08ef36f8b5d4cadbf90d2dfce512ca65dcc45db8966a9fb840f"
+          }
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-11-01T21:55:05.339008147Z",
+      "updated_at": "2026-11-01T22:18:53.943924548Z",
       "seal": {
         "by": "server",
-        "mac": "033824626333c21095a3d38b594d3850efc1d911f2b29251d53c77e261161816"
+        "mac": "d5e7b3e7dbac6397445d17494095f62bbb0e7d070d8daa2f001ed5b2605f74f7"
       }
     },
     {
@@ -1404,7 +1429,9 @@
         "skill"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: the statement's count (\"the server's 10 tools\") is not promised by its source, concept.md, and is stale: the server has registered 12 tools since next_steps and recheck were added. Replaced by a count-free claim that SKILL.md references every tool the server registers.",
+        "retired_at": "2026-11-01T22:16:10.472965918Z"
       },
       "evidence": [
         {
@@ -1461,10 +1488,10 @@
         }
       ],
       "created_at": "2026-10-23T12:47:36.781375391Z",
-      "updated_at": "2026-10-23T15:51:51.086228019Z",
+      "updated_at": "2026-11-01T22:16:10.472965918Z",
       "seal": {
         "by": "server",
-        "mac": "afc64f7a9465c770a57a982a1c1fac27a2c1f7f5101c38002a6838c801e74a12"
+        "mac": "614aad713f3d4d3f4c967290fe0eaa82fca134485e8aa0f45aa5732d0413b68a"
       }
     },
     {
@@ -3615,7 +3642,9 @@
         "integrity"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"each of the six write tools\" states a count that its source (issue #9 acceptance criterion: \"every write tool\") does not promise. Replaced by a count-free claim using the source's wording.",
+        "retired_at": "2026-11-01T22:16:10.501653757Z"
       },
       "evidence": [
         {
@@ -3660,10 +3689,10 @@
         }
       ],
       "created_at": "2026-10-23T15:54:48.877845729Z",
-      "updated_at": "2026-10-23T15:56:58.741020438Z",
+      "updated_at": "2026-11-01T22:16:10.501653757Z",
       "seal": {
         "by": "server",
-        "mac": "be685d9bd81fcba3f0dacedde75d58c908d950e29691322436972dd499ffd7de"
+        "mac": "e180ad000dcf0b6d5cc21d15e4a0170dae263aeaf0af2dad7f9f4f901404c995"
       }
     },
     {
@@ -5770,7 +5799,9 @@
         "area:docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"The six recheck statuses\" states a count that concepts/anchors.md does not state, and that goes stale when a status is added. Replaced by a count-free claim that the statuses documented there match the AnchorStatus enum.",
+        "retired_at": "2026-11-01T22:16:10.521174524Z"
       },
       "evidence": [
         {
@@ -5812,10 +5843,10 @@
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.178144670Z",
+      "updated_at": "2026-11-01T22:16:10.521174524Z",
       "seal": {
         "by": "server",
-        "mac": "de3edf89b7f13f6a90023f553d50b2dccab8c028991524de0b2dcddc9bb5969c"
+        "mac": "f57fd6b80368e929c8c9d56a5f73cc02958f1c59add410c6d3922422c62d5836"
       }
     },
     {
@@ -5995,7 +6026,9 @@
         "area:docs"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"The five verification methods\" states a count that concepts/integrity-and-methods.md does not state, and that goes stale when a method is added. Replaced by a count-free claim that the methods documented there match the VerificationMethod enum.",
+        "retired_at": "2026-11-01T22:16:10.534283540Z"
       },
       "evidence": [
         {
@@ -6037,10 +6070,10 @@
         }
       ],
       "created_at": "2026-10-31T14:01:19.791821168Z",
-      "updated_at": "2026-10-31T14:02:31.205389351Z",
+      "updated_at": "2026-11-01T22:16:10.534283540Z",
       "seal": {
         "by": "server",
-        "mac": "d314adc8fddd4448d4a3a5adc330fa80f9ca04cb151364478017910222a796db"
+        "mac": "a0b48c1d9067349ee5d60e3fa77a78590cf43f2af17c73db1771fe97cc764a85"
       }
     },
     {
@@ -6116,7 +6149,9 @@
         "from-issue:31"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Issue #40: \"All 12 MCP tools\" states a count that its source (issue #31: \"on every tool\") does not promise, and that goes stale when a tool is added. Replaced by a count-free claim that every MCP tool accepts an optional catalog argument.",
+        "retired_at": "2026-11-01T22:16:10.487989240Z"
       },
       "evidence": [
         {
@@ -6194,10 +6229,10 @@
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:51.833384425Z",
+      "updated_at": "2026-11-01T22:16:10.487989240Z",
       "seal": {
         "by": "server",
-        "mac": "be3b199aedbcab45004348230db2317dbce2e69d508fabcdd66bb62617d5667e"
+        "mac": "c7a980fb7fda43121b9331623588d159a0893f20f06254089afb077c68a71e71"
       }
     },
     {
@@ -12514,6 +12549,422 @@
       "seal": {
         "by": "server",
         "mac": "db0161d6f66e815464a5bd479f20ff59e4923aae1c38ac59b3f68db89eac0559"
+      }
+    },
+    {
+      "id": "CLM-0157",
+      "statement": "skills/claims-audit/SKILL.md has valid skill frontmatter and references every tool the server registers by name",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "analysis",
+      "source": "concept.md: 'a skill that is tailor-made to use this mcp'",
+      "derived_from": [
+        "CLM-0001"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "skill",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0277",
+          "kind": "analysis",
+          "locator": "skills/claims-audit/SKILL.md:1-4 frontmatter; for t in <registered tools>: grep -c \"`$t`\" skills/claims-audit/SKILL.md; src/server.rs:731-755 registers_all_twelve_tools",
+          "summary": "At 1acd9d0 SKILL.md lines 1-4 are a --- delimited frontmatter with name: claims-audit and a description. The set of registered tools (from the tool_router list asserted by registers_all_twelve_tools, which passed, and from tools/list over stdio) is add_claim, add_claims, add_evidence, audit_report, get_claim, list_claims, next_steps, recheck, record_verdict, retire_claim, trace, update_claim. Each appears backticked in SKILL.md (grep -c: 1,4,3,3,1,4,3,7,3,1,1,4); none is missing.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 1,
+                "end": 4
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.590540123Z",
+          "seal": {
+            "by": "server",
+            "mac": "e0eb601901d9a52100782116f31d484b305f391efd3f1dfaf4f389fd532ae094"
+          }
+        },
+        {
+          "id": "EVD-0278",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact server::tests::registers_all_twelve_tools (1 passed)",
+          "summary": "The test compares the router's tool names with an explicit sorted list; it passed on 1acd9d0, so the set I checked SKILL.md against is the registered set.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 730,
+                "end": 755
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.610100750Z",
+          "seal": {
+            "by": "server",
+            "mac": "81e4c73b4333f7fa9ed0d53751528db7bd1568003d75219e4b7f175e447b8ed7"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Frontmatter is valid and every name in the registered tool set, confirmed by the router test, appears backticked in SKILL.md (EVD-0277, EVD-0278).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0277",
+            "EVD-0278"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.304245473Z",
+          "seal": {
+            "by": "server",
+            "mac": "0221be2341651080c48a7dc062a39e91449834b48de74d5eda077a0c7aaf7385"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.304245473Z",
+      "seal": {
+        "by": "server",
+        "mac": "c1e2c577271e73b16f157cf407e86993e0aa55dc70f184dbbc21e9f9b0bb2154"
+      }
+    },
+    {
+      "id": "CLM-0158",
+      "statement": "Every MCP tool accepts an optional catalog argument (absolute path, or relative to the server's cwd) and none requires it",
+      "kind": "interface",
+      "level": "software",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "https://github.com/hypotheosis/claims-mcp/issues/31 : \"An optional `catalog` argument on every tool (absolute path, or relative to the server's cwd)\"",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "from-issue:31",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0279",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact server::tests::every_tool_advertises_the_catalog_argument (1 passed)",
+          "summary": "Test iterates every tool in the router and asserts input_schema.properties has catalog and that required does not contain it. Passed on 1acd9d0. (It also asserts a count of 12, but the loop covers whatever the router lists.)",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1277,
+                "end": 1298
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.626654627Z",
+          "seal": {
+            "by": "server",
+            "mac": "e9a2e1866cd7be43f78e3a66b45effd56148f8c494551c7790684395ad675d30"
+          }
+        },
+        {
+          "id": "EVD-0280",
+          "kind": "inspection",
+          "locator": "src/server.rs:28-48, 188-400 handlers",
+          "summary": "Every #[tool] handler takes Parameters<OnLedger<...>> (recheck takes OnLedger<NoParams>); catalog is an Option<PathBuf> with a serde default, documented as absolute or relative to the server's working directory, and store_for passes it on.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 28,
+                "end": 48
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.640351184Z",
+          "seal": {
+            "by": "server",
+            "mac": "a995f32f69d4aa7a4fc97d6cdaacb5a495b8d3c103aeaa0cd3a5a25ccebdfeca"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The schema test loops over every router tool asserting catalog is offered and not required, and the handler types show the same for every handler (EVD-0279, EVD-0280).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0279",
+            "EVD-0280"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.318586702Z",
+          "seal": {
+            "by": "server",
+            "mac": "b46cc46a3fba21d9eab47fac1a2dfe358dc5c0b310e084cbc3d774eaebbc868f"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.318586702Z",
+      "seal": {
+        "by": "server",
+        "mac": "2cf60389b7245d2ccc70c522a263a2273ff176435b91a93cc39bde7f82136012"
+      }
+    },
+    {
+      "id": "CLM-0159",
+      "statement": "While any integrity check fails, every write tool (those that mutate the catalog) returns an error naming the failing records and the restore-from-git recovery steps, and the catalog file is left unchanged",
+      "kind": "security",
+      "level": "software",
+      "integrity_level": 4,
+      "verification_method": "demonstration",
+      "source": "issue #9 acceptance criterion 7",
+      "derived_from": [
+        "CLM-0038"
+      ],
+      "artifacts": [
+        "src/store.rs",
+        "src/error.rs"
+      ],
+      "tags": [
+        "issue:9",
+        "integrity",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0281",
+          "kind": "demonstration",
+          "locator": "python3 /tmp/claude-1000/-home-pgrace--agents-skills/73799e8a-72f7-4e14-aa98-aa95ddeeba71/scratchpad/demo40/drive.py (stdio, target/debug/claims-mcp built at 1acd9d0, --catalog c.json = tampered COPY of claims.json); tools/list then tools/call for add_claim, add_claims, update_claim, retire_claim, add_evidence, record_verdict; sha256 before/after",
+          "summary": "Tools registered per tools/list: 12; the six that call store.mutate are the six I called, the other six are read tools (get_claim, list_claims, trace, audit_report, next_steps, recheck) checked against src/server.rs. On a copy whose first statement was edited, every write call returned isError true with \"catalog c.json was changed outside claims-mcp, so every write is refused until it is restored. Failed checks: CLM-0001 (seal does not match its content). Never edit the catalog file directly. To recover, restore it from git (`git checkout -- c.json`...\". sha256 of c.json was identical before and after. The worktree's claims.json was not tampered.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T22:18:04.651294242Z",
+          "seal": {
+            "by": "server",
+            "mac": "a661a05c5e75486d46abcfc7ecfe698089fbb418d079c9e32ce85008167cbb0f"
+          }
+        },
+        {
+          "id": "EVD-0282",
+          "kind": "test",
+          "locator": "cargo test --bin claims-mcp -- --exact store::tests::tampered_catalog_refuses_writes_but_allows_reads (1 passed); server::tests::hand_edited_catalog_turns_writes_into_explained_tool_errors (1 passed)",
+          "summary": "Both tests passed on 1acd9d0: the store refuses writes on a tampered catalog but allows reads, and the server test asserts the tool error contains \"changed outside claims-mcp\", the failing record id, \"git checkout\" and \"Never edit\".",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/store.rs",
+              "lines": {
+                "start": 413,
+                "end": 440
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.668507421Z",
+          "seal": {
+            "by": "server",
+            "mac": "1a00bb54027f7c6005a917d800b25a1f08ac728fefb738b33807c115bb578a14"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Every write tool (the set that calls mutate) was called on a tampered copy; each returned the error naming the failing record and the git restore steps, and the file hash was unchanged (EVD-0281). The unit and server tests agree (EVD-0282).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0281",
+            "EVD-0282"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.332086448Z",
+          "seal": {
+            "by": "server",
+            "mac": "21412612cf211a8b08aaa8d4038b735a5c5c4962264f47ccb31b5a0db1fd7f1b"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.332086448Z",
+      "seal": {
+        "by": "server",
+        "mac": "6b24abde000aac10d6d47cda81b9195d50e491961a7980e29d5757722e1707b3"
+      }
+    },
+    {
+      "id": "CLM-0160",
+      "statement": "The recheck statuses documented in concepts/anchors.md match the AnchorStatus enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/anchors.md lines 32-39 (recheck status table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/anchors.md",
+        "lines": {
+          "start": 32,
+          "end": 39
+        },
+        "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/anchors.md",
+        "src/recheck.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0283",
+          "kind": "inspection",
+          "locator": "src/recheck.rs:19-35 (enum AnchorStatus); docs/site/src/concepts/anchors.md:32-39",
+          "summary": "AnchorStatus variants: Current, Moved, Changed, Overturned, Missing, CommitMissing, Unpinned. The docs table lists moved, changed, overturned, missing, commit_missing and unpinned: exactly the non-current variants, which are the ones recheck reports; the page says current anchors are not listed. The set differs from the enum only by Current, by design. The page states no count.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/recheck.rs",
+              "lines": {
+                "start": 19,
+                "end": 35
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.683020651Z",
+          "seal": {
+            "by": "server",
+            "mac": "90156ccde05b92472d26ad26cf31086b21154adc957b3e4aefc0e10508140f28"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The documented statuses are exactly AnchorStatus's non-current variants (EVD-0283).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0283"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.345669095Z",
+          "seal": {
+            "by": "server",
+            "mac": "fad4bcfa4e38b18382130da87b620d4d6ccc359591d497d75d66d81bcf72e949"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.345669095Z",
+      "seal": {
+        "by": "server",
+        "mac": "813a856d0fd127c66e04f29b273377a315ae562abb246f8387caae04721e73e4"
+      }
+    },
+    {
+      "id": "CLM-0161",
+      "statement": "The verification methods documented in concepts/integrity-and-methods.md, including formal_proof, match the VerificationMethod enum",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "docs/site/src/concepts/integrity-and-methods.md lines 24-30 (verification method table)",
+      "source_anchor": {
+        "path": "docs/site/src/concepts/integrity-and-methods.md",
+        "lines": {
+          "start": 24,
+          "end": 30
+        },
+        "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+      },
+      "derived_from": [
+        "CLM-0071"
+      ],
+      "artifacts": [
+        "docs/site/src/concepts/integrity-and-methods.md",
+        "src/model.rs"
+      ],
+      "tags": [
+        "docs",
+        "area:docs",
+        "from-issue:40"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0284",
+          "kind": "inspection",
+          "locator": "src/model.rs:168-184 (enum VerificationMethod); docs/site/src/concepts/integrity-and-methods.md:24-30",
+          "summary": "VerificationMethod variants (snake_case): inspection, analysis, demonstration, test, formal_proof. The docs table lists exactly those names with matching meanings, formal_proof included. The page states no count in that table.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/model.rs",
+              "lines": {
+                "start": 168,
+                "end": 184
+              },
+              "commit": "1acd9d0b8e9ae49173d4a2cdd26983d91e5cd6a4"
+            }
+          },
+          "recorded_at": "2026-11-01T22:18:04.697658671Z",
+          "seal": {
+            "by": "server",
+            "mac": "55d889b1dc76ed31fe90eb0ea32a80ea652a8e823c10d0bfead8db112de30f3d"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The documented methods are exactly the VerificationMethod variants (EVD-0284).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0284"
+          ],
+          "recorded_at": "2026-11-01T22:18:13.359845704Z",
+          "seal": {
+            "by": "server",
+            "mac": "8d4c11b2514aadad1548d0dc7d1c66a6a907e1b63006c16aaae0d253858c6f01"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T22:17:39.647914708Z",
+      "updated_at": "2026-11-01T22:18:13.359845704Z",
+      "seal": {
+        "by": "server",
+        "mac": "daa4a0b99ec97b79a8899b10e78b5ba04d4727cbf687d2edac134fd6109a548c"
       }
     }
   ]
