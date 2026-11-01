@@ -55,8 +55,12 @@ not audited as claims.
 [[points]]
 title = "Independence"
 body = """
-The audit was not independent: the model that produced claims-mcp also audited it. Weigh the \
-verdicts accordingly and spot-check the evidence locators, starting with integrity level 4.
+The original audit (claims through CLM-0077) was not independent: the model that produced \
+claims-mcp also audited it. Weigh those verdicts accordingly and spot-check their evidence \
+locators, starting with integrity level 4. The 0.2.5 claims (CLM-0078 to CLM-0130) were \
+recorded by an auditor subagent on a different model, given the issue, the PR description and \
+the diff but not the producer's account. It is still a model of the same family, so the same \
+spot checks apply.
 """
 
 [[points]]
