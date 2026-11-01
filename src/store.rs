@@ -286,6 +286,27 @@ mod tests {
     }
 
     #[test]
+    fn load_file_reads_without_leaving_a_lock_file() {
+        // Arrange: a written catalog and a path that does not exist.
+        let (directory, store) = temp_store();
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("one"), at(0)).map(|_| ()))
+            .expect("write");
+        let lock = directory.path().join(".claims.json.lock");
+        fs::remove_file(&lock).expect("remove the store's lock");
+
+        // Act
+        let loaded = load_file(store.path()).expect("load");
+        let missing = load_file(&directory.path().join("absent.json")).expect("load missing");
+
+        // Assert
+        assert_eq!(loaded.claims().len(), 1);
+        assert!(missing.is_pristine());
+        assert!(!lock.exists());
+        assert!(!directory.path().join(".absent.json.lock").exists());
+    }
+
+    #[test]
     fn mutate_persists_and_read_sees_it() {
         let (directory, store) = temp_store();
         store

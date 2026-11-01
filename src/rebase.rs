@@ -816,6 +816,76 @@ mod tests {
     }
 
     #[test]
+    fn a_tampered_onto_or_base_is_refused() {
+        let base = main_with_two_claims();
+        let mut tampered = base.clone();
+        add_supported(&mut tampered, ClaimId::new(1), 10);
+        tampered.claims_mut()[0].evidence[0].summary = "edited by hand".to_owned();
+
+        let error = rebase(&base, &base, &tampered).expect_err("tampered onto");
+        assert!(error
+            .to_string()
+            .contains("--onto catalog fails its integrity check"));
+        let error = rebase(&tampered, &tampered, &base).expect_err("tampered base");
+        assert!(error
+            .to_string()
+            .contains("--base catalog fails its integrity check"));
+    }
+
+    #[test]
+    fn an_existing_claim_relinked_to_a_new_claim_follows_its_new_id() {
+        // Arrange: both sides add CLM-0003; the branch then links CLM-0001 to its own CLM-0003.
+        let base = main_with_two_claims();
+        let mut main = base.clone();
+        write(&mut main, |catalog| {
+            catalog.add_claim(new_claim("main three"), at(5)).expect("add");
+        });
+        let mut branch = base.clone();
+        write(&mut branch, |catalog| {
+            catalog.add_claim(new_claim("branch three"), at(6)).expect("add");
+            let update = ClaimUpdate {
+                derived_from: Some(vec![ClaimId::new(3)]),
+                ..ClaimUpdate::default()
+            };
+            catalog
+                .update_claim(ClaimId::new(1), update, at(7))
+                .expect("update");
+        });
+
+        // Act
+        let (rebased, _) = rebase(&base, &branch, &main).expect("rebase");
+
+        // Assert: the link points at the branch's claim under its new id, not main's CLM-0003.
+        assert!(seal::verify(&rebased).verified);
+        let one = rebased.get(ClaimId::new(1)).expect("claim");
+        assert_eq!(one.derived_from, [ClaimId::new(4)]);
+        let parent = rebased.get(ClaimId::new(4)).expect("claim");
+        assert_eq!(parent.statement, "branch three");
+    }
+
+    #[test]
+    fn a_retirement_on_the_branch_is_replayed_next_to_main_evidence() {
+        let base = main_with_two_claims();
+        let mut main = base.clone();
+        add_supported(&mut main, ClaimId::new(2), 10);
+        let mut branch = base.clone();
+        write(&mut branch, |catalog| {
+            catalog
+                .retire_claim(ClaimId::new(2), "obsolete", at(20))
+                .expect("retire");
+        });
+
+        let (rebased, _) = rebase(&base, &branch, &main).expect("rebase");
+
+        assert!(seal::verify(&rebased).verified);
+        let two = rebased.get(ClaimId::new(2)).expect("claim");
+        assert!(!two.is_active());
+        assert_eq!(two.evidence.len(), 1);
+        assert_eq!(two.verdicts.len(), 1);
+        assert_eq!(two.updated_at, at(20));
+    }
+
+    #[test]
     fn a_base_newer_than_the_branch_is_refused() {
         let base = main_with_two_claims();
         let error = rebase(&base, &Catalog::default(), &base).expect_err("not descended");
