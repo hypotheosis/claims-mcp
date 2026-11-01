@@ -5,10 +5,10 @@
     "by": "server",
     "mac": "065454a838be246886a5e053c92d83e7569c276645945feceac2944163302a81"
   },
-  "next_evidence_seq": 177,
+  "next_evidence_seq": 183,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "eb289196c32f3a7613c22fbbe474cddc4953b932b92d017ea0b5a47de35557a8"
+    "mac": "4e24ca6f7707783fb09b95cee90efff7eb94026a483d0f7203bd54cf3116f8d5"
   },
   "claims": [
     {
@@ -6164,6 +6164,28 @@
             "by": "server",
             "mac": "6c54b5226c65ec3502e142ac6ce25c740c13b6cc2af29b842b5e0180a5ccce02"
           }
+        },
+        {
+          "id": "EVD-0177",
+          "kind": "demonstration",
+          "locator": "python3 audit/e2e.py (stdio, head 2187c3f debug binary, server --catalog outside git)",
+          "summary": "Re-run on head: add_claim with catalog=r1 and r2 pinned source_anchor.commit 2dead97b... and 2b2d5e47..., equal to git rev-parse HEAD of each; nothing written to the server's own ledger dir. cargo test ...per_call_catalog_writes_that_ledger_and_pins_its_repository passed (1 passed); full cargo test 157 passed.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 464
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.879260892Z",
+          "seal": {
+            "by": "server",
+            "mac": "990b94814c450eb83086a6e3a9592e727eff280caedb2f6051994c6203d13e89"
+          }
         }
       ],
       "verdicts": [
@@ -6181,13 +6203,26 @@
             "by": "server",
             "mac": "e169eebb527d286b3650db1cc7463b5759568622afd2715ab3056b9b83a257e3"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head 2187c3f: the unit test and my stdio re-run again pin each ledger's anchors to its own repo HEAD.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0177"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.110946599Z",
+          "seal": {
+            "by": "server",
+            "mac": "5689e3ac27629dd583fd13a50c21622d03096eb4ef35c373e1e29280db569fc3"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:51.872644105Z",
+      "updated_at": "2026-11-01T18:53:00.110946599Z",
       "seal": {
         "by": "server",
-        "mac": "db50f4cd56609acff30c7bedeabc39d72a230b41e44a064d432f5ce0a6935e2f"
+        "mac": "172a507a55d0dd7104c8dc5e35f817bd5fbf32bb2723284154ddfac7ca0f4d1e"
       }
     },
     {
@@ -6266,6 +6301,28 @@
             "by": "server",
             "mac": "8d05beadb1a5b59a28afa5bb9500e7a2c04e67ac8f7997f177a6bdf5305bf880"
           }
+        },
+        {
+          "id": "EVD-0178",
+          "kind": "inspection",
+          "locator": "src/server.rs:411-424 store_for at 2187c3f",
+          "summary": "The None arm still returns self.store.clone(); the only change since b59e57e is a tracing::debug! inside the named-ledger arm, which runs only when catalog is given. cargo test ...per_call_catalog... (no-catalog block) passes.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 424
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.925633798Z",
+          "seal": {
+            "by": "server",
+            "mac": "a9ea53895af16a296ccd9ef6ebabe79a43597d0b6d20df2331b0c7191f5e0608"
+          }
         }
       ],
       "verdicts": [
@@ -6282,13 +6339,26 @@
             "by": "server",
             "mac": "6b2b9e1ded5092e9a3c42ec2c82c60f830fbac839ed6e250f0b28c6ddc511b6a"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: the no-catalog arm is unchanged; the new debug log is only in the named-ledger arm.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0178"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.163728583Z",
+          "seal": {
+            "by": "server",
+            "mac": "3c9ab4588f5e8d4b608cbf4b13a825c61b731431e134a5d751d44bf409b0772e"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:51.912328567Z",
+      "updated_at": "2026-11-01T18:53:00.163728583Z",
       "seal": {
         "by": "server",
-        "mac": "08fa9a6dbff72126de5a72275c834c1315038718afd1e3b2494a2c5ceffef636"
+        "mac": "45046dd5543aed6bf0c903f8f14465f66342ae381d3327d665521c4ca0cb5135"
       }
     },
     {
@@ -6399,6 +6469,28 @@
             "by": "server",
             "mac": "da285ef4d8414457a5bbcb967f68546fe918cbf7c37832d8af262b4e87eb84ca"
           }
+        },
+        {
+          "id": "EVD-0179",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-287 at 2187c3f",
+          "summary": "PR mode still tells the auditor to pass catalog with the absolute ledger path on every call (lines 265-274) and now introduces claims_call.py only after 'Check the tools' input schemas first: if they have no catalog property...' (279-282).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 287
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:52.970018898Z",
+          "seal": {
+            "by": "server",
+            "mac": "f7defd923678afd08fb3599fb7d62bf7f3d0537f1f560b2f5a393aa5f2171f44"
+          }
         }
       ],
       "verdicts": [
@@ -6414,13 +6506,26 @@
             "by": "server",
             "mac": "67cf81a4c3ac4bef027255cce04c5fdc7fa85c24044de72c9ad3b644c5600045"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: PR mode still passes catalog on every call and keeps claims_call.py only as the fallback.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0179"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.208702595Z",
+          "seal": {
+            "by": "server",
+            "mac": "47d8aecd6b55a23fd6a9635c405559f63beaa4b53f8599bbffde7cc7ea260923"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:51.990794488Z",
+      "updated_at": "2026-11-01T18:53:00.208702595Z",
       "seal": {
         "by": "server",
-        "mac": "2e87855ac45e0b2dc1bea2d5733a828b0a2f62b408bdf2324f0f29c1c4b26758"
+        "mac": "2846fa0f6200e287555b75c7898c23e6391ecf8c5890cb79f15de45b240d9e73"
       }
     },
     {
@@ -6765,6 +6870,28 @@
             "by": "server",
             "mac": "9e9c344a9bea5a1fed060a3e209d48b6e48f65f674a1e3ae14b6e75413a053ad"
           }
+        },
+        {
+          "id": "EVD-0180",
+          "kind": "inspection",
+          "locator": "src/server.rs:411-464",
+          "summary": "read and mutate still call store_for once, clone the store as repo_store and pass &repo_store to the operation; the new debug! log in store_for does not change that. GitCli::for_store (src/anchor.rs:305-310) is unchanged and uses store.directory().",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 464
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.015101221Z",
+          "seal": {
+            "by": "server",
+            "mac": "4eb8977c4fe5458c01256f6f7e266e60077a33313eae419dfa6d3e209a6104a7"
+          }
         }
       ],
       "verdicts": [
@@ -6781,13 +6908,26 @@
             "by": "server",
             "mac": "4fdc58f6702cf6fb175c32ecd3760505e2fa91a14ca4d655620360ac7e9a146b"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: read and mutate still resolve the store once and pass it on; the debug log changes nothing else.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0180"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.256630245Z",
+          "seal": {
+            "by": "server",
+            "mac": "98d7a50d35357ab66db51076d3fbb4c86a00654983f8b8c1a80aa59268184f3e"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:52.189175888Z",
+      "updated_at": "2026-11-01T18:53:00.256630245Z",
       "seal": {
         "by": "server",
-        "mac": "713f28858c926d91a5322cfda1bfa44b77478cc1c846fa7c50d6066636bd855b"
+        "mac": "f36e3e2f792f5ddd78b9af73fa98a0d1d4b8e38a357addfe015a227328efdecf"
       }
     },
     {
@@ -6854,6 +6994,28 @@
             "by": "server",
             "mac": "e4427db3c7bdad16d3c48ee8650a2816752c0f04a5876fac24d8498faefe103f"
           }
+        },
+        {
+          "id": "EVD-0181",
+          "kind": "test",
+          "locator": "cargo test server::tests::empty_catalog_path_is_an_explained_error (1 passed) at 2187c3f; stdio catalog \"\"",
+          "summary": "Empty path still hits the guard at src/server.rs:414-417 before the new debug! line and returns the validation error; my stdio call again returned \"invalid input: catalog must be a path to a ledger file...\" with isError true.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 411,
+                "end": 424
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.061287327Z",
+          "seal": {
+            "by": "server",
+            "mac": "fdc9486a4db7fe164a80f160bf2a7f01e4f667bb308b811f43e704db2ff4cc67"
+          }
         }
       ],
       "verdicts": [
@@ -6870,13 +7032,26 @@
             "by": "server",
             "mac": "2ca614998b0c1ff7a247d701bc690aad04ab8c5924b03ad6dc8be3b3d30bd1d3"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited on head: the empty-path guard precedes the new log line, test passes, stdio call refused.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0181"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.305451518Z",
+          "seal": {
+            "by": "server",
+            "mac": "446b07135e33132c563670044ffc7d020e4a875bea4a54eadef8ed500772f0c9"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:52.228879950Z",
+      "updated_at": "2026-11-01T18:53:00.305451518Z",
       "seal": {
         "by": "server",
-        "mac": "3375f26d2ee0a25565330938fdfd85e282eedbc6f2bb153591db26284b26ea3e"
+        "mac": "387dfd3678510a9172dc1fadaf567010741d3376c0723a20126e004b205f19ec"
       }
     },
     {
@@ -7003,6 +7178,28 @@
             "by": "server",
             "mac": "6bed2ed6505519b589dbb357be9539474867938d6d9facc72d485c6d4e2d7cb3"
           }
+        },
+        {
+          "id": "EVD-0182",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-283 at 2187c3f; origin/main 0.2.4 binary run (EVD-0156)",
+          "summary": "Judged as stated (fallback for 0.2.4-or-earlier servers that silently ignore unknown arguments). The skill still keeps claims_call.py as the fallback, now triggered by an input schema lacking catalog, and still says the released 0.2.4 and earlier lack the argument and silently ignore it. My earlier run of the 0.2.4 build confirms the ignoring. The version-based trigger was replaced by a schema check that covers those servers, so the stated behaviour holds though the wording differs.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 283
+              },
+              "commit": "2187c3fbd618159bab1f22466e5cc42f088ebcb3"
+            }
+          },
+          "recorded_at": "2026-11-01T18:52:53.114043660Z",
+          "seal": {
+            "by": "server",
+            "mac": "ae664366ae75a19bcdb6c6efac3a9588b6d776baed9fa13ed7e57ca00e5b1566"
+          }
         }
       ],
       "verdicts": [
@@ -7019,13 +7216,26 @@
             "by": "server",
             "mac": "67b0df9c871b033ef53d79e1f330c925d8c61f036864fa801cafb18964fac958"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Judged as stated: the skill still keeps the fallback and still says 0.2.4-or-earlier servers silently ignore catalog; the trigger is now the schema check, which covers those servers.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0182"
+          ],
+          "recorded_at": "2026-11-01T18:53:00.367823788Z",
+          "seal": {
+            "by": "server",
+            "mac": "38d59a30086d3af35ccf7e7295d88ad6411b8c6c52eea0052514b14887aeb766"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T15:51:52.313920071Z",
+      "updated_at": "2026-11-01T18:53:00.367823788Z",
       "seal": {
         "by": "server",
-        "mac": "49d26e035298f8ae8e2b8aba0b3cb4c8e023d354a29e30f73074f2564feae7fe"
+        "mac": "b348e7f7633ac8134a33309794ebe32f6cc24118cff8768e12e52e9c86ba4266"
       }
     },
     {
