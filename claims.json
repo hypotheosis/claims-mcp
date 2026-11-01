@@ -1,14 +1,14 @@
 {
   "schema_version": 2,
-  "next_claim_seq": 131,
+  "next_claim_seq": 143,
   "next_claim_seq_seal": {
     "by": "server",
-    "mac": "1bc9042149cf5915287706f44e3bbbed65d7af398c8202c8abbc18d575b2296c"
+    "mac": "527f25aed3b34599a08e4e01ba05dddeec52ef4d6e66f54f562241f27305ce0d"
   },
-  "next_evidence_seq": 235,
+  "next_evidence_seq": 248,
   "next_evidence_seq_seal": {
     "by": "server",
-    "mac": "eaf4acbbadedaa65ccbd2b6bb5eca75309df411bc3e27c7b808061f23446b556"
+    "mac": "0b20693e886aa87ba1153936184b81fc78105ac68908be26f52b3e0256bb8f48"
   },
   "claims": [
     {
@@ -6548,6 +6548,28 @@
             "by": "server",
             "mac": "da7deb691611f9e93fbc82aaa7753e138677c21a5b69381c146465e74181fdcd"
           }
+        },
+        {
+          "id": "EVD-0246",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:265-296 (head 22ba8f0)",
+          "summary": "PR mode still says to pass catalog with the absolute ledger path on every call (lines 265-277) and now has no claims_call.py at all: git grep claims_call finds nothing in skills/, and the script is deleted. The fallback was replaced by the nonexistent-path probe plus stop-and-ask (279-296).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 265,
+                "end": 296
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:37.849281449Z",
+          "seal": {
+            "by": "server",
+            "mac": "4e8004b1949300bdb2286152b1fb558bc2ed05f88c108387cd44aee77d603506"
+          }
         }
       ],
       "verdicts": [
@@ -6589,13 +6611,26 @@
             "by": "server",
             "mac": "41164bfb034cf126230e57bbbfbcb64a1bbf72540fbb3a207cac5612c336b9af"
           }
+        },
+        {
+          "verdict": "supported",
+          "rationale": "Re-audited at 22ba8f0: SKILL.md still passes catalog on every call and no longer mentions claims_call.py.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0246"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.427216016Z",
+          "seal": {
+            "by": "server",
+            "mac": "6ec230ecf5e81d294e0cabe44598bc8e1bdf6c1fcf50792dabdc26e523f698b6"
+          }
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T19:10:53.430480669Z",
+      "updated_at": "2026-11-01T21:17:54.427216016Z",
       "seal": {
         "by": "server",
-        "mac": "6b363b337b0ab955ce5341d4c06d656ca13128c931c8d99c490cd2830ff9b8a5"
+        "mac": "afaa05c9e9be98b04dee0b011a5ea05ad95b4c80225b0b15f9e0cd63dcf34dec"
       }
     },
     {
@@ -7212,7 +7247,9 @@
         "from-issue:31"
       ],
       "status": {
-        "state": "active"
+        "state": "retired",
+        "reason": "Superseded on branch claims-mcp/drop-claims-call (commit 245baf7): claims_call.py is removed, and the skill no longer falls back to it for servers without catalog. It now checks with list_claims {\"catalog\": \"\"} and stops on an old server. The replacement claim is registered in the audit of this change.",
+        "retired_at": "2026-11-01T21:14:15.541945402Z"
       },
       "evidence": [
         {
@@ -7337,10 +7374,10 @@
         }
       ],
       "created_at": "2026-11-01T15:49:34.022660328Z",
-      "updated_at": "2026-11-01T19:10:53.517403360Z",
+      "updated_at": "2026-11-01T21:14:15.541945402Z",
       "seal": {
         "by": "server",
-        "mac": "84e0614bf607f479296b540f0b2fbcbc635a4f36c44e738e80e6a4946e499eeb"
+        "mac": "410c7c1418fdeb8b219f8f13d6eae23a029e0c964b9434333b9c4927eeb3c183"
       }
     },
     {
@@ -10348,6 +10385,799 @@
       "seal": {
         "by": "server",
         "mac": "a38b684a96440b966f3bd6311ca07692aa3672ba52686be0ca9804b5c864953c"
+      }
+    },
+    {
+      "id": "CLM-0131",
+      "statement": "claims_call.py is removed, and the claims-audit skill tells an agent facing a server without per-call catalog to stop and ask the user to upgrade and restart or reconnect",
+      "kind": "functional",
+      "level": "system",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back",
+      "derived_from": [
+        "CLM-0078"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md",
+        "skills/claims-audit/scripts/claims_call.py"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0247",
+          "kind": "analysis",
+          "locator": "children of CLM-0131",
+          "summary": "The script is deleted (CLM-0132), nothing live refers to it (CLM-0133), the skill probes with a nonexistent path and stops with an upgrade/reconnect request on success (CLM-0134, CLM-0135), and the docs, changelog, ledger and validation statements in the description hold (CLM-0136 to CLM-0142). Together they cover the maintainer's request.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:17:37.862514522Z",
+          "seal": {
+            "by": "server",
+            "mac": "f20aa24cda155b2f37658fd895015a76a1a198cf82f586a1e1ca1e7bd97cf538"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "All active children are supported; together they show the script is gone and the skill stops and asks for upgrade/reconnect.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0247"
+          ],
+          "recorded_at": "2026-11-01T21:18:03.018121279Z",
+          "seal": {
+            "by": "server",
+            "mac": "9cf62003382d0b1d550508f3870b69fd412ff57adf12fae602c630bfe8c43b45"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:18:03.018121279Z",
+      "seal": {
+        "by": "server",
+        "mac": "33f7b7dd74669ea5c8cc748b47afc5d3df857b4afc844a22b1e66705571d8d58"
+      }
+    },
+    {
+      "id": "CLM-0132",
+      "statement": "skills/claims-audit/scripts/claims_call.py no longer exists at HEAD",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/scripts/claims_call.py"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0235",
+          "kind": "inspection",
+          "locator": "git ls-tree -r HEAD --name-only | grep claims_call (0 lines); ls skills/claims-audit/scripts (no such directory)",
+          "summary": "At head 22ba8f0 no tracked path contains claims_call and the scripts directory is gone; commit 245baf7 shows the file deleted (151 lines).",
+          "stance": "supports",
+          "anchor": {
+            "search": {
+              "pattern": "claims_call\\.py",
+              "scope": [
+                "skills"
+              ],
+              "hits": 0,
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.096364476Z",
+          "seal": {
+            "by": "server",
+            "mac": "264521a59f5500bfe3f7effdc38f6abc1757afc816a6e42d55c3391a9eefc41c"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Zero tracked paths match and the directory is gone at head.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0235"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.439794927Z",
+          "seal": {
+            "by": "server",
+            "mac": "778912a13ade3cbe6d1af5ff2695d37ec0bd4cf2d38a369c977bdbed1b6cd299"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.439794927Z",
+      "seal": {
+        "by": "server",
+        "mac": "9dfb2ef4b7eff7f981a0ce87be3b2ac785fd97adf1d131e578b98f0709ff1274"
+      }
+    },
+    {
+      "id": "CLM-0133",
+      "statement": "PR description: \"No file in the repository refers to `claims_call.py` any more, apart from history: the changelog, the 0.2.5 report notes, and evidence and claims in `claims.json`.\"",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "analysis",
+      "source": "PR description: \"No file in the repository refers to `claims_call.py` any more, apart from history: the changelog, the 0.2.5 report notes, and evidence and claims in `claims.json`.\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md",
+        "docs/site"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0236",
+          "kind": "analysis",
+          "locator": "git grep -nE 'claims_call|claims-audit/scripts|scripts/claims' -- . ':!claims.json' ':!changelog' at 22ba8f0",
+          "summary": "Outside claims.json and changelog/ the only hit is report/audit-notes.toml:51, the 0.2.5 report notes mentioning the helper as history (PR #33). Changelog hits are in four dated entries (three history, one this change). No source, docs, skill, CI or Cargo reference remains.",
+          "stance": "supports",
+          "anchor": {
+            "search": {
+              "pattern": "claims_call",
+              "case_insensitive": true,
+              "scope": [
+                ".github",
+                "Cargo.toml",
+                "README.md",
+                "docs",
+                "justfile",
+                "skills",
+                "src"
+              ],
+              "hits": 0,
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.121407877Z",
+          "seal": {
+            "by": "server",
+            "mac": "b2d40c50cb7ac799a8cc56b820f154339da80e79c0b2fc0e69142a1af8b0771e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Repository-wide grep shows only history references (changelog, report notes, ledger).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0236"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.450239181Z",
+          "seal": {
+            "by": "server",
+            "mac": "016d548df7b4ecb97bff9248ecc26bf2d1937bd124972ec29ff73c8ac9a27bd9"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.450239181Z",
+      "seal": {
+        "by": "server",
+        "mac": "8032b623438bc78616ab8c2ae7925411d6ef4aec61d27c9c91b243e959e1da99"
+      }
+    },
+    {
+      "id": "CLM-0134",
+      "statement": "SKILL.md pull-request mode directs the agent to call list_claims with catalog /nonexistent-claims-probe/claims.json and treats the resulting error as proof the server honours catalog",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back",
+      "source_anchor": {
+        "path": "skills/claims-audit/SKILL.md",
+        "lines": {
+          "start": 279,
+          "end": 296
+        },
+        "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0237",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-296",
+          "summary": "The section tells the agent to run list_claims with catalog /nonexistent-claims-probe/claims.json, says a supporting server fails with \"catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: ...\", and says that error means go ahead.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 296
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.138189581Z",
+          "seal": {
+            "by": "server",
+            "mac": "681bca35af63a556033fd11339554bbece4df2beb2db53ef16904f9b816e339e"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The text at lines 279-296 states the probe and the expected error.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0237"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.464353007Z",
+          "seal": {
+            "by": "server",
+            "mac": "d4af88547aeb9401100e80bd5cb4e26f8f25690b0ee714d4b4014f082cd4eb58"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.464353007Z",
+      "seal": {
+        "by": "server",
+        "mac": "ffb84e457a927c2e99c7b7f2abd9a5661e3ae8b0191178aa9ffbc736c2359f79"
+      }
+    },
+    {
+      "id": "CLM-0135",
+      "statement": "SKILL.md tells the agent that if the probe call succeeds it must stop, make no further claims-mcp calls, and ask the user to upgrade claims-mcp and restart the session or reconnect the server",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "inspection",
+      "source": "maintainer request, 2026-11-01: remove claims_call.py now that 0.2.5 has per-call catalog; old servers stop instead of falling back",
+      "source_anchor": {
+        "path": "skills/claims-audit/SKILL.md",
+        "lines": {
+          "start": 279,
+          "end": 296
+        },
+        "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0238",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:292-296",
+          "summary": "\"If the call succeeds, the server ignored the argument: stop, make no further claims-mcp calls, and ask the user to upgrade claims-mcp and restart the session or reconnect the server (/mcp in Claude Code).\" No fallback to a script remains.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 292,
+                "end": 296
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.155175796Z",
+          "seal": {
+            "by": "server",
+            "mac": "e900b2990a87b0e0eb43d522b55c3a98e318ea99817d8fa7c429b1eaff9f5a9f"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The text states stop, no further calls, ask to upgrade and restart or reconnect.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0238"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.477196359Z",
+          "seal": {
+            "by": "server",
+            "mac": "ff81d5fc893c5f793a487b451d4eb8ede3f78f3f73555368b783b6af303ebebf"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.477196359Z",
+      "seal": {
+        "by": "server",
+        "mac": "7cd974b013a9e79a0b7eeec42870c8f56d493433f8d1c385f07654721559a796"
+      }
+    },
+    {
+      "id": "CLM-0136",
+      "statement": "PR description: SKILL.md explains why the tool schema is not proof: a client can keep showing the schema it loaded before the server was upgraded or reconnected",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: \"It explains why the tool schema is not proof: a client can keep showing the schema it loaded before the server was upgraded or reconnected.\"",
+      "source_anchor": {
+        "path": "skills/claims-audit/SKILL.md",
+        "lines": {
+          "start": 279,
+          "end": 283
+        },
+        "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "skills/claims-audit/SKILL.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0239",
+          "kind": "inspection",
+          "locator": "skills/claims-audit/SKILL.md:279-283",
+          "summary": "\"Neither the version nor the tool schema you see settles it: ... a client can keep showing the schema it loaded before the server was upgraded or reconnected.\"",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "skills/claims-audit/SKILL.md",
+              "lines": {
+                "start": 279,
+                "end": 283
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.171891611Z",
+          "seal": {
+            "by": "server",
+            "mac": "8c2b2303577dc3657a5dd00093320dd23f5a6654f8d65d3735d7ec52aeac9c81"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "Lines 279-283 explain the stale-schema reason.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0239"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.489771059Z",
+          "seal": {
+            "by": "server",
+            "mac": "1c460eef0e3fd65baa82b9781c941e29de6a4f3fb6c604706ef73bd367a036fa"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.489771059Z",
+      "seal": {
+        "by": "server",
+        "mac": "b2ea35f5451b2a732d3cec8e88256d9db2fe6d4db3867f388048f3e8dd677981"
+      }
+    },
+    {
+      "id": "CLM-0137",
+      "statement": "PR description: docs/site/src/reference/tools.md \"Choosing the ledger\" describes the same check (a read tool with catalog set to a nonexistent-directory ledger fails on a 0.2.5 server and answers normally on an older one)",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: \"`docs/site/src/reference/tools.md`: \\\"Choosing the ledger\\\" describes the same check.\"",
+      "source_anchor": {
+        "path": "docs/site/src/reference/tools.md",
+        "lines": {
+          "start": 37,
+          "end": 41
+        },
+        "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+      },
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "docs/site/src/reference/tools.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0240",
+          "kind": "inspection",
+          "locator": "docs/site/src/reference/tools.md:37-41",
+          "summary": "Paragraph says servers before 0.2.5 ignore catalog, and to call a read tool with catalog /nonexistent-claims-probe/claims.json: a supporting server fails to open it, an older one answers normally; the schema is not proof. mdbook build docs/site succeeded. Cosmetic: the paragraph's lines are wrapped unevenly (line 38 and 40 are overlong).",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "docs/site/src/reference/tools.md",
+              "lines": {
+                "start": 37,
+                "end": 41
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.188902696Z",
+          "seal": {
+            "by": "server",
+            "mac": "967c40301094f7e22282aac61496b3b9927033083724d20ebe1467cbeadb5d65"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "tools.md lines 37-41 describe the same check; the docs build passes.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0240"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.501220807Z",
+          "seal": {
+            "by": "server",
+            "mac": "bb3dc624b178d239d48863ec5c0851893cab533a8284d79aa23ed6ae217e9680"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.501220807Z",
+      "seal": {
+        "by": "server",
+        "mac": "9e37aa7b8c142f6b673831d52dee2e177b110a0b3ee51159c35bda4a2e9ec60d"
+      }
+    },
+    {
+      "id": "CLM-0138",
+      "statement": "PR description: calling list_claims on the connected 0.2.5 server with catalog /nonexistent-claims-probe/claims.json returns \"catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory (os error 2)\"",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "demonstration",
+      "source": "PR description: \"`list_claims` with `catalog: /nonexistent-claims-probe/claims.json` returned \\\"catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory (os error 2)\\\".\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0241",
+          "kind": "demonstration",
+          "locator": "claims MCP list_claims {\"catalog\": \"/nonexistent-claims-probe/claims.json\"} on the session's server",
+          "summary": "Returned the error \"catalog I/O error on /nonexistent-claims-probe/.claims.json.lock: No such file or directory (os error 2)\", exactly the quoted text.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:17:31.202150399Z",
+          "seal": {
+            "by": "server",
+            "mac": "6916e51bc2b9d63c540a012c03a8ababe197b66ebbf2aeeebd943bca7a2c538b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "I made the same call and got the identical error text.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0241"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.514963511Z",
+          "seal": {
+            "by": "server",
+            "mac": "cf10c7e475f5c150a2c830adf28bbe4f6b1789d052a8c347a89b92ce155609be"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.514963511Z",
+      "seal": {
+        "by": "server",
+        "mac": "3eb12e64bc5aecfff1e81c89baac095df0d614b7125ed3812361ebb8b52e93ab"
+      }
+    },
+    {
+      "id": "CLM-0139",
+      "statement": "PR description: an empty catalog argument is also refused by the server",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 3,
+      "verification_method": "test",
+      "source": "PR description: \"An empty `catalog` is also refused\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0242",
+          "kind": "test",
+          "locator": "cargo test empty_catalog_path (server::tests::empty_catalog_path_is_an_explained_error): 1 passed",
+          "summary": "The test calls list_claims with catalog Some(PathBuf::new()), asserts is_error == Some(true) and that the text contains \"catalog must be a path\". I read the assertions.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "src/server.rs",
+              "lines": {
+                "start": 1245,
+                "end": 1257
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.218775943Z",
+          "seal": {
+            "by": "server",
+            "mac": "d0f46638ad97e2add680f4d1f328df5adcbbec2eec451edef622048bcdf45c14"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "A passing test asserts an empty path yields a tool error.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0242"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.528471495Z",
+          "seal": {
+            "by": "server",
+            "mac": "966ce3e8c1aa3731caa1167b3f55b3d3e786b20791fec4c650e4baeb1f037288"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.528471495Z",
+      "seal": {
+        "by": "server",
+        "mac": "bd075626be35085b80cbd3d88cfd2ce24f670793ebe329e392f1b6398b9502fc"
+      }
+    },
+    {
+      "id": "CLM-0140",
+      "statement": "PR description: cargo clippy --all-targets -- -D warnings, cargo fmt --check, mdbook build docs/site pass and just test reports 175 passed on the head commit",
+      "kind": "functional",
+      "level": "artifact",
+      "integrity_level": 2,
+      "verification_method": "test",
+      "source": "PR description: \"`just fmt` ✅ / `cargo clippy --all-targets -- -D warnings` ✅ / `just test` ✅ (175 passed) / `mdbook build docs/site` ✅\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "src/server.rs"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0243",
+          "kind": "log",
+          "locator": "cargo test; cargo clippy --all-targets -- -D warnings; cargo fmt --check; mdbook build docs/site (at 22ba8f0)",
+          "summary": "cargo test: \"test result: ok. 175 passed; 0 failed\". clippy: Finished with no warnings. fmt --check: clean. mdbook build: HTML book written, no errors. (just itself not run; cargo fmt --check stands in for just fmt.)",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:17:31.231790395Z",
+          "seal": {
+            "by": "server",
+            "mac": "1d1ef04dc8a79a4c46151996fa1017598096ae12787b3cffa5b6b9eb0b08e52f"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "I reran all four gates on head; counts match (175 passed).",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0243"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.541369857Z",
+          "seal": {
+            "by": "server",
+            "mac": "e69c5d5113f0399b3b277301696ca2a4eaed8f93b3a64acf592fcdf1ccb8f3f3"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.541369857Z",
+      "seal": {
+        "by": "server",
+        "mac": "b94848a6633a80c648c416b0a3878112b26c5887344f4020e52e3efb01160491"
+      }
+    },
+    {
+      "id": "CLM-0141",
+      "statement": "PR description: CLM-0091 (\"the skill keeps claims_call.py as the fallback...\") is retired with a reason because this PR removes that fallback",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: \"Ledger: CLM-0091 (\\\"the skill keeps `claims_call.py` as the fallback…\\\") is retired with a reason, because this PR removes that fallback.\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "claims.json"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0244",
+          "kind": "inspection",
+          "locator": "get_claim CLM-0091 with catalog; git diff -- claims.json",
+          "summary": "CLM-0091's statement is the claims_call.py fallback claim; its status is retired with a non-empty reason saying claims_call.py is removed and the fallback gone. Note: the reason text still names the superseded empty-string probe (list_claims {\"catalog\": \"\"}), which commit 22ba8f0 replaced; a retired claim cannot be edited.",
+          "stance": "supports",
+          "recorded_at": "2026-11-01T21:17:31.245143408Z",
+          "seal": {
+            "by": "server",
+            "mac": "c56f090da990abe482ff98ed9bb97db334e70e26f658306c16412e210faec567"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "CLM-0091 is retired with a reason; the working-tree ledger diff shows it.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0244"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.555139541Z",
+          "seal": {
+            "by": "server",
+            "mac": "0ac6f276e21ebe496c8c351e28d727eaedda326905522d2d3e825b0abc706b85"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.555139541Z",
+      "seal": {
+        "by": "server",
+        "mac": "4a3dee7761a77f8fd9a515868b8ced6d6a58c08227f7512be513813eb77b9d26"
+      }
+    },
+    {
+      "id": "CLM-0142",
+      "statement": "PR description: the changelog entry changelog/2026-11-01T21-13-20Z.md exists and describes the removal and the path-based probe",
+      "kind": "documentation",
+      "level": "artifact",
+      "integrity_level": 1,
+      "verification_method": "inspection",
+      "source": "PR description: \"`changelog/2026-11-01T21-13-20Z.md`.\"",
+      "derived_from": [
+        "CLM-0131"
+      ],
+      "artifacts": [
+        "changelog/2026-11-01T21-13-20Z.md"
+      ],
+      "tags": [
+        "change:drop-claims-call"
+      ],
+      "status": {
+        "state": "active"
+      },
+      "evidence": [
+        {
+          "id": "EVD-0245",
+          "kind": "inspection",
+          "locator": "changelog/2026-11-01T21-13-20Z.md:1-15",
+          "summary": "File exists, titled \"Drop claims_call.py; check for catalog support by asking the server\"; describes the removal, the nonexistent-path probe, why an empty value is not used, and the tools-reference change.",
+          "stance": "supports",
+          "anchor": {
+            "file": {
+              "path": "changelog/2026-11-01T21-13-20Z.md",
+              "lines": {
+                "start": 1,
+                "end": 15
+              },
+              "commit": "22ba8f0d0b666a8daae6f9a22ee9931c7730efee"
+            }
+          },
+          "recorded_at": "2026-11-01T21:17:31.261586931Z",
+          "seal": {
+            "by": "server",
+            "mac": "ee1a15698922bb622bd527e51ddcb4cfd1f3d3dc67c6c40fb4ed50fea0644b7b"
+          }
+        }
+      ],
+      "verdicts": [
+        {
+          "verdict": "supported",
+          "rationale": "The changelog file exists with the described content.",
+          "auditor": "claude-sonnet-5-5",
+          "evidence_ids": [
+            "EVD-0245"
+          ],
+          "recorded_at": "2026-11-01T21:17:54.566169987Z",
+          "seal": {
+            "by": "server",
+            "mac": "281ff8ea864d449bc5364e7a8a4831689caff0a6859dc6cc11eb1eb3a6f03bb6"
+          }
+        }
+      ],
+      "created_at": "2026-11-01T21:17:05.286970039Z",
+      "updated_at": "2026-11-01T21:17:54.566169987Z",
+      "seal": {
+        "by": "server",
+        "mac": "fcb7615c46c84e0f83efad340d9b47731f743811dae00ae4008367717d2eb107"
       }
     }
   ]
