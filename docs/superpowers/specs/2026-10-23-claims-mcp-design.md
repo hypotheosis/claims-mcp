@@ -27,8 +27,9 @@ using these tools.
 ## 2. Non-goals
 
 - Running tests or shell commands from the server.
-- Multiple catalogs per server instance. One server serves one catalog file; run more instances for
-  more catalogs.
+- A catalog that is selected and held in server state. Each server has one default catalog file
+  (`--catalog`); since 0.2.5 a tool call can name another with its `catalog` argument (section
+  4), but the choice lasts for that call only.
 - Full revision history of claim text. Git history covers that; only verdicts are append-only.
 - An HTTP transport. Only stdio is supported.
 
@@ -183,7 +184,12 @@ server does not fail the protocol request.
 | `record_verdict` | `claim_id`, `verdict`, `rationale`, `auditor`, `evidence_ids[]` | the claim, with the new verdict appended |
 | `trace` | `id`, `direction` (`up` / `down` / `both`, default `both`), optional `max_depth` (default unlimited) | breadth-first `ancestors` and `descendants` lists of `{id, statement, current_verdict, depth, retired}` nodes (each claim once, at its shortest depth) |
 | `audit_report` | optional `include_matrix` (default true) | the report described in 4.1 |
+| `next_steps` | optional `limit` (items listed in each of tiers 1 and 2; default 10, 0 for all) | `integrity`, `summary`, `wrong` (tier 1: refuted open claims), `unproven` (tier 2: other open claims at integrity level 3-4) and `other` (tier 3: the rest, counted per area); each listed item carries one next step taken from the `Fix:` in its latest verdict rationale |
 | `recheck` | none | `head`, `checked`, `current`, and `items[]` (`claim`, `role`, `evidence`?, `stance`?, `anchor`, `status`, `detail`) for every anchor on an active claim that is not current; `status` is `moved`, `changed`, `overturned`, `missing`, `commit_missing`, or `unpinned` |
+
+Every tool also takes an optional `catalog`: the ledger file for that call only, as an absolute
+path or one relative to the server's working directory. Anchors are pinned to `HEAD` of the git
+repository that holds it, and a call without it uses the server's `--catalog` (issue #31, 0.2.5).
 
 The server also lists read-only resources, one per PDF report file compiled into the binary
 (`src/report/files.rs`, issue #18): `claims://report/claims-report.typ`,
