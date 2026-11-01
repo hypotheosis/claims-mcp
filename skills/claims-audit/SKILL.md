@@ -379,10 +379,29 @@ into a ledger holding two `EVD-0001` records, which the server then refuses to r
 
 So before pushing, and again before merging, check whether main's ledger changed since the
 branch's base (`git diff --quiet <merge-base> origin/main -- claims.json`). If it did, never
-merge or hand-edit `claims.json`: take main's file (`git checkout origin/main -- claims.json`),
-record this PR's findings again through the tools from the auditor's hand-back, and commit that.
-The ids change, so update the PR description's table. A CI step running `claims-mcp verify` on
-the PR's merge result catches the case that slipped through.
+merge or hand-edit `claims.json`. Instead:
+
+- **If `claims-mcp rebase --help` works** (releases after 0.2.4), merge main and replay this
+  branch's records onto main's ledger in the same step:
+
+  ```bash
+  TMP=$(mktemp -d)
+  git merge --no-commit origin/main
+  git checkout HEAD -- claims.json
+  git show MERGE_HEAD:claims.json > "$TMP/main.json"
+  git show "$(git merge-base HEAD MERGE_HEAD)":claims.json > "$TMP/base.json" || rm "$TMP/base.json"
+  claims-mcp --catalog claims.json rebase --onto "$TMP/main.json" --base "$TMP/base.json"
+  claims-mcp --catalog claims.json verify && git add claims.json && git commit
+  ```
+
+  It prints each `old -> new` id. If it refuses (both sides changed one claim differently, or
+  the branch added evidence to a claim main retired), abort the merge and fall back below.
+- **Otherwise**, take main's file (`git checkout origin/main -- claims.json`), record this PR's
+  findings again through the tools from the auditor's hand-back, and commit that.
+
+Either way the ids change, so update the PR description's table. A CI step running
+`claims-mcp verify` on the PR's merge result catches the case that slipped through. The full
+procedure is the docs site's "Branches that both write the ledger" guide.
 
 ## Anti-patterns
 

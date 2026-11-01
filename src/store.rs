@@ -175,29 +175,9 @@ impl CatalogStore {
         Ok(file)
     }
 
-    /// Reads and parses the catalog; a missing file yields an empty catalog.
-    /// The catalog's own invariants are checked so a bad merge or hand edit is reported, not used.
+    /// Reads and parses the catalog; see [`load_file`].
     fn load(&self) -> Result<Catalog> {
-        let path = &self.paths.catalog;
-        let bytes = match fs::read(path) {
-            Ok(bytes) => bytes,
-            Err(error) if error.kind() == ErrorKind::NotFound => return Ok(Catalog::default()),
-            Err(source) => return Err(io_error(path, source)),
-        };
-        let catalog: Catalog =
-            serde_json::from_slice(&bytes).map_err(|source| ClaimsError::Parse {
-                path: path.clone(),
-                source,
-            })?;
-        if ![SCHEMA_VERSION, UNSEALED_SCHEMA_VERSION].contains(&catalog.schema_version()) {
-            return Err(ClaimsError::UnsupportedSchema {
-                path: path.clone(),
-                found: catalog.schema_version(),
-                supported: SCHEMA_VERSION,
-            });
-        }
-        catalog.validate()?;
-        Ok(catalog)
+        load_file(&self.paths.catalog)
     }
 
     /// Serializes the catalog and atomically replaces the catalog file with it.
@@ -229,6 +209,38 @@ impl CatalogStore {
             .map_err(|source| io_error(&paths.temp, source))?;
         fs::rename(&paths.temp, &paths.catalog).map_err(|source| io_error(&paths.catalog, source))
     }
+}
+
+/// Reads and parses the catalog at `path` without locking it; a missing file yields an empty
+/// catalog. The catalog's own invariants are checked so a bad merge or hand edit is reported,
+/// not used.
+///
+/// Stores call it under their lock. `claims-mcp rebase` calls it directly for its read-only
+/// inputs (copies taken with `git show`), so no lock file is left beside them.
+///
+/// # Errors
+///
+/// [`ClaimsError::Io`], [`ClaimsError::Parse`], [`ClaimsError::UnsupportedSchema`], or the
+/// [`ClaimsError::Validation`] from [`Catalog::validate`].
+pub fn load_file(path: &Path) -> Result<Catalog> {
+    let bytes = match fs::read(path) {
+        Ok(bytes) => bytes,
+        Err(error) if error.kind() == ErrorKind::NotFound => return Ok(Catalog::default()),
+        Err(source) => return Err(io_error(path, source)),
+    };
+    let catalog: Catalog = serde_json::from_slice(&bytes).map_err(|source| ClaimsError::Parse {
+        path: path.to_path_buf(),
+        source,
+    })?;
+    if ![SCHEMA_VERSION, UNSEALED_SCHEMA_VERSION].contains(&catalog.schema_version()) {
+        return Err(ClaimsError::UnsupportedSchema {
+            path: path.to_path_buf(),
+            found: catalog.schema_version(),
+            supported: SCHEMA_VERSION,
+        });
+    }
+    catalog.validate()?;
+    Ok(catalog)
 }
 
 /// Makes the rename itself durable by syncing the containing directory (Unix only; on other
@@ -271,6 +283,27 @@ mod tests {
             .expect("read");
         assert_eq!(count, 0);
         assert!(!store.path().exists());
+    }
+
+    #[test]
+    fn load_file_reads_without_leaving_a_lock_file() {
+        // Arrange: a written catalog and a path that does not exist.
+        let (directory, store) = temp_store();
+        store
+            .mutate_blocking(|catalog| catalog.add_claim(new_claim("one"), at(0)).map(|_| ()))
+            .expect("write");
+        let lock = directory.path().join(".claims.json.lock");
+        fs::remove_file(&lock).expect("remove the store's lock");
+
+        // Act
+        let loaded = load_file(store.path()).expect("load");
+        let missing = load_file(&directory.path().join("absent.json")).expect("load missing");
+
+        // Assert
+        assert_eq!(loaded.claims().len(), 1);
+        assert!(missing.is_pristine());
+        assert!(!lock.exists());
+        assert!(!directory.path().join(".absent.json.lock").exists());
     }
 
     #[test]
