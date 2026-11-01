@@ -320,8 +320,11 @@ Classify every `refuted` claim:
 
 - **Ours**: a claim from the issue or the PR description, or an existing claim this diff broke.
   The author must fix it before the PR opens: fix the code (or, for a description statement
-  that is simply wrong, the description), commit, and have the same auditor re-audit those
-  claims on the new head. A new verdict appends to the history; nothing is deleted.
+  that is simply wrong, the description), commit, and have those claims re-audited on the new
+  head. Resume the same auditor if the harness can (Claude Code's SendMessage resumes a
+  finished subagent); otherwise start a fresh auditor on the same non-author model and give it
+  the previous hand-back and the claims to re-audit. A new verdict appends to the history;
+  nothing is deleted.
 - **Elsewhere**: a problem in code this PR did not change, found along the way. Record it as
   `refuted` with its `Fix:` line, leave it in the ledger, and list it in the PR description as
   pre-existing. It does not block the PR.
