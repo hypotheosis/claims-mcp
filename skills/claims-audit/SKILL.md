@@ -385,6 +385,7 @@ merge or hand-edit `claims.json`. Instead:
   branch's records onto main's ledger in the same step:
 
   ```bash
+  TMP=$(mktemp -d)
   git merge --no-commit origin/main
   git checkout HEAD -- claims.json
   git show MERGE_HEAD:claims.json > "$TMP/main.json"
