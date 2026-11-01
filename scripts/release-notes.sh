@@ -8,7 +8,7 @@
 #
 # The pull requests are the first-parent merge commits in FROM..TO. GitHub writes each as
 # `Merge pull request #N from OWNER/BRANCH`, with the pull request's title as the body. The
-# release's own pull request (title `chore: Release ...`, release.toml's
+# release's own pull request (title `chore: Release vX.Y.Z`, release.toml's
 # `pre-release-commit-message`) is left out; change both together. A merge commit in another
 # form goes under Other, as written, with no link.
 set -Eeuo pipefail
@@ -79,7 +79,7 @@ while IFS=$'\x1f' read -r -d $'\x1e' subject body; do
         number=""
         title="${subject}"
     fi
-    [[ "${title}" != "chore: Release "* ]] || continue
+    [[ ! "${title}" =~ ^chore:\ Release\ v[0-9] ]] || continue
     add_entry "${title}" "${number}"
 done < <(git log --first-parent --merges --reverse --format='%s%x1f%b%x1e' \
     "${FROM_REF}..${TO_REF}")

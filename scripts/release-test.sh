@@ -224,6 +224,7 @@ test_notes_grouping_and_range() {
         merge_pull_request 6 'feat(api)!: rename the tool'
         merge_pull_request 7 'Add a plain sentence title'
         merge_pull_request 8 'chore: tidy the justfile'
+        merge_pull_request 12 'chore: Release notes wording'
         # A merge inside a pull request's branch is not on main's first-parent history.
         git checkout --quiet -b pr-10
         git checkout --quiet -b side
@@ -264,6 +265,7 @@ test_notes_grouping_and_range() {
 
 - Add a plain sentence title ([#7](https://github.com/hypotheosis/claims-mcp/pull/7))
 - chore: tidy the justfile ([#8](https://github.com/hypotheosis/claims-mcp/pull/8))
+- chore: Release notes wording ([#12](https://github.com/hypotheosis/claims-mcp/pull/12))
 - Merge branch 'hotfix'
 EOF
 )"
