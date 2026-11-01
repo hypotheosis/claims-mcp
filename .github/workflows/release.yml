@@ -116,6 +116,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Full history and tags, for the release notes. Checked out first: checkout empties the
+      # workspace, which would delete the downloaded artifacts.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         # Every artifact of this run: the build archives and the report from `ci`.
         with:
@@ -127,8 +132,18 @@ jobs:
           for file in claims-mcp-*; do
             sha256sum "$file" > "$file.sha256"
           done
+      # The pull requests merged since the previous release, from scripts/release-notes.sh: the
+      # same notes `just release-prepare` wrote into this release's changelog entry. The tag is on
+      # the release pull request's merge commit, so its first parent is main before the release.
+      - name: release notes
+        run: |
+          RELEASE_STEP="release notes"
+          source scripts/release-lib.sh
+          previous=$(previous_release_tag "$GITHUB_REF_NAME^")
+          scripts/release-notes.sh "$previous" "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" dist/* \
-            --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+            --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/notes.md" --verify-tag

@@ -50,3 +50,33 @@ viewer-test:
     mkdir -p target
     cargo run --release --quiet -- --catalog claims.json tldr --json > target/tldr.json
     CLAIMS_TLDR_JSON=target/tldr.json node --test 'docs/site/viewer-tests/*.test.mjs'
+
+# `level` is patch, minor, major or an exact X.Y.Z. Makes one commit (the versions and the
+# generated changelog entry) and an annotated tag with cargo-release, and pushes nothing. Refuses
+# off main, with a dirty tree, or when main is not exactly origin/main.
+# Prepare a release commit and tag locally.
+release-prepare level:
+    scripts/release-prepare.sh '{{level}}'
+
+# Opens the release pull request, waits for its checks and review, merges it with a merge commit,
+# and pushes the tag on that merge commit, which release.yml publishes. Stops with the pull
+# request open on a failed check or an unresolved review thread.
+# Ship the prepared release.
+release-ship:
+    scripts/release-ship.sh
+
+# Closes its pull request, deletes its tag and resets main to origin/main. Refuses a pushed tag,
+# a merged pull request, or local commits besides the release commit.
+# Abandon an unpublished release.
+release-abort:
+    scripts/release-abort.sh
+
+# The changelog entry and the GitHub release body both come from it.
+# Print the release notes for the pull requests merged between two refs.
+release-notes from to:
+    scripts/release-notes.sh '{{from}}' '{{to}}'
+
+# Runs against throwaway repositories and a fake `gh`; nothing leaves the machine.
+# Test the release scripts.
+release-test:
+    scripts/release-test.sh

@@ -1,7 +1,8 @@
 # Pull request checks: the pre-commit checklist from .claude/CLAUDE.md, the test suite on Linux,
 # Windows, and macOS (x86_64 Linux, x86_64 Windows, arm64 macOS; the release's aarch64 Linux and
 # x86_64 macOS builds are compiled but not tested), and the rendered audit reports (summary and
-# full) as a downloadable artifact.
+# full) as a downloadable artifact, the release scripts' tests, and, on a release pull request,
+# a check that its branch names the Cargo.toml version.
 #
 # release.yml also calls this workflow, so a tag publishes only after these checks pass on the
 # tagged commit, and the release reuses the audit reports rendered here.
@@ -87,6 +88,36 @@ jobs:
           toolchain: "1.89"
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: cargo check --locked --all-targets
+
+  release-scripts:
+    name: release scripts
+    runs-on: ubuntu-latest
+    env:
+      # The end-to-end release test runs the real cargo-release; fail rather than skip it.
+      REQUIRE_CARGO_RELEASE: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@1168f6810a3cb30a3514bf5756a3b7f0422c6df8 # v2.87.28
+        with:
+          tool: cargo-release@0.25.18
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+      - run: shellcheck -x scripts/*.sh
+      - run: just release-test
+
+  # A release pull request (`just release-ship` opens it from `release/vX.Y.Z`) must carry that
+  # version in Cargo.toml, or release.yml would refuse its tag after the merge.
+  release-branch:
+    name: release branch matches Cargo.toml
+    if: startsWith(github.head_ref, 'release/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: scripts/release-branch-check.sh "$HEAD_REF"
 
   report:
     name: audit report
