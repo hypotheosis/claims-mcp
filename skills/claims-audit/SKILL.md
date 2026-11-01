@@ -1,6 +1,6 @@
 ---
 name: claims-audit
-description: Audit whether an artifact does what it was supposed to do by recording atomic claims, independently gathered evidence, and FEVER verdicts (supported / refuted / not_enough_info) in the claims-mcp catalog. Use whenever the user asks to audit, verify, validate, or fact-check work against its instructions or spec; build or check requirements traceability; run IEEE 1012 style verification and validation or conformance checks; or confirm that an LLM or agent actually produced what it was told to produce. Requires the `claims` MCP server (claims-mcp).
+description: Audit whether an artifact does what it was supposed to do by recording atomic claims, independently gathered evidence, and FEVER verdicts (supported / refuted / not_enough_info) in the claims-mcp catalog. Use whenever the user asks to audit, verify, validate, or fact-check work against its instructions or spec; build or check requirements traceability; run IEEE 1012 style verification and validation or conformance checks; or confirm that an LLM or agent actually produced what it was told to produce; also when a workflow opening a pull request asks for its change to be audited before the PR opens. Requires the `claims` MCP server (claims-mcp).
 ---
 
 # Claims Audit
@@ -226,6 +226,150 @@ Call `recheck` first: every anchor it lists as `changed`, `overturned`, `missing
 (`moved` anchors still hold; re-record them if you want current line numbers). Then focus on
 `refuted`, `not_enough_info`, and `stale` claims: gather new evidence, then record a new
 verdict. History is append-only, so the earlier verdict remains as the audit trail.
+
+## Auditing a pull request
+
+Use this mode when a workflow that opens a pull request (an issue-to-PR skill, for example)
+asks for its change to be audited before the PR opens. It answers two questions: does the
+change do what the issue asked and what the PR description says, and did it break anything the
+ledger already records as working. The workflow steps above still apply; this section says what
+is different.
+
+### Who audits
+
+The **auditor is a fresh subagent on a different model** from the one that wrote the change
+(for example `claude-sonnet-5-5` when the author ran on Opus; in Claude Code, the Agent tool
+with `model: "sonnet"`). Give it only:
+
+- the issue (URL, title, body, and comments that change the requirements);
+- the draft PR description, as a file;
+- the commit range (`<base>..<head>`) and the repository path;
+- the ledger mode and ledger path (below);
+- an instruction to follow this skill and to return the report described under *Hand-back*.
+
+Do not pass it the author's reasoning, plan, or summary of what was done. They are the
+producer's account, and the core rule forbids using them as evidence.
+
+### Ledger mode or table-only mode
+
+- **Ledger mode**: `claims.json` is tracked in the repository (`git ls-files --error-unmatch
+  claims.json`). Findings are recorded in it through the tools and committed on the branch.
+- **Table-only mode**: no tracked ledger. **Make no claims-mcp calls at all.** A write creates the
+  ledger, and even a read creates the sidecar `.claims.json.lock` next to where the ledger would
+  be, which a later `git add -A` would commit; with no ledger there is nothing to read anyway.
+  If either file appears, delete it before committing. Apply the same method and return the
+  findings for the PR description only,
+  **without claim ids**. Ids in a description would not match the ones a ledger committed later
+  assigns.
+
+**Which ledger the server writes.** An MCP client starts claims-mcp once, and a relative
+`--catalog` resolves against the directory the session started in. If that is not the checkout
+the PR is built in (a git worktree, another clone), the MCP tools would write the wrong file and
+pin the wrong commit. In that case make every call through `scripts/claims_call.py`, which
+starts its own server for the ledger you name:
+
+```bash
+python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json list_claims '{"tag": "from-issue:42"}'
+python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json < calls.json
+```
+
+`calls.json` is a JSON list of `{"tool", "arguments"}`; the calls run in order and stop at the
+first error. The server pins anchors to `HEAD` of the repository holding the ledger.
+
+### Before the audit
+
+The change must be **committed**: anchors pin `HEAD`, and evidence recorded on uncommitted code
+is `unpinned`. The author commits the implementation, then asks for the audit, and commits the
+ledger last in a commit of its own.
+
+### Claims to check
+
+1. **Existing claims first.** `list_claims` with the changed paths as `artifact`, and with
+   `text` from the issue title. Claims registered while the work was planned get evidence and
+   verdicts; do not register duplicates.
+2. **The issue's requirements and acceptance criteria.** `source` is the issue URL.
+3. **The PR description's statements of fact about the change**: what it changed or removed,
+   what was run and passed, how behavior changed, what the tests cover. Quote each one exactly
+   in `source`; split statements that join several facts. Skip intentions and plans.
+4. Tag every new claim `from-issue:N` (not `issue:N`, which names a refuted claim's tracking
+   issue). Link them under an existing parent where one fits, otherwise under one new parent
+   for the issue.
+
+Check each claim yourself:
+
+- **Runs**: rerun the command ("tests pass", "clippy clean") on the head commit and record the
+  command as the locator, with the counts it printed. A manual check you cannot repeat is
+  `not_enough_info`, not `refuted`.
+- **Universal claims** ("renamed everywhere", "every variant is tested"): search the whole
+  repository at head, not the diff. Leftovers are usually in files the PR did not touch.
+- **Fixes and new behavior**: check the code does it, then find a test that exercises the
+  defect's input and asserts the fixed outcome. Read the assertion, not the test's name.
+- **No behavior change**: every non-test hunk that changes semantics and that the description
+  does not mention refutes it.
+
+### Regressions
+
+Call `recheck`. For each anchor it reports as `changed`, `overturned`, or `missing` in a file the
+diff touched, re-audit that claim on the head commit and record a new verdict. Anchors that only
+`moved` still hold. Report the rest of the `recheck` output without acting on it: drift in files
+this PR did not touch is not this PR's finding.
+
+### Ours or elsewhere
+
+Classify every `refuted` claim:
+
+- **Ours**: a claim from the issue or the PR description, or an existing claim this diff broke.
+  The author must fix it before the PR opens: fix the code (or, for a description statement
+  that is simply wrong, the description), commit, and have those claims re-audited on the new
+  head. Resume the same auditor if the harness can (Claude Code's SendMessage resumes a
+  finished subagent); otherwise start a fresh auditor on the same non-author model and give it
+  the previous hand-back and the claims to re-audit. A new verdict appends to the history;
+  nothing is deleted.
+- **Elsewhere**: a problem in code this PR did not change, found along the way. Record it as
+  `refuted` with its `Fix:` line, leave it in the ledger, and list it in the PR description as
+  pre-existing. It does not block the PR.
+
+`not_enough_info` never blocks; list it with what would decide it.
+
+### Hand-back
+
+The auditor returns, per claim: id (ledger mode only), the statement, the verdict, the key
+evidence locator, ours or elsewhere, and the `Fix:` step for anything not supported. It also
+lists `recheck` findings and the evidence ids it recorded. The author checks it against
+`audit_report` before using its numbers.
+
+### Commit and describe
+
+In ledger mode, run `claims-mcp --catalog claims.json verify` and commit `claims.json` alone
+(`chore(claims): audit the change for #N`). Then add a `## Claims` section to the PR
+description:
+
+```markdown
+## Claims
+
+| Claim | Verdict | Evidence |
+|-------|---------|----------|
+| CLM-0190 "parse_config rejects files over 1 MiB" | supported | `cargo test config::too_large` (1 passed) |
+| CLM-0044 "README lists every subcommand" (pre-existing) | refuted | `seal` missing from README.md:120; Fix: add it |
+```
+
+In table-only mode, drop the ids and add one line saying the repository has no claims ledger.
+In ledger mode, also write: "Merge with a merge commit: the ledger's anchors pin this branch's
+commits." A squash or rebase merge leaves them as `commit_missing`.
+
+### When main's ledger moved
+
+Ids come from sealed counters on each branch, so two branches that both added claims or both
+added evidence hand out the same ids. Git may report a conflict, or it may **merge cleanly**:
+two branches that each added one evidence item to different claims merge without a conflict
+into a ledger holding two `EVD-0001` records, which the server then refuses to read at all.
+
+So before pushing, and again before merging, check whether main's ledger changed since the
+branch's base (`git diff --quiet <merge-base> origin/main -- claims.json`). If it did, never
+merge or hand-edit `claims.json`: take main's file (`git checkout origin/main -- claims.json`),
+record this PR's findings again through the tools from the auditor's hand-back, and commit that.
+The ids change, so update the PR description's table. A CI step running `claims-mcp verify` on
+the PR's merge result catches the case that slipped through.
 
 ## Anti-patterns
 
