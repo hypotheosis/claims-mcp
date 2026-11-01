@@ -276,18 +276,22 @@ The call then reads or writes that ledger and pins anchors to `HEAD` of the repo
 holds it. A call that leaves `catalog` out goes to the session's ledger, so one forgotten
 argument writes the wrong file; check with `git status` in both checkouts before committing.
 
-Check the tools' input schemas first: if they have no `catalog` property, the connected server
-predates the argument and silently ignores it, so a call would write the session's ledger. (The
-released 0.2.4 and earlier lack it, but the version alone doesn't tell you, since unreleased
-builds report the last version.) Then make every call through `scripts/claims_call.py`, which starts its own server for the ledger you name:
+**Check that the connected server honours `catalog` before the first call that names one.** A
+server older than 0.2.5 does not have the argument and silently ignores it, so every call would
+go to the session's ledger. Neither the version nor the tool schema you see settles it: an
+unreleased build reports the last released version, and a client can keep showing the schema it
+loaded before the server was upgraded or reconnected. Ask the server instead:
 
-```bash
-python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json list_claims '{"tag": "from-issue:42"}'
-python3 <this-skill>/scripts/claims_call.py --catalog <checkout>/claims.json < calls.json
+```json
+list_claims {"catalog": ""}
 ```
 
-`calls.json` is a JSON list of `{"tool", "arguments"}`; the calls run in order and stop at the
-first error. The server pins anchors to `HEAD` of the repository holding the ledger.
+A server that supports `catalog` refuses an empty path with an error ("catalog must be a path to
+a ledger file, or omitted to use the server's own"). That error means you can go ahead. If the
+call **succeeds**, the server ignored the argument: **stop**, make no further claims-mcp calls,
+and ask the user to upgrade claims-mcp and restart the session or reconnect the server (`/mcp`
+in Claude Code). Delete the `.claims.json.lock` that call may have left in the session's
+directory.
 
 ### Before the audit
 

@@ -34,6 +34,12 @@ session's ledger and pin that repository's commit. Because the choice is made pe
 stored in the server, agents sharing one connection can each work on their own ledger at the
 same time.
 
+Servers before 0.2.5 don't have `catalog` and ignore it without an error, writing the session's
+ledger instead. To check the server you're connected to, call any tool with `"catalog": ""`:
+a server that supports the parameter refuses the empty path, and an older one answers as if it
+weren't there. The tool schema your client shows isn't proof, because a client can keep the
+schema from before the server was upgraded.
+
 ## add_claim
 
 | Parameter | Required | Meaning |
