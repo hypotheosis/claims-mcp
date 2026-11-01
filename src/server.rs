@@ -415,7 +415,11 @@ impl ClaimsServer {
                 "catalog must be a path to a ledger file, or omitted to use the server's own"
                     .to_owned(),
             )),
-            Some(path) => Ok(CatalogStore::new(path)),
+            Some(path) => {
+                // Logged so a write to the wrong ledger can be traced from stderr.
+                tracing::debug!(catalog = %path.display(), "call names its own ledger");
+                Ok(CatalogStore::new(path))
+            }
         }
     }
 
