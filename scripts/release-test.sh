@@ -555,6 +555,33 @@ test_ship_guards() {
     pass 'ship: a bad reviewer login, no PR URL, a failed thread query, and a bad merge commit'
 }
 
+# A tag push refused after the merge (here by a pre-receive hook) names the commands that
+# finish the release, and running them does.
+test_ship_names_recovery_when_tag_push_fails() {
+    local work integration hook command
+    work="$(create_repository ship-tag-push)"
+    integration="$(second_clone ship-tag-push integration)"
+    hook="${SCRATCH}/ship-tag-push.git/hooks/pre-receive"
+    prepare_release "${work}"
+    printf '#!/usr/bin/env bash\nif grep -q " refs/tags/"; then exit 1; fi\n' >"${hook}"
+    chmod +x "${hook}"
+    TEST_INTEGRATION_CLONE="${integration}" TEST_RELEASE_BRANCH='release/v1.2.3' \
+        run_script "${work}" scripts/release-ship.sh
+    assert_rejected 'a refused tag push' "${PR_URL} merged, but pushing v1.2.3 failed"
+    command="${RUN_OUTPUT##*Finish the release with: }"
+    [[ "${command}" == 'git push origin refs/tags/v1.2.3 && git merge --ff-only origin/main' ]] \
+        || fail "unexpected recovery command: ${command}"
+    rm "${hook}"
+    (cd "${work}" && eval "${command}" >/dev/null 2>&1) || fail 'the recovery command failed'
+    [[ "$(git --git-dir="${SCRATCH}/ship-tag-push.git" rev-parse 'v1.2.3^{commit}')" \
+        == "$(git --git-dir="${SCRATCH}/ship-tag-push.git" rev-parse main)" ]] \
+        || fail 'the recovery did not push the tag on the merge commit'
+    [[ "$(git -C "${work}" rev-parse HEAD)" \
+        == "$(git --git-dir="${SCRATCH}/ship-tag-push.git" rev-parse main)" ]] \
+        || fail 'the recovery did not fast-forward local main'
+    pass 'ship: a failed tag push after the merge names the commands that finish the release'
+}
+
 test_ship_tags_merge_commit() {
     local work integration gh_log tagged
     work="$(create_repository ship-ok)"
@@ -701,6 +728,7 @@ main() {
     test_ship_stops_on_review
     test_ship_closes_when_main_moves
     test_ship_guards
+    test_ship_names_recovery_when_tag_push_fails
     test_ship_tags_merge_commit
     test_branch_check
     test_abort_refusals

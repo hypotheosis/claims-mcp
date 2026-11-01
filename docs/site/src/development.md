@@ -69,7 +69,9 @@ then:
    fast-forwards local `main`. The tag starts `release.yml`, which publishes the release.
 
 When it stops on a check or a review, the pull request stays open and no tag is pushed (the
-local tag from `just release-prepare` stays where it is). It refuses to start unless
+local tag from `just release-prepare` stays where it is). If the pull request merges but the
+tag push fails, it stops and prints the commands that finish the release:
+`git push origin refs/tags/vX.Y.Z && git merge --ff-only origin/main`. It refuses to start unless
 `HEAD` carries the tag for the `Cargo.toml` version, that tag is not on `origin`, and `HEAD` is a
 single-parent commit directly on the current `origin/main`.
 

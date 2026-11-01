@@ -132,7 +132,13 @@ git merge-base --is-ancestor HEAD "${MERGE_COMMIT}" \
 TAG_MESSAGE="$(git for-each-ref --format='%(contents:subject)' "refs/tags/${RELEASE_TAG}")"
 readonly TAG_MESSAGE
 git tag --force --annotate "${RELEASE_TAG}" "${MERGE_COMMIT}" --message "${TAG_MESSAGE}" >/dev/null
-git push --quiet origin "refs/tags/${RELEASE_TAG}"
+# The pull request has merged, so neither a rerun (HEAD no longer carries the tag) nor
+# `just release-abort` (the pull request merged) can pick the release up again: say how to
+# finish it by hand.
+git push --quiet origin "refs/tags/${RELEASE_TAG}" \
+    || fail "${PR_URL} merged, but pushing ${RELEASE_TAG} failed; the local tag is on the merge \
+commit. Finish the release with: git push origin refs/tags/${RELEASE_TAG} && \
+git merge --ff-only origin/main"
 git merge --quiet --ff-only refs/remotes/origin/main
 
 printf 'released %s from %s; release.yml publishes it\n' "${RELEASE_TAG}" "${MERGE_COMMIT}"
